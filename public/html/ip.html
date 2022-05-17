@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<!-- Head -->
+<head>
+
+  <!-- Basic Page Needs -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Set IP</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/palette.css">
+  <link rel="stylesheet" href="../assets/fontawesome/all.css">
+  <style>
+    /* Page specific CSS */
+    @media (hover: hover) {
+      .hover-red:hover {
+        color: var(--r70);
+      }
+    }
+
+  </style>
+
+  <!-- JavaScript -->
+  <script defer src="../html/ip.js"></script>
+  <script src="../js/helper.js"></script>
+  <script>
+    // Page specific JavaScriptg
+  </script>
+
+</head>
+
+<!-- Body -->
+<body>
+  <noscript>You need to enable JavaScript to run this app</noscript>
+
+  <!-- Main -->
+  <main class="grid">
+
+    <!-- Network Interfaces -->
+    <section class="radius-0">
+
+      <!-- Heading -->
+      <h4>
+        Network Interfaces
+        <p>Save IP settings and create presets</p>
+      </h4>
+      
+      <!-- NIC -->
+      <div class="grid">
+        <label for="selectNic" class="w70-t">Select a NIC</label>
+        <select id="selectNic" class="fill w30">
+          <option>WiFi</option>
+          <option>Ethernet</option>
+          <option>vEthernet (WSL)</option>
+          <option>VirtualBox Host-Only Network</option>
+        </select>
+      </div>
+
+      <section class="flex w30-bdr pad radius t-mono">
+        <div class="grid" style="gap: 0px;" id="nicInfo">
+          <span class="w90-t     ">xxx.xxx.xxx.xxx</span>
+          <span class="w50-t t-sm">Mask: xxx.xxx.xxx.xxx</span>
+          <span class="w50-t t-sm">Gate: xxx.xxx.xxx.xxx</span>
+          <span class="w50-t t-sm">DNS1: xxx.xxx.xxx.xxx</span>
+          <span class="w50-t t-sm">DNS2: xxx.xxx.xxx.xxx</span>
+        </div>
+        <a class="w50-t right" onclick="dialogOpen('dialog')">
+          <i class="fa fa-user"></i>
+        </a>
+      </section>
+      
+      <br>
+      
+      <!-- Presets -->
+      <p class="w70-t">Then a Preset</p>
+      <div class="grid auto-sm t-mono" id="presetsCards">
+        
+        <!-- DHCP -->
+        <div>
+          <input type="radio" name="radioSet1" id="setDhcp" class="button" checked>
+          <label for="setDhcp" class="flex">
+            <div class="grid" style="gap: 0px;">
+              <span class="          ">DHCP</span>
+            </div>
+            <i class="fa fa-server w50-t right"></i>
+          </label>
+        </div>
+          
+        <!-- Add Preset -->
+        <div>
+          <a class="w30-bdr w90-t pad radius flex align-center" 
+             onclick="dialogOpen('dialog')">
+            <span>Add Preset...</span>
+            <i class="fa fa-add right w50-t"></i>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- JS to add preset cards -->
+      <div class="grid auto-sm t-mono fill" id="presetCards"></div>
+      <!-- <div>
+        <input type="radio" name="radioSet1" id="rad2" class="button">
+        <label for="rad2" class="flex">
+          <div class="grid gap-0">
+            <span class="          ">192.168.1.9</span>
+            <span class="w50-t t-sm">Mask: 255.255.255.0</span>
+            <span class="w50-t t-sm">Gate: 192.168.1.254</span>
+            <span class="w50-t t-sm">DNS1: 192.168.1.1</span>
+            <span class="w50-t t-sm">DNS2: 192.168.1.1</span>
+          </div>
+          <a class="w50-t right hover-red">
+            <i class="fa fa-trash"></i>
+          </a>
+        </label>
+      </div> -->
+
+
+    </section>
+
+    <!-- Set IP Popup -->
+    <dialog id="dialog" onclick="dialogBackgroundClose('dialog')">
+      <section class="w10 w50-bdr gap fill width-md relative">
+        <div class="exit">
+          <a class="fa fa-xl fa-xmark" onclick="dialogClose('dialog')"></a>
+        </div>
+        <h4>
+          Set Network Settings
+          <p>IP Address and DNS Servers</p>
+        </h4>
+
+        <!-- Set IP + DNS -->
+        <div class="flex even align-start break-md">
+
+          <!-- Set IP -->
+          <div class="grid">
+            <div>
+              <label>
+                IP address <br>
+                <input type="text" id="ipAddr" class="fill t-mono" placeholder="192.168.1.2">
+              </label>
+            </div>
+            <div>
+              <label>
+                Subnet Mask <br>
+                <input type="text" id="subnetMask" class="fill t-mono" placeholder="255.255.255.0">
+              </label>
+            </div>
+            <div>
+              <label>
+                Gateway <br>
+                <input type="text" id="gateway" class="fill t-mono" placeholder="192.168.1.1">
+              </label>
+            </div>
+          </div>
+          
+          <!-- Set DNS -->
+          <div class="grid">
+            <div>
+              <label>
+                DNS 1 <br>
+                <input type="text" id="dns1" class="fill t-mono" placeholder="192.168.1.1">
+              </label>
+            </div>
+            <div>
+              <label>
+                DNS 2 <br>
+                <input type="text" id="dns2" class="fill t-mono" placeholder="1.1.1.1">
+              </label>
+            </div>  
+          </div>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex">
+          <button id="setIpBtn" class="grow a30" onclick="dialogClose('dialog')">
+            Set Network Settings
+          </button>
+          <button id="savePresetBtn" class="grow g30" onclick="dialogClose('dialog')">
+            Save New Preset
+          </button>
+        </div>
+        
+
+      </section>
+    </dialog>
+      
+  </main>
+
+  
+  <footer class="grid">
+
+    <!-- Cheatsheet -->
+    <details>
+      <summary class="w30-t">Subnet Mask Cheatsheet</summary>
+      <table class="fill width-md">
+        <tbody>
+        <tr class="w70-t"> 
+             <th>Mask</th> <th>Subnet Mask</th>     <th># of IPs</th> 
+        </tr>
+        <tr> <td>/30</td>  <td>255.255.255.252</td> <td>4</td>        </tr>
+        <tr> <td>/29</td>  <td>255.255.255.248</td> <td>8</td>        </tr>
+        <tr> <td>/28</td>  <td>255.255.255.240</td> <td>16</td>       </tr>
+        <tr> <td>/27</td>  <td>255.255.255.224</td> <td>32</td>       </tr>
+        <tr> <td>/26</td>  <td>255.255.255.192</td> <td>64</td>       </tr>
+        <tr> <td>/25</td>  <td>255.255.255.128</td> <td>128</td>      </tr>
+        <tr> <td>/24</td>  <td>255.255.255.0</td>   <td>256</td>      </tr>
+        <tr> <td>/23</td>  <td>255.255.254.0</td>   <td>512</td>      </tr>
+        <tr> <td>/22</td>  <td>255.255.252.0</td>   <td>1024</td>     </tr>
+        <tr> <td>/21</td>  <td>255.255.248.0</td>   <td>2048</td>     </tr>
+        <tr> <td>/20</td>  <td>255.255.240.0</td>   <td>4096</td>     </tr>
+        <tr> <td>/19</td>  <td>255.255.224.0</td>   <td>8192</td>     </tr>
+        <tr> <td>/18</td>  <td>255.255.192.0</td>   <td>16384</td>    </tr>
+        <tr> <td>/17</td>  <td>255.255.128.0</td>   <td>32768</td>    </tr>
+        <tr> <td>/16</td>  <td>255.255.0.0</td>     <td>65536</td>    </tr>
+        </tbody>
+      </table>
+    </details>
+  
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+https://fontawesome.com/docs/web/setup/host-yourself/webfonts
+https://fontawesome.com/v5/cheatsheet/free/regular
+
+<head>
+  <!--load all Font Awesome styles -->
+  <link href="/your-path/fontawesome/css/all.css" rel="stylesheet">
+</head>

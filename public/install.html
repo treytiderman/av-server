@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<!-- Head -->
+<head>
+
+  <!-- Basic Page Needs -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Install</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="./pwa/icons/ios/32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./pwa/icons/ios/16.png">
+  
+  <!-- PWA stuff -->
+  <script src="./sw.js"></script>
+  <script src="./pwa/sw-start.js"></script>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" sizes="180x180" href="./pwa/icons/ios/180.png">
+  
+  <!-- CSS -->
+  <link defer rel="stylesheet" href="https://trey.app/css/base.css">
+  <link defer rel="stylesheet" href="https://trey.app/css/palette.css">
+  <link defer rel="stylesheet" href="../../assets/fontawesome/all.css">
+  <style>
+    /* Page specific CSS */
+  </style>
+
+  <!-- JavaScript -->
+  <script defer src="./js/helper.js"></script>
+  <script defer>
+    // Page specific JavaScript
+  </script>
+
+</head>
+
+<!-- Body -->
+<body>
+  <noscript>You need to enable JavaScript to run this app</noscript>
+
+  <!-- Nav -->
+  <button class="ham" onclick="navOpen('nav')"> <i class="fa fa-bars"></i> </button>
+  <nav class="ham" id="nav" onclick="navBackgroundClose('nav')">
+    <a href="/macro"> <pre>Macros   <i class="fa fa-xl fa-home"></i></pre> </a>
+    <a href="/lgtv"> <pre>TV   <i class="fa fa-xl fa-tv"></i></pre> </a>
+    <a href="/smsl"> <pre>Speakers   <i class="fa fa-xl fa-volume-high"></i></pre> </a>
+    <a href="/cam"> <pre>Camera   <i class="fa fa-xl fa-camera"></i></pre> </a>
+    <a href="/install" style="margin-top: auto;" class="active"> <pre>Install   <i class="fa fa-xl fa-download"></i></pre> </a>
+  </nav>
+
+  <!-- Main -->
+  <main id="main" style="max-width: 400px">
+    <h4>
+      Install
+      <p>Install the PWA</p>
+    </h4>
+
+  </main>
+
+</body>
+
+</html>
