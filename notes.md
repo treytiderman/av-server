@@ -1,10 +1,22 @@
 # Features
 
-# IP Presets
-# DHCP server 
-# TCP server/client
-# Serial TX/RX
-# Test Patterns
+## IP Presets
+
+## DHCP server 
+
+## TCP server/client
+
+## Serial TX/RX
+
+## Test Patterns
+White, Black, Color Bars, Animations, Screen tearing
+
+## Midi DMX
+https://github.com/node-dmx/dmx
+
+## mDNS
+
+## DNS server
 
 ## Port Scanner
 https://github.com/eviltik/evilscan
@@ -12,6 +24,13 @@ https://stackoverflow.com/questions/15031625/can-i-scan-my-local-network-for-spe
 
 ## Packet Capture | PCAP
 https://www.npmjs.com/package/pcap
+
+## NTP Server
+## Calculators
+ADA, TV Size, Rack Units
+## EDID Reader?
+## Noise Generator
+## Webcam viewer
 
 
 
