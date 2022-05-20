@@ -13,6 +13,8 @@ White, Black, Color Bars, Animations, Screen tearing
 
 ## Midi DMX
 https://github.com/node-dmx/dmx
+https://github.com/andypotato/dmx-controller-demo
+https://medium.com/swlh/connect-your-interactive-experiences-to-a-dmx-lighting-controller-with-node-js-ce8a8bb15f8b
 
 ## mDNS
 
