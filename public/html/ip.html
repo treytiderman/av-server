@@ -20,7 +20,6 @@
         color: var(--r70);
       }
     }
-
   </style>
 
   <!-- JavaScript -->
@@ -66,7 +65,7 @@
             <span class="w50-t t-sm">DNS1: xxx.xxx.xxx.xxx</span>
             <span class="w50-t t-sm">DNS2: xxx.xxx.xxx.xxx</span>
           </div>
-          <a class="w50-t right" onclick="dialogOpen('dialog')">
+          <a class="w50-t right" onclick="dialogOpen('dialog')" id="addPresetBtn">
             <i class="fa fa-user"></i>
           </a>
         </div>
@@ -93,7 +92,7 @@
           <!-- Add Preset -->
           <div>
             <a class="w30-bdr w90-t pad radius flex align-center" 
-                onclick="dialogOpen('dialog')" style="height: 43px;">
+                onclick="dialogOpen('dialog')" id="addPresetBtn" style="height: 43px;">
               <span>Add Preset...</span>
               <i class="fa fa-add right w50-t"></i>
             </a>
@@ -194,7 +193,7 @@
       
   </main>
   
-  <footer class="grid">
+  <footer class="grid" style="display: none;">
 
     <!-- Cheatsheet -->
     <details>

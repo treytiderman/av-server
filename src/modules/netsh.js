@@ -84,7 +84,8 @@ class NICS {
       const interfaceText = interfacesText[i];
       if (interfaceText !== '') {        
         let myNIC = new NIC(interfaceText);
-        this.interfaces.push(myNIC);
+        if (myNIC.name.includes("Loopback") || myNIC.name.includes("Local Area")) { }
+        else {this.interfaces.push(myNIC);}
       }
     }
     return this.interfaces;

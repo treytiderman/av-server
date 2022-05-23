@@ -2,6 +2,7 @@
 const selectNic = document.getElementById('selectNic');
 const nicInfo = document.getElementById('nicInfo');
 const setIpBtn = document.getElementById('setIpBtn');
+const addPresetBtn = document.getElementById('addPresetBtn');
 const savePresetBtn = document.getElementById('savePresetBtn');
 const presetCards = document.getElementById('presetCards');
 const ipIsDhcp = document.getElementById('ipIsDhcp');
@@ -249,6 +250,28 @@ setIpBtn.addEventListener('click', () => {
   preset.nic = selectNic.value;
   post('/net/static', preset);
   uiPresetCards(PRESETS);
+
+})
+
+addPresetBtn.addEventListener('click', () => {
+
+  get('/net/nics').then( nics => {
+    let index = 0;
+    for (let i = 0; i < nics.length; i++) {
+      if (nics[i].name === selectNic.value) {index = i}
+    }
+    const nic = nics[index];
+
+    // IP
+    ipAddr.value = nic.ipAddr;
+    subnetMask.value = nic.subnet.mask;
+    gateway.value = nic.gateway;
+
+    // DNS
+    dns1.value = nic.dnsServers[0];
+    dns2.value = nic.dnsServers[1];
+
+  })
 
 })
 

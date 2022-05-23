@@ -48,7 +48,7 @@ npm run start
 npm run dev
 ```
 
-# get network interface info
+# get network interface config
 ```
 netsh interface ipv4 show config
 ```
@@ -73,6 +73,19 @@ Configuration for interface "Ethernet"
     DNS servers configured through DHCP:  192.168.1.1
     Register with which suffix:           None
     WINS servers configured through DHCP: None
+
+Configuration for interface "Ethernet2"
+    DHCP enabled:                         No
+    IP Address:                           192.168.1.9
+    Subnet Prefix:                        192.168.1.0/24 (mask 255.255.255.0)
+    IP Address:                           192.168.1.92
+    Subnet Prefix:                        192.168.1.0/24 (mask 255.255.255.0)
+    Default Gateway:                      192.168.1.254
+    Gateway Metric:                       1
+    InterfaceMetric:                      25
+    Statically Configured DNS Servers:    None
+    Register with which suffix:           None
+    Statically Configured WINS Servers:   None
 
 Configuration for interface "VirtualBox Host-Only Network"
     DHCP enabled:                         No
@@ -116,6 +129,14 @@ netsh interface ipv4 set address name="Ethernet" static 192.168.1.9 255.255.255.
 
 ```
 
+# add network interface address to nic
+```
+netsh interface ipv4 add address name="Ethernet" 192.168.1.92 255.255.255.0
+```
+```
+
+```
+
 # set network interface dns to dhcp
 ```
 netsh interface ipv4 set dns name="Ethernet" source=dhcp
@@ -145,8 +166,6 @@ netsh interface ipv4 set address name="Ethernet" static 192.168.1.99 255.255.255
 netsh interface ipv4 set address name="Ethernet" source=dhcp
 
 
-
-
 netsh interface ipv4 set dns name="YOUR INTERFACE NAME" static DNS_SERVER
 netsh interface ipv4 set dns name="YOUR INTERFACE NAME" static DNS_SERVER index=2
 netsh interface ipv4 set dnsservers name"YOUR INTERFACE NAME" source=dhcp
@@ -155,3 +174,22 @@ netsh interface ipv4 set dns name="Ethernet" static 192.168.1.1
 netsh interface ipv4 add dns name="Ethernet" 1.1.1.1 index=2
 netsh interface ipv4 set dns name="Ethernet" source=dhcp
 
+
+
+
+# set interface metric
+```
+netsh interface ipv4 set interface Ethernet metric=3
+netsh interface ipv4 set interface Ethernet metric=auto
+```
+```
+Ok.
+
+```
+
+
+
+# How to Show Multicast Joins for all Network Interfaces
+```
+netsh interface ip show joins
+```

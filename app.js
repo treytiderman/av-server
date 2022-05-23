@@ -21,7 +21,13 @@ app.use(log);
 
 // Router /
 app.get('/', async (req, res) => {
+  res.send( await fs.readFile('./public/html/home.html','utf8') );
+});
+app.get('/ip', async (req, res) => {
   res.send( await fs.readFile('./public/html/ip.html','utf8') );
+});
+app.get('/dhcp', async (req, res) => {
+  res.send( await fs.readFile('./public/html/dhcp.html','utf8') );
 });
 app.get('/api', async (req, res) => {
   res.status(200).send( await fs.readFile('./public/html/api/test.html','utf8') )

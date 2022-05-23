@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<!-- Head -->
+<head>
+
+  <!-- Basic Page Needs -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Set IP</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/palette.css">
+  <link rel="stylesheet" href="../assets/fontawesome/all.css">
+  <style>
+    /* Page specific CSS */
+    @media (hover: hover) {
+      .hover-red:hover {
+        color: var(--r70);
+      }
+    }
+    .fixed-tr {
+      position: absolute;
+      top: var(--padding-y);
+      right: var(--padding-x);
+    }
+    .grid.auto-c{
+      grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    }
+
+  </style>
+
+  <!-- JavaScript -->
+  <script defer src="../html/dhcp.js"></script>
+  <script src="../js/helper.js"></script>
+  <script>
+    // Page specific JavaScriptg
+  </script>
+
+</head>
+
+<!-- Body -->
+<body>
+  <noscript>You need to enable JavaScript to run this app</noscript>
+
+  <!-- Main -->
+  <main class="">
+
+    <!-- Header -->
+    <h4>
+      DHCP Server
+      <p>Setup and run a DHCP server</p>
+    </h4>
+
+    <div class="flex align-start break-lg">
+      
+      <!-- DHCP Server | Settings -->
+      <section style="max-width: 400px">
+        <h5>Settings</h5>
+  
+        <!-- On / Off -->
+        <div class="flex even width-sm">
+          <!-- <button class="g30">On</button>
+          <button class="r10 r30-bdr r30-t">Off</button> -->
+          <button class="g10 g30-bdr g30-t">On</button>
+          <button class="r30">Off</button>
+        </div>
+  
+        <!-- Settings -->
+        <div class="grid">
+  
+          <div class="flex even break-md">
+            <label>
+              DHCP Range Start <br>
+              <input type="text" id="ipAddr" class="fill t-mono" placeholder="192.168.1.100">
+            </label>
+            <label>
+              DHCP Range End <br>
+              <input type="text" id="ipAddr" class="fill t-mono" placeholder="192.168.1.254">
+            </label>
+          </div>
+          <div class="flex even break-md">
+            <label>
+              Subnet Mask <br>
+              <input type="text" id="subnetMask" class="fill t-mono" placeholder="255.255.255.0">
+            </label>
+            <label>
+              Gateway <br>
+              <input type="text" id="gateway" class="fill t-mono" placeholder="192.168.1.1">
+            </label>
+          </div>
+          <div class="flex even break-md">
+            <label>
+              DNS 1 <br>
+              <input type="text" id="dns1" class="fill t-mono" placeholder="192.168.1.1">
+            </label>
+            <label>
+              DNS 2 <br>
+              <input type="text" id="dns2" class="fill t-mono" placeholder="1.1.1.1">
+            </label>
+          </div> 
+  
+        </div>
+  
+      </section>
+  
+      <!-- DHCP Server | Settings -->
+      <section class="grow">
+        <h5>Addresses</h5>
+        
+        <div class="grid auto-c t-mono fill" id="">
+          <div class="w30-bdr grid pad radius gap-0 relative">
+            <span class="          ">xxx.xxx.xxx.xxx</span>
+            <span class="w50-t t-sm">FF:FF:FF:FF:FF:FF</span>
+            <span class="w50-t t-sm">HOSTNAME</span>
+            <a class="w30-t fixed-tr"> <i class="fa fa-lock-open"></i> </a>
+          </div>
+          <div class="w30-bdr grid pad radius gap-0 relative">
+            <span class="          ">192.168.1.110</span>
+            <span class="w50-t t-sm">00:D8:61:1A:8E:7B</span>
+            <span class="w50-t t-sm">Trey-PC</span>
+            <a class="w50-t fixed-tr"> <i class="fa fa-lock"></i> </a>
+          </div>
+          <div class="w30-bdr grid pad radius gap-0 relative">
+            <span class="          ">192.168.1.110</span>
+            <span class="w50-t t-sm">00:D8:61:1A:8E:7B</span>
+            <span class="w50-t t-sm">Trey-PC</span>
+            <a class="w30-t fixed-tr"> <i class="fa fa-lock-open"></i> </a>
+          </div>
+          <div class="w30-bdr grid pad radius gap-0 relative">
+            <span class="          ">192.168.1.110</span>
+            <span class="w50-t t-sm">00:D8:61:1A:8E:7B</span>
+            <span class="w50-t t-sm">Trey-PC</span>
+            <a class="w30-t fixed-tr"> <i class="fa fa-lock-open"></i> </a>
+          </div>
+        </div>
+  
+      </section>
+
+    </div>
+
+      
+  </main>
+  
+  <footer class="grid">
+  
+  </footer>
+
+</body>
+</html>

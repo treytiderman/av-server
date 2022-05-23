@@ -746,10 +746,6 @@ dialog {
   place-items: center;
 }
 
-.relative {
-  position: relative;
-}
-
 .exit {
   position: absolute;
   top: 1rem;
@@ -831,6 +827,10 @@ dialog {
 .resize {
   resize: both;
   overflow: auto;
+}
+
+.relative {
+  position: relative;
 }
 
 .fixed {
@@ -920,13 +920,6 @@ body.nav-fixed nav {
   flex-wrap: wrap;
 }
 
-.gap-0 { gap: 0; }
-.gap-1 { gap: 1rem; }
-.gap-2 { gap: 2rem; }
-.gap-3 { gap: 3rem; }
-.gap-4 { gap: 4rem; }
-.gap-5 { gap: 5rem; }
-
 .align-end { align-items: flex-end; }
 .align-start { align-items: flex-start; }
 .align-center { align-items: center; }
@@ -989,5 +982,12 @@ body.nav-fixed nav {
 .span-10 { grid-column: auto / span 10 }
 .span-11 { grid-column: auto / span 11 }
 .span-12 { grid-column: auto / span 12 }
+
+.gap-0 { gap: 0; }
+.gap-1 { gap: 1rem; }
+.gap-2 { gap: 2rem; }
+.gap-3 { gap: 3rem; }
+.gap-4 { gap: 4rem; }
+.gap-5 { gap: 5rem; }
 
 /* #endregion Grid */
