@@ -32,8 +32,8 @@
   </style>
 
   <!-- JavaScript -->
-  <script defer src="../html/dhcp.js"></script>
   <script src="../js/helper.js"></script>
+  <!-- <script defer src="../html/dhcp.js"></script> -->
   <script>
     // Page specific JavaScriptg
   </script>
@@ -60,11 +60,24 @@
         <h5>Settings</h5>
   
         <!-- On / Off -->
-        <div class="flex even width-sm">
-          <!-- <button class="g30">On</button>
-          <button class="r10 r30-bdr r30-t">Off</button> -->
-          <button class="g10 g30-bdr g30-t">On</button>
-          <button class="r30">Off</button>
+        <div class="flex even" id="power">
+          <button class="g10 g30-bdr g30-t" onclick="powerCSS(event)">On</button>
+          <button class="r30" onclick="powerCSS(event)">Off</button>
+          <script>
+            function powerCSS(event) {
+              const powerDiv = event.target.parentElement;
+              const powerOn = powerDiv.children[0];
+              const powerOff = powerDiv.children[1];
+              if (powerOff.classList.value === 'r30') {
+                powerOn.classList = 'g30'
+                powerOff.classList = 'r10 r30-bdr r30-t'
+              }
+              else {
+                powerOn.classList = 'g10 g30-bdr g30-t'
+                powerOff.classList = 'r30'
+              }
+            }
+          </script>
         </div>
   
         <!-- Settings -->
@@ -107,7 +120,7 @@
   
       <!-- DHCP Server | Settings -->
       <section class="grow">
-        <h5>Addresses</h5>
+        <h5>Client Addresses</h5>
         
         <div class="grid auto-c t-mono fill" id="">
           <div class="w30-bdr grid pad radius gap-0 relative">

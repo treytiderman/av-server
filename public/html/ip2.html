@@ -16,14 +16,35 @@
   <style>
     /* Page specific CSS */
     @media (hover: hover) {
+      .hover-red:focus,
       .hover-red:hover {
         color: var(--r70);
       }
+      .hover-green:focus,
+      .hover-green:hover {
+        color: var(--g70);
+      }
+      .hover-blue:focus,
+      .hover-blue:hover {
+        color: var(--b70);
+      }
     }
-
+    .checked {
+      position: relative;
+    }
+    .topRight {
+      display: none;
+      position: absolute;
+      top: var(--padding-y);
+      right: var(--padding-x);
+    }
+    .checked > .topRight {
+      display: block;
+    }
   </style>
 
   <!-- JavaScript -->
+  <script defer src="../html/ip2.js"></script>
   <script src="../js/helper.js"></script>
   <script>
     // Page specific JavaScriptg
@@ -32,7 +53,7 @@
 </head>
 
 <!-- Body -->
-<body class="black">
+<body>
   <noscript>You need to enable JavaScript to run this app</noscript>
 
   <!-- Main -->
@@ -48,75 +69,111 @@
     <div class="flex align-start break-lg">
 
       <!-- Select a NIC -->
-      <section class="gap g70-bdr" style="max-width: 350px; border-width: 3px;">
-        <p class="g70-t">Select a NIC</p>
+      <section style="max-width: 350px">
+        <p class="w70-t">Select a NIC</p>
         <label for="selectNic" class="w70-t" hidden>Select a NIC</label>
-        <select id="selectNic" class="fill g70" style="height: 43px;">
+        <select id="selectNic" class="fill" style="height: 43px;">
           <option>WiFi</option>
           <option>Ethernet</option>
           <option>vEthernet (WSL)</option>
           <option>VirtualBox Host-Only Network</option>
         </select>
-        <div class="flex g50-bdr pad radius t-mono">
+        <div class="flex w30-bdr pad radius t-mono">
           <div class="grid" style="gap: 0px;" id="nicInfo">
-            <span class="g90-t     ">xxx.xxx.xxx.xxx</span>
-            <span class="g70-t t-sm">Mask: xxx.xxx.xxx.xxx</span>
-            <span class="g70-t t-sm">Gate: xxx.xxx.xxx.xxx</span>
-            <span class="g70-t t-sm">DNS1: xxx.xxx.xxx.xxx</span>
-            <span class="g70-t t-sm">DNS2: xxx.xxx.xxx.xxx</span>
+            <span class="w90-t     ">xxx.xxx.xxx.xxx</span>
+            <span class="w50-t t-sm">Mask: xxx.xxx.xxx.xxx</span>
+            <span class="w50-t t-sm">Gate: xxx.xxx.xxx.xxx</span>
+            <span class="w50-t t-sm">DNS1: xxx.xxx.xxx.xxx</span>
+            <span class="w50-t t-sm">DNS2: xxx.xxx.xxx.xxx</span>
           </div>
-          <a class="g50-t right" onclick="dialogOpen('dialog')">
+          <a class="w50-t right" onclick="dialogOpen('dialog')" id="addPresetBtn">
             <i class="fa fa-user"></i>
           </a>
         </div>
       </section>
 
       <!-- Then a Preset -->
-      <section class="grow gap b70-bdr" style="border-width: 3px;">
-        <p class="b70-t">Then a Preset</p>
+      <section class="grow">
+        <p class="w70-t">Then a Preset</p>
 
-        <!-- Permanent Cards | DHCP, Add preset -->
-        <div class="grid auto-sm t-mono">
+        <!-- Functions | Set, Add, Remove -->
+        <div class="flex t-mono">
+
+          <button class="w30-bdr hover-green">
+            Set
+            <i class="fa fa-check"></i>
+          </button>
+
+          <button class="w30-bdr hover-blue">
+            Add
+            <i class="fa fa-add"></i>
+          </button>
+
+          <button class="w30-bdr hover-red">
+            Remove
+            <i class="fa fa-trash"></i>
+          </button>
+
+        </div>
+
+        <!-- Permanent Cards | DHCP, New Preset -->
+        <div class="grid auto-sm t-mono fill">
 
           <!-- DHCP -->
-          <div>
-            <input type="radio" name="radioSet1" id="setDhcp" class="button" checked>
-            <label for="setDhcp" class="flex align-center" style="height: 43px;">
-              <div class="grid" style="gap: 0px;">
-                <span class="">DHCP</span>
-              </div>
-              <i class="fa fa-server b50-t right"></i>
-            </label>
-          </div>
-
-          <!-- Add Preset -->
-          <div>
-            <a class="b30-bdr b90-t pad radius flex align-center" 
-                onclick="dialogOpen('dialog')" style="height: 43px;">
-              <span>Add Preset...</span>
-              <i class="fa fa-add right b50-t"></i>
-            </a>
-          </div>
+          <button class="flex column align-start t-l gap-0 w10 w30-bdr" id="dhcpPreset">
+            <span class="w90-t     ">DHCP</span>
+            <span class="w50-t t-sm">Request an address from the server</span>
+            <div class="topRight"><i class="fa fa-check"></i></div>
+          </button>
+          
+          <!-- New Preset -->
+          <button class="flex column align-start t-l gap-0 w10 w30-bdr" 
+            onclick="dialogOpen('dialog')" 
+            id="addPresetBtn">
+            <span class="w90-t     ">New Preset...</span>
+            <span class="w50-t t-sm">Create a new preset</span>
+          </button>
 
         </div>
 
         <!-- Preset cards | JS to add -->
         <div class="grid auto-sm t-mono fill" id="presetCards">
-          <div>
-            <input type="radio" name="radioSet1" id="rad2" class="button">
-            <label for="rad2" class="flex">
-              <div class="grid gap-0">
-                <span class="          ">192.168.1.9</span>
-                <span class="w50-t t-sm">Mask: 255.255.255.0</span>
-                <span class="w50-t t-sm">Gate: 192.168.1.254</span>
-                <span class="w50-t t-sm">DNS1: 192.168.1.1</span>
-                <span class="w50-t t-sm">DNS2: 192.168.1.1</span>
-              </div>
-              <a class="w50-t right hover-red">
-                <i class="fa fa-trash"></i>
-              </a>
-            </label>
-          </div>
+          
+          <!-- Test Preset -->
+          <button class="grid t-l gap-0 w10 w30-bdr">
+            <span class="w90-t     ">192.168.1.9</span>
+            <span class="w50-t t-sm">Mask: 255.255.255.0</span>
+            <span class="w50-t t-sm">Gate: 192.168.1.254</span>
+            <span class="w50-t t-sm">DNS1: 192.168.1.1</span>
+            <span class="w50-t t-sm">DNS2: 192.168.1.1</span>
+            <div class="topRight"><i class="fa fa-check"></i></div>
+          </button>
+
+          <button class="grid t-l gap-0 w10 w30-bdr">
+            <span class="w90-t     ">192.168.1.2</span>
+            <span class="w50-t t-sm">Mask: 255.255.255.0</span>
+            <span class="w50-t t-sm">Gate: 192.168.1.254</span>
+            <span class="w50-t t-sm">DNS1: 192.168.1.1</span>
+            <span class="w50-t t-sm">DNS2: 192.168.1.1</span>
+            <div class="topRight"><i class="fa fa-check"></i></div>
+          </button>
+          <button class="grid t-l gap-0 w10 w30-bdr">
+            <span class="w90-t     ">192.168.1.3</span>
+            <span class="w50-t t-sm">Mask: 255.255.255.0</span>
+            <span class="w50-t t-sm">Gate: 192.168.1.254</span>
+            <span class="w50-t t-sm">DNS1: 192.168.1.1</span>
+            <span class="w50-t t-sm">DNS2: 192.168.1.1</span>
+            <div class="topRight"><i class="fa fa-check"></i></div>
+          </button>
+          <button class="grid t-l gap-0 w10 w30-bdr">
+            <span class="w90-t     ">192.168.1.4</span>
+            <span class="w50-t t-sm">Mask: 255.255.255.0</span>
+            <span class="w50-t t-sm">Gate: 192.168.1.254</span>
+            <span class="w50-t t-sm">DNS1: 192.168.1.1</span>
+            <span class="w50-t t-sm">DNS2: 192.168.1.1</span>
+            <div class="topRight"><i class="fa fa-check"></i></div>
+          </button>
+          
         </div>
 
       </section>
@@ -178,12 +235,15 @@
         </div>
 
         <!-- Buttons -->
-        <div class="flex">
-          <button id="setIpBtn" class="grow a30" onclick="dialogClose('dialog')">
-            Set Network Settings
+        <div class="flex even">
+          <button id="setIpBtn" class="w10 hover-blue" 
+            onclick="dialogClose('dialog')">
+            Set as Network Settings
           </button>
-          <button id="savePresetBtn" class="grow g30" onclick="dialogClose('dialog')">
-            Save New Preset
+          <button id="savePresetBtn" class="w30 w30-bdr hover-green" 
+            onclick="dialogClose('dialog')">
+            Create Preset 
+            <i class="fa fa-floppy-disk"></i>
           </button>
         </div>
         
@@ -192,6 +252,37 @@
     </dialog>
       
   </main>
+  
+  <footer class="grid" style="display: none;">
+
+    <!-- Cheatsheet -->
+    <details>
+      <summary class="w30-t">Subnet Mask Cheatsheet</summary>
+      <table class="fill width-md">
+        <tbody>
+        <tr class="w70-t"> 
+             <th>Mask</th> <th>Subnet Mask</th>     <th># of IPs</th> 
+        </tr>
+        <tr> <td>/30</td>  <td>255.255.255.252</td> <td>4</td>        </tr>
+        <tr> <td>/29</td>  <td>255.255.255.248</td> <td>8</td>        </tr>
+        <tr> <td>/28</td>  <td>255.255.255.240</td> <td>16</td>       </tr>
+        <tr> <td>/27</td>  <td>255.255.255.224</td> <td>32</td>       </tr>
+        <tr> <td>/26</td>  <td>255.255.255.192</td> <td>64</td>       </tr>
+        <tr> <td>/25</td>  <td>255.255.255.128</td> <td>128</td>      </tr>
+        <tr> <td>/24</td>  <td>255.255.255.0</td>   <td>256</td>      </tr>
+        <tr> <td>/23</td>  <td>255.255.254.0</td>   <td>512</td>      </tr>
+        <tr> <td>/22</td>  <td>255.255.252.0</td>   <td>1024</td>     </tr>
+        <tr> <td>/21</td>  <td>255.255.248.0</td>   <td>2048</td>     </tr>
+        <tr> <td>/20</td>  <td>255.255.240.0</td>   <td>4096</td>     </tr>
+        <tr> <td>/19</td>  <td>255.255.224.0</td>   <td>8192</td>     </tr>
+        <tr> <td>/18</td>  <td>255.255.192.0</td>   <td>16384</td>    </tr>
+        <tr> <td>/17</td>  <td>255.255.128.0</td>   <td>32768</td>    </tr>
+        <tr> <td>/16</td>  <td>255.255.0.0</td>     <td>65536</td>    </tr>
+        </tbody>
+      </table>
+    </details>
+  
+  </footer>
 
 </body>
 </html>

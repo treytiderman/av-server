@@ -52,8 +52,8 @@ body {
 
   /* Outline, Border, Border Radius */
   /* width | style | color */
-  --outline: 1px solid var(--l30);
-  --border: 1.6px solid var(--w50);
+  --outline: 2px solid var(--w70);
+  --border: 2px solid var(--w50);
   --radius: 0.4rem;
   --radius-2: 0.8rem;
 
@@ -116,7 +116,7 @@ main {
   margin: auto;
   display: block;
   max-width: 100%;
-  overflow-x: auto;
+  /* overflow-x: auto; */
   padding: var(--gap);
   border-radius: var(--radius-2);
 }
@@ -127,7 +127,7 @@ main {
 section, article {
   display: block;
   max-width: 100%;
-  overflow-x: auto;
+  /* overflow-x: auto; */
   border-radius: var(--radius-2);
   
   /* For outline-offset to work */
@@ -272,7 +272,8 @@ a:focus {
 
 a:hover {
   /* text-decoration: underline; */
-  color: var(--w90);
+  /* color: var(--w90); */
+  filter: brightness(150%);
 }
 
 b,
@@ -481,7 +482,7 @@ input[type=submit] {
   border-color: var(--w50);
 }
 
-select,
+/* select, */
 textarea,
 input[type="date"],
 input[type="datetime-local"],
@@ -496,6 +497,7 @@ input[type="time"],
 input[type="url"],
 input[type="week"] {
   border-color: var(--w30);
+  cursor: initial;
 }
 
 progress[value],
@@ -554,11 +556,6 @@ input + label {
   cursor: pointer;
 }
 
-:focus {
-  outline-offset: 2px;
-  outline: var(--outline);
-}
-
 /* Text selection */
 ::selection {
   color: var(--w10);
@@ -569,12 +566,15 @@ input + label {
   background: var(--a50);
 }
 
-/* Hover */
+/* Focus + Hover */
 @media (hover: hover) {
+  :focus,
   input:hover,
   select:hover,
   button:hover {
-    filter: brightness(80%);
+    /* outline-offset: -2px; */
+    /* outline: var(--outline); */
+    filter: brightness(150%);
   }
 }
 
@@ -989,5 +989,6 @@ body.nav-fixed nav {
 .gap-3 { gap: 3rem; }
 .gap-4 { gap: 4rem; }
 .gap-5 { gap: 5rem; }
+.gap-05 { gap: 0.5rem; }
 
 /* #endregion Grid */
