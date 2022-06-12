@@ -12,25 +12,19 @@ router.get('/nics', async (req, res) => {
   const nics = await netsh.getNics();
   res.json(nics);
 });
-router.post('/static', async (req, res) => {
+router.post('/dhcp/ip', async (req, res) => {
   const preset = JSON.parse(req.body);
-  const output = await netsh.setStatic(
-    preset.nic,
-    preset.ip,
-    preset.mask,
-    preset.gateway,
-    preset.dns[0],
-    preset.dns[1]
-  )
+  const output = await netsh.setDhcpIp(preset.nic);
   res.status(200).json(output);
 });
-router.post('/static/add', async (req, res) => {
+router.post('/dhcp/dns', async (req, res) => {
   const preset = JSON.parse(req.body);
-  const output = await netsh.addStaticIp(
-    preset.nic,
-    preset.ip,
-    preset.mask,
-  )
+  const output = await netsh.setDhcpDns(preset.nic);
+  res.status(200).json(output);
+});
+router.post('/dhcp', async (req, res) => {
+  const preset = JSON.parse(req.body);
+  const output = await netsh.setDhcp(preset.nic);
   res.status(200).json(output);
 });
 router.post('/static/ip', async (req, res) => {
@@ -52,19 +46,25 @@ router.post('/static/dns', async (req, res) => {
   )
   res.status(200).json(output);
 });
-router.post('/dhcp', async (req, res) => {
+router.post('/static/add', async (req, res) => {
   const preset = JSON.parse(req.body);
-  const output = await netsh.setDhcp(preset.nic);
+  const output = await netsh.addStaticIp(
+    preset.nic,
+    preset.ip,
+    preset.mask,
+  )
   res.status(200).json(output);
 });
-router.post('/dhcp/ip', async (req, res) => {
+router.post('/static', async (req, res) => {
   const preset = JSON.parse(req.body);
-  const output = await netsh.setDhcpIp(preset.nic);
-  res.status(200).json(output);
-});
-router.post('/dhcp/dns', async (req, res) => {
-  const preset = JSON.parse(req.body);
-  const output = await netsh.setDhcpDns(preset.nic);
+  const output = await netsh.setStatic(
+    preset.nic,
+    preset.ip,
+    preset.mask,
+    preset.gateway,
+    preset.dns[0],
+    preset.dns[1]
+  )
   res.status(200).json(output);
 });
 

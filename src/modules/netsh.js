@@ -110,11 +110,82 @@ class NICS {
     return this.interfaces;
   }
 }
+let nicsGlobal = [];
+
+
+
+// Validation
+function isNum(string) {
+  if (typeof string != "string") return false;
+  return !isNaN(string) && !isNaN(parseFloat(string))
+}
+function hasWhitespace(string) {
+  if (typeof string != "string") return false;
+  return /\s/.test(string);
+}
+function validNic(nicName) {
+  let valid = false;
+  if (nicName === null) return false
+  nicsGlobal.forEach(nic => {
+    if (nic.name === nicName) valid = true;
+  });
+  return valid
+}
+function validIp(ip) {
+  let validI = true;
+  if (ip === null) return false
+  const split = ip.split(".");
+  const periodCount = split.length - 1;
+  // Rules
+  if (periodCount !== 3) validI = false;
+  else {
+    // Each octet
+    for (let i = 0; i < split.length; i++) {
+      // Is number
+      if (isNum(split[i]) === false) validI = false;
+      // Check for white space
+      // else if (hasWhitespace(split[i])) validI = false;
+      // Number is in ip range 0-255
+      const num = Number(split[i]);
+      if (num < 0 || num > 255) validI = false;
+    } 
+  }
+  return validI;
+}
+function validMask(mask) {
+  let validM = true;
+  if (mask === null) return false
+  const split = mask.split(".");
+  const periodCount = split.length - 1;
+  // Rules
+  if (periodCount !== 3) validM = false;
+  else {
+    // Each octet
+    for (let i = 0; i < split.length; i++) {
+      // Is number
+      if (isNum(split[i]) === false) validM = false;
+      // Check for white space
+      // else if (hasWhitespace(split[i])) validM = false;
+    }
+    // Number is in a subnet mask
+    const mask12 = ['255','254','252','248','240','224','192','128','0'];
+    const mask3 = ['252','248','240','224','192','128','0'];
+    if (split[0] !== '255') validM = false;
+    else if (mask12.includes(split[1]) === false) validM = false;
+    else if (mask12.includes(split[2]) === false) validM = false;
+    else if (mask3.includes(split[3]) === false) validM = false;
+    else if (split[3] > split[2]) validM = false;
+    else if (split[2] > split[1]) validM = false;
+    else if (split[1] > split[0]) validM = false;
+  }
+  return validM; 
+}
 
 
 
 // Run a cli command
 async function runCmd(cmd) {
+  if (cmd !== 'netsh interface ipv4 show config') console.log(cmd);
   const { stdout, stderr } = await exec(cmd);
   if (stderr) { console.error(`stderr: ${stderr}`); return }
   return stdout
@@ -124,60 +195,68 @@ async function getNics() {
   const cmd = 'netsh interface ipv4 show config';
   const raw = await runCmd(cmd);
   const nics = new NICS(raw)
-  // console.log(nics);
+  nicsGlobal = nics;
   return nics;
 }
-getNics();
-// Set IP to be DHCP
+// DHCP
 async function setDhcpIp(nic) {
-  let cmd = `netsh interface ipv4 set address name="${nic}" source=dhcp`
-  return await runCmd(cmd);
+  if (validNic(nic)) {
+    let cmd = `netsh interface ipv4 set address name="${nic}" source=dhcp`
+    return await runCmd(cmd);
+  }
+  return 'failed'
 }
-// Set the DNS servers to DHCP
 async function setDhcpDns(nic) {
-  let cmd = `netsh interface ipv4 set dns name="${nic}" source=dhcp`
-  return await runCmd(cmd);
-}
-// Set a static IP address
-async function setStaticIp(nic, ip, mask, gateway) {
-  let cmd = `netsh interface ipv4 set address name="${nic}" static ${ip} ${mask} ${gateway}`
-  return await runCmd(cmd);
-}
-// Set static DNS servers
-async function setStaticDns(nic, dns, dns2 = null) {
-  let output = [];
-  let cmd = `netsh interface ipv4 set dns name="${nic}" static ${dns}`
-  if (dns2 !== null) {
-    let cmd2 = `netsh interface ipv4 add dns name="${nic}" ${dns2} index=2`
-    output[0] = await runCmd(cmd);
-    output[1] = await runCmd(cmd2);
-    return output
+  if (validNic(nic)) {
+    let cmd = `netsh interface ipv4 set dns name="${nic}" source=dhcp`
+    return await runCmd(cmd);
   }
-  output[0] = await runCmd(cmd);
-  output[1] = null;
-  return output
+  return 'failed'
 }
-// Set DHCP
 async function setDhcp(nic) {
-  let cmdIp = `netsh interface ipv4 set address name="${nic}" source=dhcp`
-  let cmdDns = `netsh interface ipv4 set dns name="${nic}" source=dhcp`
-  await runCmd(cmdIp);
-  return await runCmd(cmdDns);
-}
-// Set Static
-async function setStatic(nic, ip, mask, gateway, dns, dns2 = null) {
   let output = [];
-  let cmdIp = `netsh interface ipv4 set address name="${nic}" static ${ip} ${mask} ${gateway || ''}`
-  output[0] = await runCmd(cmdIp);
-  let cmdDns1 = `netsh interface ipv4 set dns name="${nic}" static ${dns}`
-  if (dns2 !== null) {
-    let cmdDns2 = `netsh interface ipv4 add dns name="${nic}" ${dns2} index=2`
-    output[1] = await runCmd(cmdDns1);
-    output[2] = await runCmd(cmdDns2);
-    return output
+  output[0] = await setDhcpIp(nic);
+  output[1] = await setDhcpDns(nic);
+  return output;
+}
+// Static
+async function setStaticIp(nic, ip, mask, gateway = null) {
+  if (validNic(nic) && validIp(ip) && validMask(mask)) {
+    if (validIp(gateway)) {
+      let cmd = `netsh interface ipv4 set address name="${nic}" static ${ip} ${mask} ${gateway}`
+      return await runCmd(cmd);
+    }
+    else {
+      let cmd = `netsh interface ipv4 set address name="${nic}" static ${ip} ${mask}`
+      return await runCmd(cmd);
+    }
   }
-  output[1] = await runCmd(cmdDns1);
-  output[2] = null;
+}
+async function addStaticIp(nic, ip, mask) {
+  if (validNic(nic) && validIp(ip) && validMask(mask)) {
+    let cmd = `netsh interface ipv4 add address name="${nic}" ${ip} ${mask}`
+    return await runCmd(cmd);
+  }
+}
+async function setStaticDns(nic, dns, dns2 = null) {
+  let output = [null, null];
+  if (validNic(nic) && validIp(dns)) {
+    let cmd = `netsh interface ipv4 set dns name="${nic}" static ${dns}`
+    output[0] = await runCmd(cmd);
+    if (validIp(dns2)) {
+      let cmd2 = `netsh interface ipv4 add dns name="${nic}" ${dns2} index=2`
+      output[1] = await runCmd(cmd2);
+    }
+  }
+  else {
+    setDhcpDns(nic);
+  }
+  return output;
+}
+async function setStatic(nic, ip, mask, gateway = null, dns = null, dns2 = null) {
+  let output = [];
+  output[0] = await setStaticIp(nic, ip, mask, gateway);
+  output[1] = await setStaticDns(nic, dns, dns2);
   return output
 }
 
@@ -228,7 +307,8 @@ async function setStatic(nic, ip, mask, gateway, dns, dns2 = null) {
 exports.getNics = getNics;
 exports.setDhcpIp = setDhcpIp;
 exports.setDhcpDns = setDhcpDns;
-exports.setStaticIp = setStaticIp;
-exports.setStaticDns = setStaticDns;
 exports.setDhcp = setDhcp;
+exports.setStaticIp = setStaticIp;
+exports.addStaticIp = addStaticIp;
+exports.setStaticDns = setStaticDns;
 exports.setStatic = setStatic;

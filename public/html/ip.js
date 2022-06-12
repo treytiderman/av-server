@@ -258,6 +258,13 @@ const presetRemove = document.getElementById('presetRemove');
 const presetCards = document.getElementById('presetCards');
 
 // Functions
+function disableAfterPost() {
+  // Feedback for waiting
+  showLoadingOverlay('nicInfo', setIpTimer);
+  disable('presetSet', setIpTimer);
+  disable('presetAdd', setIpTimer);
+  disable('setIpBtn', setIpTimer);
+}
 function selectPresetButton(element) {
   const presets = [...presetCards.children];
   presets.forEach(preset => preset.classList = 'preset');
@@ -367,8 +374,7 @@ function getSelectedPreset() {
   return selectedPreset;
 }
 function postSelectedPreset() {
-  // Feedback for waiting
-  showLoadingOverlay('nicInfo', setIpTimer);
+  disableAfterPost();
   // Do the thing
   if (clientData.presetSelected === "DHCP") {
     let obj = { "nic": clientData.nicSelected }
@@ -383,8 +389,7 @@ function postSelectedPreset() {
   }
 }
 function postSelectedPresetAdd() {
-  // Feedback for waiting
-  showLoadingOverlay('nicInfo', setIpTimer);
+  disableAfterPost();
   // Do the thing
   if (clientData.presetSelected === "DHCP") {
     // Do nothing
@@ -392,8 +397,8 @@ function postSelectedPresetAdd() {
   else {
     const selectedPreset = getSelectedPreset();
     selectedPreset.nic = clientData.nicSelected
-    console.log('/api/net/add', selectedPreset);
-    post('/api/net/add', selectedPreset);
+    console.log('/api/net/static/add', selectedPreset);
+    post('/api/net/static/add', selectedPreset);
   }
 }
 
@@ -433,6 +438,7 @@ function hasWhitespace(string) {
 }
 function validIp(ip) {
   let validI = true;
+  if (ip === null) return false
   const split = ip.split(".");
   const periodCount = split.length - 1;
   // Rules
@@ -453,6 +459,7 @@ function validIp(ip) {
 }
 function validMask(mask) {
   let validM = true;
+  if (mask === null) return false
   const split = mask.split(".");
   const periodCount = split.length - 1;
   // Rules
@@ -539,8 +546,7 @@ function addPreset() {
   dialogClose('popupNetworkSettings')
 }
 function postPresetForm() {
-  // Feedback for waiting
-  showLoadingOverlay('nicInfo', setIpTimer);
+  disableAfterPost();
   // Do the thing
   let preset = {
     "nic": clientData.nicSelected,

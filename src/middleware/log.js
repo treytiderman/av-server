@@ -5,7 +5,7 @@ function log(text) {
   const time = new Date(Date.now()).toLocaleString();
   // Log text
   const line = `${time} | ${text}`;
-  console.log(line);
+  // console.log(line);
   fs.appendFile("./src/logs/requests.txt", line + '\n')
 }
 
