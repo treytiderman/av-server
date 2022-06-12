@@ -195,36 +195,36 @@ function getNicByNicName(nics, nicName) {
 }
 function updateNicSelected() {
   // Get the children of nicInfo and the selected NIC
-  const lines = nicInfo.children;
+  const child = nicInfo.children;
   const nic = getNicByNicName(serverData.nics, nicSelect.value);
   // Set each line
-  lines[0].innerText = nic.ip || '';
-  lines[1].innerText = `Mask: ${nic.mask || ''}`;
-  lines[2].innerText = `Gate: ${nic.gateway || ''}`;
-  lines[3].innerText = `DNS1: ${nic.dns[0] || ''}`;
-  lines[4].innerText = `DNS2: ${nic.dns[1] || ''}`;
-  lines[5].innerText = `Metric: ${nic.interfaceMetric || ''}`;
+  child[0].innerText = nic.ip || '';
+  child[1].innerText = `Mask: ${nic.mask || ''}`;
+  // Show added IPs if this nic has multiple IPs
+  child[2].innerHTML = '';
+  if (nic.ipsAdded.length > 0) {    
+    nic.ipsAdded.forEach(ipAdded => {
+      const ipSpan = document.createElement('span');
+      ipSpan.innerText = ipAdded.ip || '';
+      ipSpan.classList = 'w70-t';
+      child[2].appendChild(ipSpan);
+      const maskSpan = document.createElement('span');
+      maskSpan.innerText = `Mask: ${ipAdded.mask || ''}`;
+      maskSpan.classList = 'w50-t t-sm mb-1';
+      child[2].appendChild(maskSpan);
+    });
+  }
+  child[3].innerText = `Gate: ${nic.gateway || ''}`;
+  child[4].innerText = `DNS1: ${nic.dns[0] || ''}`;
+  child[5].innerText = `DNS2: ${nic.dns[1] || ''}`;
+  child[6].innerText = `Metric: ${nic.interfaceMetric || ''}`;
   // Add tool
   const tooltip = document.createElement('aside');
   tooltip.innerHTML = `
   Interface Metric / Priority <br> 
   <small>Which interface gets to the internet?</small> <br> <br>
   Click to edit `
-  lines[5].appendChild(tooltip);
-  // Show added IPs if this nic has multiple IPs
-  lines[6].innerHTML = '';
-  if (nic.ipsAdded.length > 0) {    
-    nic.ipsAdded.forEach(ipAdded => {
-      const ipSpan = document.createElement('span');
-      ipSpan.innerText = ipAdded.ip || '';
-      ipSpan.classList = 'w70-t';
-      lines[6].appendChild(ipSpan);
-      const maskSpan = document.createElement('span');
-      maskSpan.innerText = `Mask: ${ipAdded.mask || ''}`;
-      maskSpan.classList = 'w50-t t-sm mb-1';
-      lines[6].appendChild(maskSpan);
-    });
-  }
+  child[6].appendChild(tooltip);
 }
 
 // Events
@@ -595,6 +595,74 @@ savePresetBtn.addEventListener('click', event => {
 
 // #region Popup Gateway Priority / Interface Metric
 
+// Elements
+const interfaceMetricPopup = document.getElementById('interfaceMetricPopup');
+const interfaceMetricName = document.getElementById('interfaceMetricName');
+const interfaceMetricValue = document.getElementById('interfaceMetricValue');
+const interfaceMetricSet = document.getElementById('interfaceMetricSet');
+
+// Functions
+function validMetric(metric) {
+  let validM = true;
+  if (metric === null) return false
+  // Is number
+  if (isNum(metric) === false) validM = false;
+  // Number is in ip range 0-255
+  const num = Number(metric);
+  if (num < 1 || num > 9999) validM = false;
+  return validM;
+}
+function validateMetric(id) {
+  const element = document.getElementById(id);
+  if (element.value === '') {
+    setFb(id, 'none');
+    return true;
+  }
+  else if (validMetric(element.value) === false) {
+    setFb(id, 'error');
+    return false;
+  }
+  else {
+    setFb(id, 'confirm');
+    return true;
+  }
+}
+function updateInterfaceMetric() {
+  const nic = getNicByNicName(serverData.nics, clientData.nicSelected)
+  if (interfaceMetricName.innerText !== nic.name) {
+    interfaceMetricName.innerText = nic.name;
+    interfaceMetricValue.value = nic.interfaceMetric;
+    interfaceMetricValue.placeholder = nic.interfaceMetric;
+  }
+}
+function postInterfaceMetric() {
+  if (validateMetric(interfaceMetricValue.id)) {
+    if (interfaceMetricValue.value === '') {
+      let obj = {
+        "nic": clientData.nicSelected,
+      }
+      console.log('/api/net/metric/auto', obj);
+      post('/api/net/metric/auto', obj);
+    }
+    else {
+      let obj = {
+        "nic": clientData.nicSelected,
+        "metric": interfaceMetricValue.value
+      }
+      console.log('/api/net/metric', obj);
+      post('/api/net/metric', obj);
+    }
+    dialogClose('interfaceMetricPopup');
+  }
+}
+
+// Events
+interfaceMetricValue.addEventListener('input', event => {
+  validateMetric(interfaceMetricValue.id)
+})
+interfaceMetricSet.addEventListener('click', event => {
+  postInterfaceMetric();
+})
 
 // #endregion
 
@@ -621,6 +689,7 @@ function updateClientData() {
 function updateUI() {
   updateClientData();
   updatePresetButtons();
+  updateInterfaceMetric();
 }
 async function updateServerData() {
   const newData = await get('/api/net/nics');

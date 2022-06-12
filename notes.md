@@ -48,6 +48,12 @@ npm run start
 npm run dev
 ```
 
+# How to pkg (package.json has options)
+```
+pkg app.js
+pkg --out-path dist -o AV-Tool v0.1 -t node16-win-x64 app.js
+```
+
 # get network interface config
 ```
 netsh interface ipv4 show config
@@ -192,4 +198,9 @@ Ok.
 # How to Show Multicast Joins for all Network Interfaces
 ```
 netsh interface ip show joins
+```
+
+# Show all routes
+```
+netsh interface ip show route
 ```

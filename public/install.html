@@ -21,18 +21,17 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./pwa/icons/ios/180.png">
   
   <!-- CSS -->
-  <link defer rel="stylesheet" href="https://trey.app/css/base.css">
-  <link defer rel="stylesheet" href="https://trey.app/css/palette.css">
-  <link defer rel="stylesheet" href="../../assets/fontawesome/all.css">
+  <link rel="stylesheet" href="/css/v3/base.css">
+  <link rel="stylesheet" href="/css/v3/type.css">
+  <link rel="stylesheet" href="/css/v3/icons.css">
+  <link rel="stylesheet" href="/css/v3/utilities.css">
+  <link rel="stylesheet" href="/css/v3/nav.css">
   <style>
     /* Page specific CSS */
   </style>
 
   <!-- JavaScript -->
-  <script defer src="./js/helper.js"></script>
-  <script defer>
-    // Page specific JavaScript
-  </script>
+  <script defer src="/js/navHam.js"></script>
 
 </head>
 
@@ -41,17 +40,28 @@
   <noscript>You need to enable JavaScript to run this app</noscript>
 
   <!-- Nav -->
-  <button class="ham" onclick="navOpen('nav')"> <i class="fa fa-bars"></i> </button>
-  <nav class="ham" id="nav" onclick="navBackgroundClose('nav')">
-    <a href="/macro"> <pre>Macros   <i class="fa fa-xl fa-home"></i></pre> </a>
-    <a href="/lgtv"> <pre>TV   <i class="fa fa-xl fa-tv"></i></pre> </a>
-    <a href="/smsl"> <pre>Speakers   <i class="fa fa-xl fa-volume-high"></i></pre> </a>
-    <a href="/cam"> <pre>Camera   <i class="fa fa-xl fa-camera"></i></pre> </a>
-    <a href="/install" style="margin-top: auto;" class="active"> <pre>Install   <i class="fa fa-xl fa-download"></i></pre> </a>
+  <button class="navHam" onclick="navToggle('nav')"></button>
+  <nav class="navHam" id="nav">
+    <h4>
+      Tools
+      <p>Use another tool?</p>
+    </h4>
+    <a href="/ip">
+      <i class="fa fa-lg fa-ethernet"></i>
+      Network Settings
+    </a>
+    <a href="/dhcp">
+      <i class="fa fa-lg fa-server"></i>
+      DHCP Server
+    </a>
+    <a href="/install" style="margin-top: auto;" class="active">
+      <i class="fa fa-lg fa-download"></i>
+      Install PWA
+    </a>
   </nav>
 
   <!-- Main -->
-  <main id="main" style="max-width: 400px">
+  <main style="width: 100%;">
     <h4>
       Install
       <p>Install the PWA</p>

@@ -7,7 +7,7 @@
   <!-- Basic Page Needs -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AV Tool</title>
+  <title>AV-Tools</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/v3/base.css">
@@ -74,13 +74,17 @@
       Tools
       <p>Use another tool?</p>
     </h4>
-    <a href="/html/ip.html" class="active">
+    <a href="/ip" class="active">
       <i class="fa fa-lg fa-ethernet"></i>
       Network Settings
     </a>
-    <a href="/html/dhcp.html">
+    <a href="/dhcp">
       <i class="fa fa-lg fa-server"></i>
       DHCP Server
+    </a>
+    <a href="/install" style="margin-top: auto;">
+      <i class="fa fa-lg fa-download"></i>
+      Install PWA
     </a>
   </nav>
 
@@ -111,19 +115,19 @@
           <!-- nicInfo -->
           <div class="grid gap-0 t-mono" id="nicInfo">
             <span class="w90-t     ">xxx.xxx.xxx.xxx</span>
-            <span class="w50-t t-sm">Mask: xxx.xxx.xxx.xxx</span>
-            <span class="w50-t t-sm">Gate: xxx.xxx.xxx.xxx</span>
+            <span class="w50-t t-sm mb-1">Mask: xxx.xxx.xxx.xxx</span>
+            <div class="grid gap-0 t-mono">
+              <!-- For added IPs -->
+            </div>
+            <span class="w50-t t-sm mb-1">Gate: xxx.xxx.xxx.xxx</span>
             <span class="w50-t t-sm">DNS1: xxx.xxx.xxx.xxx</span>
             <span class="w50-t t-sm mb-1">DNS2: xxx.xxx.xxx.xxx</span>
             <a class="w50-t t-sm tooltip mb-1" 
-              onclick="dialogOpen('popupGatewayPriority')" 
+              onclick="dialogOpen('interfaceMetricPopup')" 
               style="width: fit-content;">
               Metric: 99
               <aside>Help</aside>
             </a>
-            <div class="grid gap-0 t-mono">
-              <!-- For added IPs -->
-            </div>
           </div>
     
           <!-- nicEdit -->
@@ -275,14 +279,14 @@
     </dialog>
         
     <!-- Popup Gateway Priority / Interface Metric -->
-    <dialog id="popupGatewayPriority">
+    <dialog id="interfaceMetricPopup">
       <section>
-        <button class="dialogExit" onclick="dialogClose('popupGatewayPriority')">
+        <button class="dialogExit" onclick="dialogClose('interfaceMetricPopup')">
           <i class="fa fa-lg fa-xmark"></i>
         </button>
         <h4>
-          Interface Metric **TODO**
-          <p>Change the network interface metric</p>
+          Interface Metric
+          <p>Set to 1-9999 or leave blank for auto</p>
         </h4>
 
         <details>
@@ -292,30 +296,21 @@
             determines which interface to check first when going to a subnets gateway. 
             The lower the number the higher priority. In most situations a computer 
             should only have one gateway assigned to any of the interfaces. Custom 
-            routes can be made if two gateways are needed.
+            routes can be made if two gateways are needed. idk google it...
           </p>
         </details>
 
         <!-- NIC Options -->
-        <div class="grid auto-xs width-md overflow" class="width-md ">
+        <div class="flex align-end">
           <div>
             <label>
-              WiFi <br>
-              <input type="number" class="fill t-mono" value="75" placeholder="25">
+              <span id="interfaceMetricName">Fake Ethernet</span>
+              <br>
+              <input id="interfaceMetricValue" type="number" class="fill t-mono" value="25" placeholder="25">
             </label>
           </div>
-          <div>
-            <label>
-              Ethernet <br>
-              <input type="number" class="fill t-mono" value="25" placeholder="25">
-            </label>
-          </div>
-        </div>
-
-        <!-- Buttons -->
-        <div class="flex even" style="margin-top: auto;">
-          <button id="setGatewayPriority" onclick="dialogClose('popupGatewayPriority')">
-            Set Values
+          <button id="interfaceMetricSet">
+            Set Value
           </button>
         </div>
 

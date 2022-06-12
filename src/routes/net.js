@@ -12,6 +12,7 @@ router.get('/nics', async (req, res) => {
   const nics = await netsh.getNics();
   res.json(nics);
 });
+
 router.post('/dhcp/ip', async (req, res) => {
   const preset = JSON.parse(req.body);
   const output = await netsh.setDhcpIp(preset.nic);
@@ -27,6 +28,7 @@ router.post('/dhcp', async (req, res) => {
   const output = await netsh.setDhcp(preset.nic);
   res.status(200).json(output);
 });
+
 router.post('/static/ip', async (req, res) => {
   const preset = JSON.parse(req.body);
   const output = await netsh.setStaticIp(
@@ -64,6 +66,20 @@ router.post('/static', async (req, res) => {
     preset.gateway,
     preset.dns[0],
     preset.dns[1]
+  )
+  res.status(200).json(output);
+});
+
+router.post('/metric/auto', async (req, res) => {
+  const preset = JSON.parse(req.body);
+  const output = await netsh.setAutoMetric(preset.nic);
+  res.status(200).json(output);
+});
+router.post('/metric', async (req, res) => {
+  const preset = JSON.parse(req.body);
+  const output = await netsh.setStaticMetric(
+    preset.nic,
+    preset.metric,
   )
   res.status(200).json(output);
 });

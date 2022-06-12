@@ -110,7 +110,7 @@ class NICS {
     return this.interfaces;
   }
 }
-let nicsGlobal = [];
+let nicsGlobal = getNics();
 
 
 
@@ -179,6 +179,16 @@ function validMask(mask) {
     else if (split[1] > split[0]) validM = false;
   }
   return validM; 
+}
+function validMetric(metric) {
+  let validM = true;
+  if (metric === null) return false
+  // Is number
+  if (isNum(metric) === false) validM = false;
+  // Number is in ip range 0-255
+  const num = Number(metric);
+  if (num < 1 || num > 9999) validM = false;
+  return validM;
 }
 
 
@@ -259,6 +269,23 @@ async function setStatic(nic, ip, mask, gateway = null, dns = null, dns2 = null)
   output[1] = await setStaticDns(nic, dns, dns2);
   return output
 }
+// Metric
+async function setAutoMetric(nic) {
+  await getNics();
+  if (validNic(nic)) {
+    let cmd = `netsh interface ipv4 set interface ${nic} metric=auto`
+    return await runCmd(cmd);
+  }
+  return 'failed'
+}
+async function setStaticMetric(nic, metric = '') {
+  await getNics();
+  if (validNic(nic) && validMetric(metric)) {
+    let cmd = `netsh interface ipv4 set interface ${nic} metric=${metric}`
+    return await runCmd(cmd);
+  }
+  return 'failed'
+}
 
 
 
@@ -275,6 +302,11 @@ async function setStatic(nic, ip, mask, gateway = null, dns = null, dns2 = null)
 //     getNics().then(nics => console.log(nics))
 //   })
 // setStaticIp('Ethernet', '192.168.1.9', '255.255.255.0', '192.168.1.254')
+//   .then(output => {
+//     console.log(`setStaticIp: ${output}`)
+//     getNics().then(nics => console.log(nics))
+//   })
+// setStaticIp('Ethernet', '192.168.1.9', '255.255.255.0')
 //   .then(output => {
 //     console.log(`setStaticIp: ${output}`)
 //     getNics().then(nics => console.log(nics))
@@ -299,16 +331,30 @@ async function setStatic(nic, ip, mask, gateway = null, dns = null, dns2 = null)
 //     console.log(`setStatic: ${output}`)
 //     getNics().then(nics => console.log(nics))
 //   })
+// setAutoMetric('Ethernet')
+//   .then(output => {
+//     console.log(`setAutoMetric: ${output}`)
+//     getNics().then(nics => console.log(nics))
+//   })
+// setStaticMetric('Ethernet', '420')
+//   .then(output => {
+//     console.log(`setStaticMetric: ${output}`)
+//     getNics().then(nics => console.log(nics))
+//   })
 
 
 
 // Export
-// exports.state = state;
 exports.getNics = getNics;
+
 exports.setDhcpIp = setDhcpIp;
 exports.setDhcpDns = setDhcpDns;
 exports.setDhcp = setDhcp;
+
 exports.setStaticIp = setStaticIp;
 exports.addStaticIp = addStaticIp;
 exports.setStaticDns = setStaticDns;
 exports.setStatic = setStatic;
+
+exports.setAutoMetric = setAutoMetric;
+exports.setStaticMetric = setStaticMetric;

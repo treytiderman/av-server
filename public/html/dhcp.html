@@ -7,7 +7,7 @@
   <!-- Basic Page Needs -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AV Tool</title>
+  <title>AV-Tools</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/v3/base.css">
@@ -40,7 +40,7 @@
   </style>
 
   <!-- JavaScript -->
-  <script defer src="/js/helper.js"></script>
+  <script defer src="/js/http.js"></script>
   <script defer src="/js/dialog.js"></script>
   <script defer src="/js/navHam.js"></script>
   <script defer src="/js/feedback.js"></script>
@@ -52,12 +52,33 @@
 <body>
   <noscript>You need to enable JavaScript to run this app</noscript>
 
+  <!-- Nav -->
+  <button class="navHam" onclick="navToggle('nav')"></button>
+  <nav class="navHam" id="nav">
+    <h4>
+      Tools
+      <p>Use another tool?</p>
+    </h4>
+    <a href="/ip">
+      <i class="fa fa-lg fa-ethernet"></i>
+      Network Settings
+    </a>
+    <a href="/dhcp" class="active">
+      <i class="fa fa-lg fa-server"></i>
+      DHCP Server
+    </a>
+    <a href="/install" style="margin-top: auto;">
+      <i class="fa fa-lg fa-download"></i>
+      Install PWA
+    </a>
+  </nav>
+
   <!-- Main -->
-  <main class="">
+  <main style="width: 100%;">
 
     <!-- Header -->
     <h4>
-      DHCP Server
+      DHCP Server **TODO**
       <p>Setup and run a DHCP server</p>
     </h4>
 

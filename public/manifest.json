@@ -1,6 +1,6 @@
 {
-  "short_name": "home",
-  "name": "home",
+  "short_name": "AV-Tools",
+  "name": "AV-Tools",
   "icons": [
     {
       "src": "./pwa/icons/windows11/SmallTile.scale-100.png",

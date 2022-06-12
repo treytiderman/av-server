@@ -1,6 +1,6 @@
 {
-  "name": "app",
-  "version": "1.0.0",
+  "name": "av-tools",
+  "version": "0.1",
   "description": "",
   "main": "app.js",
   "scripts": {
@@ -12,6 +12,17 @@
   "dependencies": {
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "pkg": "^5.7.0"
+  },
+  "pkg": {
+    "scripts": "src/**",
+    "assets": [
+      "public/**"
+    ],
+    "targets": [
+      "node16-win-x64"
+    ],
+    "outputPath": "."
   }
 }
