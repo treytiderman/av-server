@@ -7,27 +7,59 @@
   <!-- Basic Page Needs -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Set IP</title>
+  <title>AV Tool</title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/base.css">
-  <link rel="stylesheet" href="../css/palette.css">
-  <link rel="stylesheet" href="../assets/fontawesome/all.css">
+  <link rel="stylesheet" href="/css/v3/base.css">
+  <link rel="stylesheet" href="/css/v3/type.css">
+  <link rel="stylesheet" href="/css/v3/icons.css">
+  <link rel="stylesheet" href="/css/v3/layout.css">
+  <link rel="stylesheet" href="/css/v3/inputs.css">
+  <link rel="stylesheet" href="/css/v3/palette.css">
+  <link rel="stylesheet" href="/css/v3/utilities.css">
+  <link rel="stylesheet" href="/css/v3/tooltip.css">
+  <link rel="stylesheet" href="/css/v3/dialog.css">
+  <link rel="stylesheet" href="/css/v3/feedback.css">
+  <link rel="stylesheet" href="/css/v3/nav.css">
   <style>
     /* Page specific CSS */
-    @media (hover: hover) {
-      .hover-red:hover {
-        color: var(--r70);
-      }
+    .grid.auto-custom {
+      grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    }
+    .selected {
+      position: relative;
+      border-color: var(--w50);
+    }
+    .selected::after {
+      font-family: var(--fa-style-family, "Font Awesome 6 Free");
+      font-weight: var(--fa-style, 900);
+      font-size: large;
+      content: "\f00c";
+      list-style: 1;
+      position: absolute;
+      top: 0;
+      right: .1rem;
+      padding: var(--padding);
+    }
+    .preset {
+      min-width: 220px;
+      text-align: left;
+      display: grid;
+      align-items: flex-start;
+      background-color: var(--w10);
+      box-shadow: none;
+    }
+    button i {
+      margin-left: .3rem;
     }
   </style>
 
   <!-- JavaScript -->
-  <script defer src="../html/ip.js"></script>
-  <script src="../js/helper.js"></script>
-  <script>
-    // Page specific JavaScriptg
-  </script>
+  <script defer src="/js/http.js"></script>
+  <script defer src="/js/dialog.js"></script>
+  <script defer src="/js/navHam.js"></script>
+  <script defer src="/js/feedback.js"></script>
+  <script defer src="/html/ip.js"></script>
 
 </head>
 
@@ -35,110 +67,164 @@
 <body>
   <noscript>You need to enable JavaScript to run this app</noscript>
 
+  <!-- Nav -->
+  <button class="navHam" onclick="navToggle('nav')"></button>
+  <nav class="navHam" id="nav">
+    <h4>
+      Tools
+      <p>Use another tool?</p>
+    </h4>
+    <a href="/html/ip.html" class="active">
+      <i class="fa fa-lg fa-ethernet"></i>
+      Network Settings
+    </a>
+    <a href="/html/dhcp.html">
+      <i class="fa fa-lg fa-server"></i>
+      DHCP Server
+    </a>
+  </nav>
+
   <!-- Main -->
-  <main>
+  <main style="width: 100%;">
 
     <!-- Header -->
-    <h4>
-      Network Interfaces
-      <p>Save IP settings and create presets</p>
-    </h4>
-    
-    <!-- NICs to the left and Presets on right -->
-    <div class="flex align-start break-lg">
+    <section>
+      <h4>
+        Network Settings
+        <p>Save network settings and create presets</p>
+      </h4>
+    </section>
 
-      <!-- Select a NIC -->
-      <section style="max-width: 350px">
-        <p class="w70-t">Select a NIC</p>
-        <label for="selectNic" class="w70-t" hidden>Select a NIC</label>
-        <select id="selectNic" class="fill w30" style="height: 43px;">
-          <option>WiFi</option>
-          <option>Ethernet</option>
-          <option>vEthernet (WSL)</option>
-          <option>VirtualBox Host-Only Network</option>
-        </select>
-        <div class="flex w30-bdr pad radius t-mono">
-          <div class="grid" style="gap: 0px;" id="nicInfo">
+    <!-- Computer + Interface & Actions & Presets -->
+    <div class="flex align-start break-md"> 
+      
+      <!-- This Computer -->
+      <section style="max-width: 225px; min-width: 225px;">
+        <h6 class="w70-t">
+          <i class="fa fa-lg fa-desktop" style="margin-right: .3rem;"></i>
+          This Computer
+        </h6>
+        
+        <!-- nicInfo + nicEdit -->
+        <div class="flex align-start relative">
+
+          <!-- nicInfo -->
+          <div class="grid gap-0 t-mono" id="nicInfo">
             <span class="w90-t     ">xxx.xxx.xxx.xxx</span>
             <span class="w50-t t-sm">Mask: xxx.xxx.xxx.xxx</span>
             <span class="w50-t t-sm">Gate: xxx.xxx.xxx.xxx</span>
             <span class="w50-t t-sm">DNS1: xxx.xxx.xxx.xxx</span>
-            <span class="w50-t t-sm">DNS2: xxx.xxx.xxx.xxx</span>
+            <span class="w50-t t-sm mb-1">DNS2: xxx.xxx.xxx.xxx</span>
+            <a class="w50-t t-sm tooltip mb-1" 
+              onclick="dialogOpen('popupGatewayPriority')" 
+              style="width: fit-content;">
+              Metric: 99
+              <aside>Help</aside>
+            </a>
+            <div class="grid gap-0 t-mono">
+              <!-- For added IPs -->
+            </div>
           </div>
-          <a class="w50-t right" onclick="dialogOpen('dialog')" id="addPresetBtn">
-            <i class="fa fa-user"></i>
-          </a>
-        </div>
-      </section>
-
-      <!-- Then a Preset -->
-      <section class="grow">
-        <p class="w70-t">Then a Preset</p>
-
-        <!-- Permanent Cards | DHCP, Add preset -->
-        <div class="grid auto-sm t-mono">
-
-          <!-- DHCP -->
-          <div>
-            <input type="radio" name="radioSet1" id="setDhcp" class="button" checked>
-            <label for="setDhcp" class="flex align-center" style="height: 43px;">
-              <div class="grid" style="gap: 0px;">
-                <span class="">DHCP</span>
-              </div>
-              <i class="fa fa-server w50-t right"></i>
-            </label>
-          </div>
-
-          <!-- Add Preset -->
-          <div>
-            <a class="w30-bdr w90-t pad radius flex align-center" 
-                onclick="dialogOpen('dialog')" id="addPresetBtn" style="height: 43px;">
-              <span>Add Preset...</span>
-              <i class="fa fa-add right w50-t"></i>
+    
+          <!-- nicEdit -->
+          <div class="flex column w50-t right" style="padding: 0 0 1rem 1rem;">
+            <a id="nicEdit" onclick="dialogOpen('popupNetworkSettings')">
+              <i class="fa fa-pen-to-square"></i>
             </a>
           </div>
-
+      
         </div>
+  
+      </section>
 
-        <!-- Preset cards | JS to add -->
-        <div class="grid auto-sm t-mono fill" id="presetCards">
-          <!-- <div>
-            <input type="radio" name="radioSet1" id="rad2" class="button">
-            <label for="rad2" class="flex">
-              <div class="grid gap-0">
-                <span class="          ">192.168.1.9</span>
-                <span class="w50-t t-sm">Mask: 255.255.255.0</span>
-                <span class="w50-t t-sm">Gate: 192.168.1.254</span>
-                <span class="w50-t t-sm">DNS1: 192.168.1.1</span>
-                <span class="w50-t t-sm">DNS2: 192.168.1.1</span>
-              </div>
-              <a class="w50-t right hover-red">
+      <!-- Interface + Actions + Presets -->
+      <section class="grow">
+
+        <!-- Interface + Actions -->
+        <div class="flex align-start break-md">
+
+          <!-- Interface -->
+          <section style="max-width: 300px;">
+            <h6 class="w70-t">
+              <i class="fa fa-lg fa-ethernet" style="margin-right: .3rem;"></i>
+              Interface
+            </h6>
+
+            <!-- nicSelect -->
+            <label for="nicSelect" class="w70-t" hidden>Select Interface</label>
+            <select id="nicSelect" class="fill t-ellipsis">
+              <option>Fake Ethernet</option>
+              <option>Fake WiFi</option>
+              <!-- Javascript to replace options -->
+            </select>
+
+          </section>
+          
+          <!-- Actions -->
+          <section>
+            <h6 class="w70-t">
+              <i class="fa fa-lg fa-wrench" style="margin-right: .3rem;"></i>
+              Actions
+            </h6>
+
+            <!-- Set, Add, Remove -->
+            <div class="flex">
+              <button class="g70-t-hov" id="presetSet">
+                Set 
+                <i class="fa fa-check"></i>
+              </button>
+              <button class="b70-t-hov" id="presetAdd">
+                Add 
+                <i class="fa fa-add"></i>
+              </button>
+              <button class="r70-t-hov" id="presetRemove">
+                Remove 
                 <i class="fa fa-trash"></i>
-              </a>
-            </label>
-          </div> -->
+              </button>
+            </div>
+
+          </section>
+
         </div>
 
+        <!-- Presets -->
+        <section>
+          <h6 class="w70-t" hidden>Presets</h6>
+
+          <!-- Preset cards -->
+          <div class="flex break-md t-mono" id="presetCards">
+            <button class="preset">
+              <span>xxx.xxx.xxx.xxx</span>
+              <span class="w50-t t-sm">Mask: xxx.xxx.xxx.xxx</span>
+              <span class="w50-t t-sm">Gate: xxx.xxx.xxx.xxx</span>
+              <span class="w50-t t-sm">DNS1: xxx.xxx.xxx.xxx</span>
+              <span class="w50-t t-sm">DNS2: xxx.xxx.xxx.xxx</span>
+            </button>
+            <!-- Javascript to add presets -->
+          </div>
+
+        </section>
+    
       </section>
 
     </div>
-
-    <!-- Set IP Popup -->
-    <dialog id="dialog" onclick="dialogBackgroundClose('dialog')">
-      <section class="w10 w50-bdr gap fill width-md relative">
-        <div class="exit">
-          <a class="fa fa-xl fa-xmark" onclick="dialogClose('dialog')"></a>
-        </div>
+        
+    <!-- Popup Network Settings -->
+    <dialog id="popupNetworkSettings">
+      <section>
+        <button class="dialogExit" onclick="dialogClose('popupNetworkSettings')">
+          <i class="fa fa-lg fa-xmark"></i>
+        </button>
         <h4>
-          Set Network Settings
+          Network Settings
           <p>IP Address and DNS Servers</p>
         </h4>
 
         <!-- Set IP + DNS -->
-        <div class="flex even align-start break-md">
+        <div class="grid col-12 break-md">
 
           <!-- Set IP -->
-          <div class="grid">
+          <div class="cols-6 grid">
             <div>
               <label>
                 IP address <br>
@@ -160,7 +246,7 @@
           </div>
           
           <!-- Set DNS -->
-          <div class="grid">
+          <div class="cols-6 flex column">
             <div>
               <label>
                 DNS 1 <br>
@@ -172,57 +258,72 @@
                 DNS 2 <br>
                 <input type="text" id="dns2" class="fill t-mono" placeholder="1.1.1.1">
               </label>
-            </div>  
+            </div>
+            <div class="flex even" style="margin-top: auto;">
+              <button id="setIpBtn" class="w10 w30-bdr">
+                Set Settings
+              </button>
+              <button id="savePresetBtn" class="g70-t-hov">
+                Save Preset
+              </button>
+            </div>
           </div>
 
         </div>
 
+      </section>
+    </dialog>
+        
+    <!-- Popup Gateway Priority / Interface Metric -->
+    <dialog id="popupGatewayPriority">
+      <section>
+        <button class="dialogExit" onclick="dialogClose('popupGatewayPriority')">
+          <i class="fa fa-lg fa-xmark"></i>
+        </button>
+        <h4>
+          Interface Metric **TODO**
+          <p>Change the network interface metric</p>
+        </h4>
+
+        <details>
+          <summary>What is this?</summary>
+          <p>
+            Each network interface of the computer has a priority number that
+            determines which interface to check first when going to a subnets gateway. 
+            The lower the number the higher priority. In most situations a computer 
+            should only have one gateway assigned to any of the interfaces. Custom 
+            routes can be made if two gateways are needed.
+          </p>
+        </details>
+
+        <!-- NIC Options -->
+        <div class="grid auto-xs width-md overflow" class="width-md ">
+          <div>
+            <label>
+              WiFi <br>
+              <input type="number" class="fill t-mono" value="75" placeholder="25">
+            </label>
+          </div>
+          <div>
+            <label>
+              Ethernet <br>
+              <input type="number" class="fill t-mono" value="25" placeholder="25">
+            </label>
+          </div>
+        </div>
+
         <!-- Buttons -->
-        <div class="flex">
-          <button id="setIpBtn" class="grow a30" onclick="dialogClose('dialog')">
-            Set Network Settings
-          </button>
-          <button id="savePresetBtn" class="grow g30" onclick="dialogClose('dialog')">
-            Save New Preset
+        <div class="flex even" style="margin-top: auto;">
+          <button id="setGatewayPriority" onclick="dialogClose('popupGatewayPriority')">
+            Set Values
           </button>
         </div>
-        
 
       </section>
     </dialog>
-      
+        
   </main>
-  
-  <footer class="grid" style="display: none;">
-
-    <!-- Cheatsheet -->
-    <details>
-      <summary class="w30-t">Subnet Mask Cheatsheet</summary>
-      <table class="fill width-md">
-        <tbody>
-        <tr class="w70-t"> 
-             <th>Mask</th> <th>Subnet Mask</th>     <th># of IPs</th> 
-        </tr>
-        <tr> <td>/30</td>  <td>255.255.255.252</td> <td>4</td>        </tr>
-        <tr> <td>/29</td>  <td>255.255.255.248</td> <td>8</td>        </tr>
-        <tr> <td>/28</td>  <td>255.255.255.240</td> <td>16</td>       </tr>
-        <tr> <td>/27</td>  <td>255.255.255.224</td> <td>32</td>       </tr>
-        <tr> <td>/26</td>  <td>255.255.255.192</td> <td>64</td>       </tr>
-        <tr> <td>/25</td>  <td>255.255.255.128</td> <td>128</td>      </tr>
-        <tr> <td>/24</td>  <td>255.255.255.0</td>   <td>256</td>      </tr>
-        <tr> <td>/23</td>  <td>255.255.254.0</td>   <td>512</td>      </tr>
-        <tr> <td>/22</td>  <td>255.255.252.0</td>   <td>1024</td>     </tr>
-        <tr> <td>/21</td>  <td>255.255.248.0</td>   <td>2048</td>     </tr>
-        <tr> <td>/20</td>  <td>255.255.240.0</td>   <td>4096</td>     </tr>
-        <tr> <td>/19</td>  <td>255.255.224.0</td>   <td>8192</td>     </tr>
-        <tr> <td>/18</td>  <td>255.255.192.0</td>   <td>16384</td>    </tr>
-        <tr> <td>/17</td>  <td>255.255.128.0</td>   <td>32768</td>    </tr>
-        <tr> <td>/16</td>  <td>255.255.0.0</td>     <td>65536</td>    </tr>
-        </tbody>
-      </table>
-    </details>
-  
-  </footer>
 
 </body>
+
 </html>

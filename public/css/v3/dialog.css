@@ -1,0 +1,46 @@
+dialog {
+  padding: 0;
+  border: 0;
+  margin: auto;
+  background-color: black;
+  backdrop-filter: blur(2px);
+}
+
+dialog::backdrop {
+  background-color: black;
+  backdrop-filter: blur(2px);
+  filter: blur(2px);
+  opacity: 0.8;
+}
+
+dialog > section {
+  position: relative;
+  background-color: var(--w10);
+  border: var(--border);
+  border-color: var(--w30);
+  padding: var(--gap);
+  /* white-space: nowrap; */
+}
+
+dialog > section > h1, 
+dialog > section > h2,
+dialog > section > h3,
+dialog > section > h4,
+dialog > section > h5,
+dialog > section > h6 {
+  margin-right: 3rem;
+}
+
+.dialogExit {
+  background: transparent;
+  border: transparent;
+  line-height: 1;
+  margin: 0;
+ 
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  padding: var(--gap);
+  cursor: pointer;
+}

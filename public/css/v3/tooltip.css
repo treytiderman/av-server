@@ -1,0 +1,40 @@
+.tooltip {
+  position: relative;
+}
+
+.tooltip > aside {
+  z-index: 10;
+  visibility: hidden;
+  position: absolute;
+  
+  background-color: var(--w10);
+  border: var(--border);
+  border-color: var(--w50);
+  border-radius: var(--radius);
+  padding: var(--padding);
+  
+  color: var(--w90);
+  /* text-align: center; */
+  white-space: nowrap;
+  box-shadow: var(--shadow);
+
+  bottom: 130%;
+  left: 0;
+}
+
+.tooltip > aside::after {
+  content: "";
+  z-index: 10;
+  position: absolute;
+  margin-left: -8px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: var(--w50) transparent transparent transparent;
+  
+  top: 100%;
+  left: 1rem;
+}
+
+.tooltip:hover > aside {
+  visibility: visible;
+}

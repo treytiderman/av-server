@@ -8,26 +8,33 @@ const exec = util.promisify(require('child_process').exec);
 class NIC { 
   constructor(text) {
     this.name = null;
+    this.interfaceMetric = null,
     this.ipIsDhcp = null,
-    this.ipAddr = null;
-    this.subnet = {
-      mask: null,
-      slash: null
-    }
+    this.ip = null;
+    this.mask = null,
+    this.slash = null,
     this.gateway = null;
     this.dnsIsDhcp = null,
-    this.dnsServers = [];
+    this.dns = [];
+    this.ipsAdded = [];
     return this.parse(text);
   }
   parse(text) {
     let lines = text.split("\r\n");
+    // console.log('\n');
+    let ipCount = 0;
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
+      // console.log(line);
   
       if (line.startsWith('Configuration for interface')) {
         let start = line.indexOf('"')+1;
         let stop = line.length-1;
         this.name = line.slice(start, stop).trim();
+      }
+      else if (line.startsWith('InterfaceMetric:')) {
+        let split = line.split(": ");
+        this.interfaceMetric = split[1].trim();
       }
       else if (line.startsWith('DHCP enabled:')) {
         let split = line.split(": ");
@@ -35,16 +42,28 @@ class NIC {
       }
       else if (line.startsWith('IP Address:')) {
         let split = line.split(": ");
-        this.ipAddr = split[1].trim();
+        if (this.ip === null) {          
+          this.ip = split[1].trim();
+        }
+        else {
+          this.ipsAdded[ipCount] = { "ip": split[1].trim() };
+        }
       }
       else if (line.startsWith('Subnet Prefix:')) {
         let split = line.split(": ");
         let start = split[1].indexOf('(mask')+5;
         let stop = split[1].length-1;
-        this.subnet.mask = split[1].slice(start, stop).trim();
-        start = split[1].indexOf('/')+1;
-        stop = split[1].indexOf('(mask')-1;
-        this.subnet.slash = split[1].slice(start, stop).trim();
+        if (this.mask === null) {          
+          this.mask = split[1].slice(start, stop).trim();
+          start = split[1].indexOf('/')+1;
+          stop = split[1].indexOf('(mask')-1;
+          this.slash = split[1].slice(start, stop).trim();
+        }
+        else {
+          this.ipsAdded[ipCount].mask = split[1].slice(start, stop).trim();
+          ipCount++;
+        }
+        
       }
       else if (line.startsWith('Default Gateway:')) {
         let split = line.split(": ");
@@ -52,20 +71,20 @@ class NIC {
       }
       else if (line.startsWith('DNS servers configured through DHCP:')) {
         let split = line.split(": ");
-        this.dnsServers[0] = split[1].trim();
+        this.dns[0] = split[1].trim();
         for (let j = 1; j < lines.length - i; j++) {
           const line2 = lines[j+i].trim();
           if (line2.startsWith('Register with which suffix:')) break;
-          this.dnsServers[j] = line2.trim();
+          this.dns[j] = line2.trim();
         }
       }
       else if (line.startsWith('Statically Configured DNS Servers:')) {
         let split = line.split(": ");
-        this.dnsServers[0] = split[1].trim();
+        this.dns[0] = split[1].trim();
         for (let j = 1; j < lines.length - i; j++) {
           const line2 = lines[j+i].trim();
           if (line2.startsWith('Register with which suffix:')) break;
-          this.dnsServers[j] = line2.trim();
+          this.dns[j] = line2.trim();
         }
       }
 
@@ -90,7 +109,6 @@ class NICS {
     }
     return this.interfaces;
   }
-  
 }
 
 
@@ -106,8 +124,10 @@ async function getNics() {
   const cmd = 'netsh interface ipv4 show config';
   const raw = await runCmd(cmd);
   const nics = new NICS(raw)
+  // console.log(nics);
   return nics;
 }
+getNics();
 // Set IP to be DHCP
 async function setDhcpIp(nic) {
   let cmd = `netsh interface ipv4 set address name="${nic}" source=dhcp`
@@ -147,7 +167,7 @@ async function setDhcp(nic) {
 // Set Static
 async function setStatic(nic, ip, mask, gateway, dns, dns2 = null) {
   let output = [];
-  let cmdIp = `netsh interface ipv4 set address name="${nic}" static ${ip} ${mask} ${gateway}`
+  let cmdIp = `netsh interface ipv4 set address name="${nic}" static ${ip} ${mask} ${gateway || ''}`
   output[0] = await runCmd(cmdIp);
   let cmdDns1 = `netsh interface ipv4 set dns name="${nic}" static ${dns}`
   if (dns2 !== null) {

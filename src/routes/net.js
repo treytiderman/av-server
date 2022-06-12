@@ -16,11 +16,20 @@ router.post('/static', async (req, res) => {
   const preset = JSON.parse(req.body);
   const output = await netsh.setStatic(
     preset.nic,
-    preset.ipAddr,
-    preset.subnet['mask'],
+    preset.ip,
+    preset.mask,
     preset.gateway,
-    preset.dnsServers[0],
-    preset.dnsServers[1]
+    preset.dns[0],
+    preset.dns[1]
+  )
+  res.status(200).json(output);
+});
+router.post('/static/add', async (req, res) => {
+  const preset = JSON.parse(req.body);
+  const output = await netsh.addStaticIp(
+    preset.nic,
+    preset.ip,
+    preset.mask,
   )
   res.status(200).json(output);
 });
@@ -28,8 +37,8 @@ router.post('/static/ip', async (req, res) => {
   const preset = JSON.parse(req.body);
   const output = await netsh.setStaticIp(
     preset.nic,
-    preset.ipAddr,
-    preset.subnet.mask,
+    preset.ip,
+    preset.mask,
     preset.gateway
   )
   res.status(200).json(output);
@@ -38,8 +47,8 @@ router.post('/static/dns', async (req, res) => {
   const preset = JSON.parse(req.body);
   const output = await netsh.setStaticDns(
     preset.nic,
-    preset.dnsServers[0],
-    preset.dnsServers[1]
+    preset.dns[0],
+    preset.dns[1]
   )
   res.status(200).json(output);
 });

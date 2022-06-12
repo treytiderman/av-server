@@ -1,0 +1,20 @@
+/* icons.css v3 | 5-25-2022 */
+
+@import url('/assets/fontawesome/all.css');
+
+/* If iOS */
+@supports (-webkit-touch-callout: none) {
+  input[type="date"]::after,
+  input[type="datetime-local"]::after,
+  input[type="month"]::after,
+  input[type="week"]::after {
+    padding-left: var(--padding-x);
+    font-family: "Font Awesome 6 Free", sans-serif;
+    content: "\f133";
+  }
+  input[type="time"]::after {
+    padding-left: var(--padding-x);
+    font-family: "Font Awesome 6 Free", sans-serif;
+    content: "\f017";
+  }
+}
