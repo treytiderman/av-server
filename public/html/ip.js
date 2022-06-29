@@ -546,7 +546,6 @@ function addPreset() {
   dialogClose('popupNetworkSettings')
 }
 function postPresetForm() {
-  disableAfterPost();
   // Do the thing
   let preset = {
     "nic": clientData.nicSelected,
@@ -562,6 +561,7 @@ function postPresetForm() {
     ]
   }
   if (validPreset()) {
+    disableAfterPost();
     console.log('/api/net/static', preset);
     post('/api/net/static', preset);
     dialogClose('popupNetworkSettings');

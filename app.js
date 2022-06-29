@@ -62,5 +62,10 @@ app.use('/api/net', router);
 // Start web server
 const port = 6420 ;
 app.listen(port, () => {
-  console.log(`\nApp available at: http://localhost:${port}`)
+  console.log(`AV-Tools server`)
+  console.log(`>> this hosts the web pages available at: http://localhost:${port} \n`)
 })
+
+// Require Open
+const open = require('open');
+open(`http://localhost:${port}`);
