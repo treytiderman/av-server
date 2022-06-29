@@ -123,32 +123,20 @@ Configuration for interface "Loopback Pseudo-Interface 1"
 ```
 netsh interface ipv4 set address name="Ethernet" source=dhcp
 ```
-```
-
-```
 
 # set network interface address to static
 ```
 netsh interface ipv4 set address name="Ethernet" static 192.168.1.9 255.255.255.0 192.168.1.254
-```
-```
-
 ```
 
 # add network interface address to nic
 ```
 netsh interface ipv4 add address name="Ethernet" 192.168.1.92 255.255.255.0
 ```
-```
-
-```
 
 # set network interface dns to dhcp
 ```
 netsh interface ipv4 set dns name="Ethernet" source=dhcp
-```
-```
-
 ```
 
 # set network interface dns to static
@@ -156,14 +144,10 @@ netsh interface ipv4 set dns name="Ethernet" source=dhcp
 netsh interface ipv4 set dns name="Ethernet" static 192.168.1.1
 netsh interface ipv4 add dns name="Ethernet" 1.1.1.1 index=2
 ```
+
+
+
 ```
-
-```
-
-
-
-
-
 netsh interface ipv4 set address name="YOUR INTERFACE NAME" static IP_ADDRESS SUBNET_MASK GATEWAY
 netsh interface ipv4 set address name=”YOUR INTERFACE NAME” source=dhcp
 
@@ -179,6 +163,8 @@ netsh interface ipv4 set dnsservers name"YOUR INTERFACE NAME" source=dhcp
 netsh interface ipv4 set dns name="Ethernet" static 192.168.1.1
 netsh interface ipv4 add dns name="Ethernet" 1.1.1.1 index=2
 netsh interface ipv4 set dns name="Ethernet" source=dhcp
+
+```
 
 
 

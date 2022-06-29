@@ -1,4 +1,6 @@
 // Send query to server
+// uri = the end part of the url
+// Example google.com/puppy (uri = puppy)
 async function get(uri) {
   
   // Fetch options
@@ -7,21 +9,21 @@ async function get(uri) {
   const options = {
     method: 'GET',
   };
-
+  
   // Fetch
+  console.log('GET:', url);
   let response = await fetch(url, options);
-  if (!response.ok) { return }
+  if (!response.ok) { return 'REQUEST FAILED' }
   const res = await response.json();
   return res;
 
 }
-
-// Send query to server
 async function post(uri, data) {
 
   // Fetch options
   const origin = document.location.origin;
   const url = `${origin}${uri}`;
+  console.log('POST:', url, data);
   const options = {
     method: 'POST',
     body: JSON.stringify(data)
@@ -29,19 +31,18 @@ async function post(uri, data) {
 
   // Fetch
   let response = await fetch(url, options);
-  if (!response.ok) { return }
+  if (!response.ok) { return 'REQUEST FAILED' }
   const res = await response.json();
   return res;
 
 }
-
-// Send query to server
 async function getAuth(uri) {
   
   // Fetch options
   const origin = document.location.origin;
   const url = `${origin}${uri}`;
   const token = localStorage.getItem('token');
+  if (token === null) { location.href = "/api/login"; return }
   const options = {
     method: 'GET',
     headers: {'Authorization': `Bearer ${token}`}
@@ -49,24 +50,23 @@ async function getAuth(uri) {
 
   // Fetch
   let response = await fetch(url, options);
-  if (!response.ok) { console.log("I'm not ok"); return }
+  if (!response.ok) { return 'REQUEST FAILED' }
 
   // Not logged in
-  if (response.redirected) { return `not logged in` }
+  if (response.redirected) { return 'NOT LOGGED IN' }
 
   // Logged in
   const res = await response.json();
   return res;
 
 }
-
-// Send query to server
 async function postAuth(uri, data) {
 
   // Fetch options
   const origin = document.location.origin;
   const url = `${origin}${uri}`;
   const token = localStorage.getItem('token');
+  if (token === null) { location.href = "/api/login"; return }
   const options = {
     method: 'POST',
     headers: {'Authorization': `Bearer ${token}`},
@@ -75,10 +75,10 @@ async function postAuth(uri, data) {
 
   // Fetch
   let response = await fetch(url, options);
-  if (!response.ok) { console.log("I'm not ok"); return }
+  if (!response.ok) { return 'REQUEST FAILED' }
 
   // Not logged in
-  if (response.redirected) { return false }
+  if (response.redirected) { return 'NOT LOGGED IN' }
 
   // Logged in
   const res = await response.json();
