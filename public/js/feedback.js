@@ -43,17 +43,26 @@ function hideLoadingOverlay(id) {
   loadingOverlay.classList.remove("loadingOverlay");
 }
 
-// Disable Element by ID
-function disable(id, timeout = 0) {
-  const element = document.getElementById(id);
-  element.disabled = true;
-  if (timeout > 0) setTimeout(() => element.disabled = false, timeout);
+// Enable/Disable Element by ID
+function enableElement(id) {
+  document.getElementById(id).disabled = false;
 }
-
-// Enable Element by ID
-function enable(id) {
-  const element = document.getElementById(id);
-  element.disabled = false;
+function disableElement(id, timeout = 0) {
+  document.getElementById(id).disabled = true;
+  if (timeout === 0) return 'NO TIMEOUT SET';
+  setTimeout(() => {
+    id => document.getElementById(id).disabled = true
+  }, timeout);
+}
+function enableElements(ids) {
+  ids.forEach(id => document.getElementById(id).disabled = false);
+}
+function disableElements(ids, timeout = 0) {
+  ids.forEach(id => document.getElementById(id).disabled = true);
+  if (timeout === 0) return 'NO TIMEOUT SET';
+  setTimeout(() => {
+    ids.forEach(id => document.getElementById(id).disabled = true)
+  }, timeout);
 }
 
 // Toasts

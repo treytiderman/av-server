@@ -44,7 +44,7 @@
   <script defer src="/js/dialog.js"></script>
   <script defer src="/js/navHam.js"></script>
   <script defer src="/js/feedback.js"></script>
-  <!-- <script defer src="/html/av/ip.js"></script> -->
+  <script defer src="./dhcp.js"></script>
 
 </head>
 
@@ -78,35 +78,20 @@
 
     <!-- Header -->
     <h4>
-      DHCP Server **TODO**
+      DHCP Server
       <p>Setup and run a DHCP server</p>
     </h4>
 
-    <div class="flex align-start break-lg">
+    <div class="flex align-start break-md">
       
       <!-- DHCP Server | Settings -->
       <section style="max-width: 400px">
         <h5>Settings</h5>
   
         <!-- On / Off -->
-        <div class="flex even" id="power">
-          <button class="g10 g30-bdr g30-t" onclick="powerCSS(event)">On</button>
-          <button class="r30" onclick="powerCSS(event)">Off</button>
-          <script>
-            function powerCSS(event) {
-              const powerDiv = event.target.parentElement;
-              const powerOn = powerDiv.children[0];
-              const powerOff = powerDiv.children[1];
-              if (powerOff.classList.value === 'r30') {
-                powerOn.classList = 'g30'
-                powerOff.classList = 'r10 r30-bdr r30-t'
-              }
-              else {
-                powerOn.classList = 'g10 g30-bdr g30-t'
-                powerOff.classList = 'r30'
-              }
-            }
-          </script>
+        <div class="flex even">
+          <button id="serverStart" class="g10 g30-bdr g50-t">Start Server?</button>
+          <button id="serverStop" class="r30">Server stopped</button>
         </div>
   
         <!-- Settings -->
@@ -114,32 +99,50 @@
   
           <div class="flex even break-md">
             <label>
-              DHCP Range Start <br>
-              <input type="text" id="ipAddr" class="fill t-mono" placeholder="192.168.1.100">
+              Computer's static IP <br>
+              <input type="text" id="serverIp" class="fill t-mono" 
+                placeholder="192.168.1.9" value="192.168.1.9">
             </label>
             <label>
-              DHCP Range End <br>
-              <input type="text" id="ipAddr" class="fill t-mono" placeholder="192.168.1.254">
+              Lease Period (sec) <br>
+              <input type="number" id="leasePeriod" class="fill t-mono" 
+                placeholder="3600" value="3600">
+            </label>
+          </div>
+          <div class="flex even break-md">
+            <label>
+              Range Start <br>
+              <input type="text" id="rangeStart" class="fill t-mono" 
+                placeholder="192.168.1.100" value="192.168.1.100">
+            </label>
+            <label>
+              Range End <br>
+              <input type="text" id="rangeEnd" class="fill t-mono" 
+                placeholder="192.168.1.199" value="192.168.1.199">
             </label>
           </div>
           <div class="flex even break-md">
             <label>
               Subnet Mask <br>
-              <input type="text" id="subnetMask" class="fill t-mono" placeholder="255.255.255.0">
+              <input type="text" id="mask" class="fill t-mono" 
+                placeholder="255.255.255.0" value="255.255.255.0">
             </label>
             <label>
               Gateway <br>
-              <input type="text" id="gateway" class="fill t-mono" placeholder="192.168.1.1">
+              <input type="text" id="gateway" class="fill t-mono" 
+                placeholder="192.168.1.1" value="192.168.1.1">
             </label>
           </div>
           <div class="flex even break-md">
             <label>
               DNS 1 <br>
-              <input type="text" id="dns1" class="fill t-mono" placeholder="192.168.1.1">
+              <input type="text" id="dns1" class="fill t-mono" 
+                placeholder="192.168.1.1" value="192.168.1.1">
             </label>
             <label>
               DNS 2 <br>
-              <input type="text" id="dns2" class="fill t-mono" placeholder="1.1.1.1">
+              <input type="text" id="dns2" class="fill t-mono" 
+                placeholder="1.1.1.1" value="1.1.1.1">
             </label>
           </div> 
   
@@ -147,34 +150,25 @@
   
       </section>
   
-      <!-- DHCP Server | Settings -->
+      <!-- DHCP Server | Clients -->
       <section class="grow">
         <h5>Client Addresses</h5>
         
-        <div class="grid auto-c t-mono fill" id="">
+        <div class="grid auto-c t-mono fill" id="clientsDiv">
           <div class="w30-bdr grid pad radius gap-0 relative">
             <span class="          ">xxx.xxx.xxx.xxx</span>
-            <span class="w50-t t-sm">FF:FF:FF:FF:FF:FF</span>
-            <span class="w50-t t-sm">HOSTNAME</span>
-            <a class="w30-t fixed-tr"> <i class="fa fa-lock-open"></i> </a>
+            <span class="w50-t t-sm">MAC: FF:FF:FF:FF:FF:FF</span>
+            <span class="w50-t t-sm">EXP: when lease expires</span>
           </div>
           <div class="w30-bdr grid pad radius gap-0 relative">
             <span class="          ">192.168.1.110</span>
-            <span class="w50-t t-sm">00:D8:61:1A:8E:7B</span>
-            <span class="w50-t t-sm">Trey-PC</span>
-            <a class="w50-t fixed-tr"> <i class="fa fa-lock"></i> </a>
+            <span class="w50-t t-sm">MAC: 00:D8:61:1A:8E:7B</span>
+            <span class="w50-t t-sm">EXP: 6/26/2022, 9:53:42 AM</span>
           </div>
           <div class="w30-bdr grid pad radius gap-0 relative">
-            <span class="          ">192.168.1.110</span>
-            <span class="w50-t t-sm">00:D8:61:1A:8E:7B</span>
-            <span class="w50-t t-sm">Trey-PC</span>
-            <a class="w30-t fixed-tr"> <i class="fa fa-lock-open"></i> </a>
-          </div>
-          <div class="w30-bdr grid pad radius gap-0 relative">
-            <span class="          ">192.168.1.110</span>
-            <span class="w50-t t-sm">00:D8:61:1A:8E:7B</span>
-            <span class="w50-t t-sm">Trey-PC</span>
-            <a class="w30-t fixed-tr"> <i class="fa fa-lock-open"></i> </a>
+            <span class="          ">192.168.1.112</span>
+            <span class="w50-t t-sm">MAC: 00:D8:61:1A:8E:7B</span>
+            <span class="w50-t t-sm">Address offered</span>
           </div>
         </div>
   
@@ -182,12 +176,8 @@
 
     </div>
 
-      
   </main>
-  
-  <footer class="grid">
-  
-  </footer>
 
 </body>
+
 </html>

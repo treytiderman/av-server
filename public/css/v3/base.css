@@ -50,11 +50,11 @@ body {
   --break-xl: 1280px;
 
   /* White / Grayscale */
-  --w90:  hsl( 220, 8%,  90%);
-  --w70:  hsl( 220, 8%,  65%);
-  --w50:  hsl( 220, 8%,  45%);
-  --w30:  hsl( 220, 8%,  16%);
-  --w10:  hsl( 220, 8%,   6%);
+  --w90:  hsl( 220, 10%,  90%);
+  --w70:  hsl( 220, 10%,  65%);
+  --w50:  hsl( 220, 10%,  45%);
+  --w30:  hsl( 220, 10%,  16%);
+  --w10:  hsl( 220, 10%,   6%);
 
   /* Accent */
   --a90: hsl( 265,  94%,  90%);
@@ -104,7 +104,7 @@ main {
   margin: 0 auto;
   display: block;
   max-width: 100%;
-  /* overflow-x: auto; */
+  overflow-x: auto;
   display: grid;
   gap: var(--gap);
   /* align-items: baseline; */
@@ -198,10 +198,10 @@ video,
 canvas,
 iframe,
 picture { 
-  height: 100%;
   max-width: 100%;
   display: block;
   border-radius: var(--radius);
+  /* height: 100%; */
   /* max-height: 100%; */
   /* object-position: top; */
   /* object-fit: cover; */
