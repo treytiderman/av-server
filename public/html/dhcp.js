@@ -140,18 +140,18 @@ function updateServerSettings() {
 }
 function updateServerStatus(serverRunning) {
   if (serverRunning) {
-    serverStart.classList = 'g10 g30-bdr g50-t'
-    serverStart.innerText = 'Start Server?'
-    serverStop.classList = 'r30'
-    serverStop.innerText = 'Server stopped'
-    enableElements(['serverIp','rangeStart','rangeEnd','mask','gateway','dns1','dns2','leasePeriod']);
-  }
-  else {
     serverStart.classList = 'g30'
     serverStart.innerText = 'Server Running...'
     serverStop.classList = 'r10 r30-bdr r50-t'
     serverStop.innerText = 'Stop server?'
     disableElements(['serverIp','rangeStart','rangeEnd','mask','gateway','dns1','dns2','leasePeriod']);
+  }
+  else {
+    serverStart.classList = 'g10 g30-bdr g50-t'
+    serverStart.innerText = 'Start Server?'
+    serverStop.classList = 'r30'
+    serverStop.innerText = 'Server stopped'
+    enableElements(['serverIp','rangeStart','rangeEnd','mask','gateway','dns1','dns2','leasePeriod']);
   }
 }
 function validateSettings(options) {
@@ -174,14 +174,18 @@ serverStart.addEventListener("click", async () => {
   if (validateSettings(clientData.options) === 'OPTIONS VALID') {
     const response = await post('/api/dhcp/serverOptions', clientData.options);
     if (response === 'OPTIONS SET') {
-      serverData.serverRunning = await get('/api/dhcp/start');
-      updateServerStatus(serverData.serverRunning);
+      const res = await get('/api/dhcp/start');
+    }
+    else if (response === "OPTIONS FAILED VALIDATION") {
+      createToast(`OPTIONS FAILED VALIDATION`, 'error', false, 2000);
+    }
+    else if (response === "STOP DHCP SERVER FIRST") {
+      createToast(`STOP DHCP SERVER FIRST`, 'error', false, 2000);
     }
   }
 });
 serverStop.addEventListener("click", async () => {
-  serverData.serverRunning = await get('/api/dhcp/stop');
-  updateServerStatus(serverData.serverRunning);
+  const res = await get('/api/dhcp/stop');
 });
 
 // #endregion
@@ -226,10 +230,26 @@ function createClientDiv(client) {
 }
 function updateClients(clients) {
   clientsDiv.innerHTML = '';
-  clients.forEach(client => {
-    const div = createClientDiv(client);
+  if (serverData.serverRunning === false) {
+    const div = createClientDiv({
+      address: "DHCP Server is Stopped",
+      mac: "N/A",
+    });
     clientsDiv.appendChild(div)
-  });
+  }
+  else if (clients.length === 0) {
+    const div = createClientDiv({
+      address: "No clients yet",
+      mac: "N/A",
+    });
+    clientsDiv.appendChild(div)
+  }
+  else {
+    clients.forEach(client => {
+      const div = createClientDiv(client);
+      clientsDiv.appendChild(div)
+    });
+  }
 }
 
 // #endregion
@@ -237,8 +257,8 @@ function updateClients(clients) {
 // #region Update Loop
 
 // Variables
-let updateRate = 1000;
-updateRate = 100000;
+let updateRate = 2000;
+// updateRate = 100000;
 
 // Functions
 async function updateOnStartUp() {
@@ -250,6 +270,7 @@ async function updateClientDataUI() {
 }
 async function updateServerDataUI() {
   updateClients(serverData.clients);
+  updateServerStatus(serverData.serverRunning);
 }
 async function update() {
   if (!document.hidden) {

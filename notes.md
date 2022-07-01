@@ -51,7 +51,7 @@ npm run dev
 # How to pkg (package.json has options)
 ```
 pkg app.js
-pkg --out-path dist -o AV-Tool v0.1 -t node16-win-x64 app.js
+pkg -t node16-win-x64 app.js
 ```
 
 # get network interface config

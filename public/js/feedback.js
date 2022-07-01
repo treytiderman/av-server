@@ -51,7 +51,7 @@ function disableElement(id, timeout = 0) {
   document.getElementById(id).disabled = true;
   if (timeout === 0) return 'NO TIMEOUT SET';
   setTimeout(() => {
-    id => document.getElementById(id).disabled = true
+    document.getElementById(id).disabled = false
   }, timeout);
 }
 function enableElements(ids) {
@@ -61,7 +61,7 @@ function disableElements(ids, timeout = 0) {
   ids.forEach(id => document.getElementById(id).disabled = true);
   if (timeout === 0) return 'NO TIMEOUT SET';
   setTimeout(() => {
-    ids.forEach(id => document.getElementById(id).disabled = true)
+    ids.forEach(id => document.getElementById(id).disabled = false)
   }, timeout);
 }
 
