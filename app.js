@@ -72,4 +72,4 @@ app.listen(port, () => {
 
 // Require Open
 const open = require('open');
-open(`http://localhost:${port}`);
+// open(`http://localhost:${port}`);

@@ -1,0 +1,30 @@
+{
+  "name": "av-tools",
+  "version": "0.2",
+  "description": "simple tools to help audio video techs",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dhcp": "^0.2.20",
+    "express": "^4.17.3",
+    "jsonwebtoken": "^8.5.1",
+    "nodemon": "^2.0.15",
+    "open": "^8.4.0",
+    "pkg": "^5.7.0"
+  },
+  "pkg": {
+    "scripts": "src/**",
+    "assets": [
+      "public/**"
+    ],
+    "targets": [
+      "node16-win-x64"
+    ],
+    "outputPath": "."
+  }
+}

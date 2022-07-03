@@ -15,6 +15,7 @@ White, Black, Color Bars, Animations, Screen tearing
 https://github.com/node-dmx/dmx
 https://github.com/andypotato/dmx-controller-demo
 https://medium.com/swlh/connect-your-interactive-experiences-to-a-dmx-lighting-controller-with-node-js-ce8a8bb15f8b
+https://github.com/mmckegg/loop-drop-app
 
 ## mDNS
 
@@ -34,8 +35,11 @@ ADA, TV Size, Rack Units
 ## Noise Generator
 ## Webcam viewer
 
+## QR Code Gen
+## OCR from screen shots
 
-
+## Screen Saver
+https://github.com/muffinista/before-dawn
 
 # How to run
 Right click app.js and Open in Integrated Termainal
