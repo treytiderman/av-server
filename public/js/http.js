@@ -23,13 +23,13 @@ async function post(uri, data) {
   // Fetch options
   const origin = document.location.origin;
   const url = `${origin}${uri}`;
-  console.log('POST:', url, data);
   const options = {
     method: 'POST',
     body: JSON.stringify(data)
   };
-
+  
   // Fetch
+  console.log('POST:', url, data);
   let response = await fetch(url, options);
   if (!response.ok) { return 'REQUEST FAILED' }
   const res = await response.json();

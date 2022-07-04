@@ -7,16 +7,16 @@ const dhcp = require("../modules/dhcp");
 
 // Routes
 router.get('/clients', (req, res) => {
-  res.json(dhcp.clients);
+  res.json(dhcp.state.clients);
 });
 router.get('/serverRunning', (req, res) => {
-  res.json(dhcp.serverRunning);
+  res.json(dhcp.state.running);
 });
 router.get('/serverOptions', (req, res) => {
-  res.json(dhcp.serverOptions);
+  res.json(dhcp.options);
 });
 router.get('/start', (req, res) => {
-  const output = dhcp.start(dhcp.serverOptions)
+  const output = dhcp.start(dhcp.state.options)
   res.status(200).json(output);
 });
 router.get('/stop', (req, res) => {
@@ -25,15 +25,15 @@ router.get('/stop', (req, res) => {
 });
 router.post('/serverOptions', (req, res) => {
   const options = JSON.parse(req.body);
-  const output = dhcp.setServerOptions(
+  const output = dhcp.setOptions(
     options.ip,
     options.rangeStart,
-    options.rangeStop,
+    options.rangeEnd,
     options.mask,
     options.gateway,
     options.dns1,
     options.dns2,
-    options.leaseTime
+    options.leasePeriod
   )
   res.status(200).json(output);
 });

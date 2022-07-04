@@ -162,7 +162,7 @@ let clientData = {
     }
   ]
 }
-const setIpTimer = 6000;
+const setIpTimer = 8000;
 
 // #endregion
 
@@ -217,14 +217,15 @@ function updateNicSelected() {
   child[3].innerText = `Gate: ${nic.gateway || ''}`;
   child[4].innerText = `DNS1: ${nic.dns[0] || ''}`;
   child[5].innerText = `DNS2: ${nic.dns[1] || ''}`;
-  child[6].innerText = `Metric: ${nic.interfaceMetric || ''}`;
+  child[6].innerText = `DHCP: ${nic.ipIsDhcp}`;
+  child[7].innerText = `Metric: ${nic.interfaceMetric || ''}`;
   // Add tool
   const tooltip = document.createElement('aside');
   tooltip.innerHTML = `
   Interface Metric / Priority <br> 
   <small>Which interface gets to the internet?</small> <br> <br>
   Click to edit `
-  child[6].appendChild(tooltip);
+  child[7].appendChild(tooltip);
 }
 
 // Events
@@ -261,9 +262,9 @@ const presetCards = document.getElementById('presetCards');
 function disableAfterPost() {
   // Feedback for waiting
   showLoadingOverlay('nicInfo', setIpTimer);
-  disable('presetSet', setIpTimer);
-  disable('presetAdd', setIpTimer);
-  disable('setIpBtn', setIpTimer);
+  disableElement('presetSet', setIpTimer);
+  disableElement('presetAdd', setIpTimer);
+  disableElement('setIpBtn', setIpTimer);
 }
 function selectPresetButton(element) {
   const presets = [...presetCards.children];
@@ -389,9 +390,12 @@ function postSelectedPreset() {
   }
 }
 function postSelectedPresetAdd() {
-  disableAfterPost();
-  // Do the thing
-  if (clientData.presetSelected === "DHCP") {
+  const nic = getNicByNicName(serverData.nics, clientData.nicSelected);
+  if (nic.ipIsDhcp === true) {
+    // Do nothing
+    createToast('Can not add static IP when set to DHCP', 'error', true, 2000);
+  }
+  else if (clientData.presetSelected === "DHCP") {
     // Do nothing
   }
   else {
@@ -399,6 +403,7 @@ function postSelectedPresetAdd() {
     selectedPreset.nic = clientData.nicSelected
     console.log('/api/net/static/add', selectedPreset);
     post('/api/net/static/add', selectedPreset);
+    disableAfterPost();
   }
 }
 
@@ -546,7 +551,6 @@ function addPreset() {
   dialogClose('popupNetworkSettings')
 }
 function postPresetForm() {
-  disableAfterPost();
   // Do the thing
   let preset = {
     "nic": clientData.nicSelected,
@@ -562,6 +566,7 @@ function postPresetForm() {
     ]
   }
   if (validPreset()) {
+    disableAfterPost();
     console.log('/api/net/static', preset);
     post('/api/net/static', preset);
     dialogClose('popupNetworkSettings');

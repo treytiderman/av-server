@@ -38,7 +38,8 @@ class NIC {
       }
       else if (line.startsWith('DHCP enabled:')) {
         let split = line.split(": ");
-        this.ipIsDhcp = split[1].trim();
+        if (split[1].trim() === "Yes") this.ipIsDhcp = true;
+        else if (split[1].trim() === "No") this.ipIsDhcp = false;
       }
       else if (line.startsWith('IP Address:')) {
         let split = line.split(": ");

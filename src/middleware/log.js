@@ -6,7 +6,7 @@ function log(text) {
   // Log text
   const line = `${time} | ${text}`;
   // console.log(line);
-  fs.appendFile("./src/logs/requests.txt", line + '\n')
+  fs.appendFile("./logs/requests.txt", line + '\n')
 }
 
 // Log request information

@@ -18,7 +18,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "av-tools"
+            "name": "test1"
           }
         },
         {

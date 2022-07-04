@@ -44,9 +44,13 @@ app.get('/install', async (req, res) => {
 const { auth, login } = require('./src/middleware/login');
 app.use('/api/login', login);
 
-// Router /api/net - set network settings
-const { router } = require('./src/routes/net');
-app.use('/api/net', router);
+// Router /api/net - Change computers IP/Network settings
+const net = require('./src/routes/net');
+app.use('/api/net', net.router);
+
+// Router /api/dhcp - DHCP Server
+const dhcp = require('./src/routes/dhcp');
+app.use('/api/dhcp', dhcp.router);
 
 
 
@@ -62,5 +66,10 @@ app.use('/api/net', router);
 // Start web server
 const port = 6420 ;
 app.listen(port, () => {
-  console.log(`\nApp available at: http://localhost:${port}`)
+  console.log(`AV-Tools server`)
+  console.log(`>> this hosts the web pages available at: http://localhost:${port} \n`)
 })
+
+// Require Open
+const open = require('open');
+// open(`http://localhost:${port}`);
