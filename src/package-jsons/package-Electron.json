@@ -7,7 +7,8 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "publish": "electron-forge publish"
+    "publish": "electron-forge publish",
+    "test": "node tests/app.test.js"
   },
   "author": "trey",
   "license": "MIT",

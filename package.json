@@ -1,13 +1,14 @@
 {
   "name": "av-tools",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "simple tools to help audio video techs",
   "main": "src/electron/electron.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "publish": "electron-forge publish"
+    "publish": "electron-forge publish",
+    "test": "node tests/app.test.js"
   },
   "author": "trey",
   "license": "MIT",
@@ -18,7 +19,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "av-tools"
+            "name": "AV-Tools"
           }
         },
         {
