@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
+    "test": "node tests/app.test.js",
     "pkg": "pkg -t node16-win-x64 app.js"
   },
   "author": "trey",

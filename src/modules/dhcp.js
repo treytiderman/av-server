@@ -196,7 +196,7 @@ function start(options = serverState.options) {
     serverState.running = false;
     console.log("DHCP Server Stopped");
   });
-  server.listen();
+  server.listen(67, options.server);
   return true;
 }
 function stop() {
