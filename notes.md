@@ -37,6 +37,12 @@ ADA, TV Size, Rack Units
 
 ## QR Code Gen
 ## OCR from screen shots
+https://github.com/naptha/tesseract.js#tesseractjs
+
+## Macros / Global Hotkeys
+Use nut.js instead of robotjs
+https://github.com/octalmage/robotjs
+https://github.com/wilix-team/iohook
 
 ## Screen Saver
 https://github.com/muffinista/before-dawn
