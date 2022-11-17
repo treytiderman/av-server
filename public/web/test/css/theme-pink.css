@@ -1,0 +1,85 @@
+/* theme-light.css v4 | 7-28-2022 */
+/* requires styles.css v4 */
+
+html > .theme-pink {
+  color-scheme: light;
+}
+
+body.theme-pink {
+
+  /* Pinkscale */
+  --pink-90: hsl(300, 50%,  94%);
+  --pink-70: hsl(300, 50%,  84%);
+  --pink-50: hsl(300, 50%,  55%);
+  --pink-30: hsl(300, 50%,  16%);
+  --pink-10: hsl(300, 50%,  10%);
+  
+  /* Colors */
+  --font-color-0: var(--pink-50);
+  --font-color-1: var(--pink-30);
+  --font-color-2: var(--pink-10);
+  --bg-color-0: #fff;
+  --bg-color-1: var(--pink-90);
+  --bg-color-2: var(--pink-70);
+  --outline-color: var(--pink-30);
+  --border-color: var(--pink-70);
+  --shadow-color: #00000010;
+  --filter-brightness-hover: brightness(135%);
+  --filter-brightness-diable: brightness(69%);
+  --highlight-color: #00000010;
+  
+  --button-bg-color: var(--pink-70);
+  --button-font-color: var(--pink-10);
+  --accent-bg-color: hsl(60, 100%, 84%);
+  --accent-font-color: hsl(60, 20%, 10%);
+  --correct-bg-color: hsl(190, 70%, 45%);
+  --correct-font-color: hsl(190, 20%, 10%);
+  --warning-bg-color: hsl(265, 70%, 55%);
+  --warning-font-color: hsl(265, 20%, 10%);
+  --error-bg-color: hsl(350, 65%, 55%);
+  --error-font-color: hsl(350, 20%, 10%);
+
+  /* Text */
+  --font-size: 16px;
+  --font-text: 'Open Sans', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --font-header: var(--font-text);
+  --font-serif: Times New Roman, serif;
+  --line-height: 1.75;
+  --char-width: 80ch;
+  
+  /* Margin, Padding, Gap */ 
+  /* top | right | bottom | left */
+  --gap: 1.2rem;
+  --margin-x: 1.2rem;
+  --margin-y: 1.2rem;
+  --margin: var(--margin-y) var(--margin-x);
+  --pad: .6rem;
+  --padding-x: .6em;
+  --padding-y: .6em;
+  --padding: var(--padding-y) var(--padding-x);
+  
+  /* Outline, Border, Border Radius */
+  /* width | style | color */
+  --outline: 2px solid var(--outline-color);
+  --border: 2px solid var(--border-color);
+  --radius: 0.4rem;
+  --radius-2: 0.8rem;
+  
+  /* Shadow */ 
+  /* box-shadow: offset-x | offset-y | blur-radius | spread-radius | color */
+  /* text-shadow: offset-x | offset-y | blur-radius | color */
+  --text-shadow: 1px 1px 4px var(--shadow-color);
+  /* --shadow: 2px 2px 2px 0px var(--shadow-color); */
+  --shadow-2:
+    2px 2px 2px 0px var(--shadow-color),
+    0px 0px 4px 4px var(--shadow-color);
+  /* --shadow-input: -2px -2px 2px 0px var(--shadow-color); */
+  
+  /* Breakpoints */
+  --break-sm: 295px;
+  --break-md: 550px;
+  --break-lg: 960px;
+  --break-xl: 1280px;
+
+}

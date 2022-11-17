@@ -1,0 +1,85 @@
+/* theme-light.css v4 | 7-28-2022 */
+/* requires styles.css v4 */
+
+html > .theme-light {
+  color-scheme: light;
+}
+
+body.theme-light {
+
+  /* Grayscale */
+  --gray-90: hsl( 220, 10%,  94%);
+  --gray-70: hsl( 220, 10%,  86%);
+  --gray-50: hsl( 220, 10%,  55%);
+  --gray-30: hsl( 220, 10%,  16%);
+  --gray-10: hsl( 220, 10%,  10%);
+  
+  /* Colors */
+  --font-color-0: var(--gray-50);
+  --font-color-1: var(--gray-30);
+  --font-color-2: var(--gray-10);
+  --bg-color-0: #fff;
+  --bg-color-1: var(--gray-90);
+  --bg-color-2: var(--gray-70);
+  --outline-color: var(--gray-30);
+  --border-color: var(--gray-70);
+  --shadow-color: #00000010;
+  --filter-brightness-hover: brightness(125%);
+  --filter-brightness-diable: brightness(69%);
+  --highlight-color: #00000010;
+  
+  --button-bg-color: var(--gray-70);
+  --button-font-color: var(--gray-10);
+  --accent-bg-color: hsl(265, 100%, 84%);
+  --accent-font-color: hsl(265, 20%, 10%);
+  --correct-bg-color: hsl(130, 70%, 45%);
+  --correct-font-color: hsl(130, 20%, 10%);
+  --warning-bg-color: hsl(40, 70%, 55%);
+  --warning-font-color: hsl(60, 20%, 10%);
+  --error-bg-color: hsl(5, 65%, 55%);
+  --error-font-color: hsl(5, 20%, 10%);
+
+  /* Text */
+  --font-size: 16px;
+  --font-text: 'Open Sans', -apple-system, BlinkMacSystemFont, helvetica, arial, sans-serif;
+  --font-header: var(--font-text);
+  --font-mono: 'Fira Code', Menlo, Consolas, 'Courier New', Courier, monospace;
+  --font-serif: Times New Roman, serif;
+  --line-height: 1.75;
+  --char-width: 80ch;
+
+  /* Margin, Padding, Gap */ 
+  /* top | right | bottom | left */
+  --gap: 1.2rem;
+  --margin-x: 1.2rem;
+  --margin-y: 1.2rem;
+  --margin: var(--margin-y) var(--margin-x);
+  --pad: .6rem;
+  --padding-x: .6em;
+  --padding-y: .6em;
+  --padding: var(--padding-y) var(--padding-x);
+
+  /* Outline, Border, Border Radius */
+  /* width | style | color */
+  --outline: 2px solid var(--outline-color);
+  --border: 2px solid var(--border-color);
+  --radius: 0.4rem;
+  --radius-2: 0.8rem;
+  
+  /* Shadow */ 
+  /* box-shadow: offset-x | offset-y | blur-radius | spread-radius | color */
+  /* text-shadow: offset-x | offset-y | blur-radius | color */
+  --text-shadow: 1px 1px 4px var(--shadow-color);
+  /* --shadow: 2px 2px 2px 0px var(--shadow-color); */
+  --shadow-2:
+    2px 2px 2px 0px var(--shadow-color),
+    0px 0px 10px 10px var(--shadow-color);
+  /* --shadow-input: -2px -2px 2px 0px var(--shadow-color); */
+  
+  /* Breakpoints */
+  --break-sm: 295px;
+  --break-md: 550px;
+  --break-lg: 960px;
+  --break-xl: 1280px;
+
+}

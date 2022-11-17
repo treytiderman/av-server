@@ -1,0 +1,72 @@
+{
+  "name": "av-tools",
+  "version": "0.3.0",
+  "description": "av-tools",
+  "main": "modules/electron.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "electron": "electron-forge start",
+    "make": "electron-forge make",
+    "pkg": "pkg -t node16-win-x64 --out-path build/pkg server.js"
+  },
+  "keywords": [],
+  "author": "trey",
+  "license": "MIT",
+  "dependencies": {
+    "dhcp": "^0.2.20",
+    "electron-squirrel-startup": "^1.0.0",
+    "express": "^4.18.1",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^8.5.1",
+    "open": "^8.4.0",
+    "ws": "^8.8.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.64",
+    "@electron-forge/maker-deb": "^6.0.0-beta.64",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.64",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.64",
+    "@electron-forge/maker-zip": "^6.0.0-beta.64",
+    "electron": "19.0.7",
+    "nodemon": "^2.0.15",
+    "pkg": "^5.8.0"
+  },
+  "pkg": {
+    "scripts": "**",
+    "assets": [
+      "../client/**"
+    ],
+    "targets": [
+      "node16-win-x64"
+    ],
+    "outputPath": "."
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": ""
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  }
+}
