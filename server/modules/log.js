@@ -6,7 +6,7 @@ function log(text, folderPath, filename) {
   // Time & date
   const timeDate = new Date(Date.now()).toLocaleString();
   const time = timeDate.split(', ')[1];
-  const date = timeDate.split(',')[0].replaceAll("/", "-");
+  const date = timeDate.split(',')[0].replace(/\//ig, "-");
   // Log text to path
   const line = `${time} > ${text}`;
   const path = `${folderPath}${filename} ${date}.log`;

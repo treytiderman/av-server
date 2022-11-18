@@ -189,11 +189,17 @@ function validMetric(metric) {
 }
 
 // Run a cli command
+const os = require("os"); // Comes with node.js
 async function runCmd(cmd) {
-  if (cmd !== 'netsh interface ipv4 show config') console.log(cmd);
-  const { stdout, stderr } = await exec(cmd);
-  if (stderr) { console.error(`stderr: ${stderr}`); return }
-  return stdout
+  if (os.type() === "Windows_NT") {     
+    if (cmd !== 'netsh interface ipv4 show config') console.log(cmd);
+    const { stdout, stderr } = await exec(cmd);
+    if (stderr) { console.error(`stderr: ${stderr}`); return }
+    return stdout
+  }
+  else {
+    console.log("netsh.js can only run windows commands")
+  }
 }
 // Get all the network interfaces
 async function getNics() {

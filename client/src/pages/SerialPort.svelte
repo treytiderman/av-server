@@ -169,19 +169,19 @@
     /* gap: var(--gap); */
     align-items: flex-start;
   }
-  article {
-    padding: var(--gap);
-    display: grid;
-    align-content: flex-start;
-    width: 100%;
-    height: 100%;
-    gap: var(--gap);
-  }
   aside {
     padding: var(--gap);
     border-color: var(--color-header);
     display: grid;
     align-content: flex-start;
+    height: 100%;
+    gap: var(--gap);
+  }
+  article {
+    padding: var(--gap);
+    display: grid;
+    align-content: flex-start;
+    width: 100%;
     height: 100%;
     gap: var(--gap);
   }
@@ -205,6 +205,7 @@
   .connection-options {
     display: grid;
     gap: var(--gap);
+    max-width: 400px;
   }
   .connection-open {
     color: var(--color-text-green);

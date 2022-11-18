@@ -19,6 +19,15 @@ app.use('/api/v1', api.router)
 const tests = require('./routes/tests')
 app.use('/api/v1/test', tests.router)
 
+// Router /api/net - Change computers IP/Network settings
+// const net = require(__dirname + '/src/routes/net');
+const network = require('./routes/network');
+app.use('/api/network', network.router);
+
+// // Router /api/dhcp - DHCP Server
+const dhcpServer = require('./routes/dhcpServer');
+app.use('/api/dhcp/server', dhcpServer.router);
+
 // Routes /login
 const auth = require('./middleware/auth')
 app.use('/api/v1/login', auth.router)
@@ -27,6 +36,8 @@ app.use('/api/v1/login', auth.router)
 api.routesAll['/'] = pages.routes
 api.routesAll['/api/v1'] = api.routes
 api.routesAll['/api/v1/test'] = tests.routes
+api.routesAll['/api/v1/network'] = network.routes
+api.routesAll['/api/v1/dhcp'] = dhcpServer.routes
 api.routesAll['/api/v1/login'] = auth.routes
 
 const { networkInterfaces } = require('os')
@@ -49,8 +60,10 @@ function getNICs() {
 
 // Start web server
 const port = 4620
+const os = require("os"); // Comes with node.js
 server.listen(port, () => {
-  console.log(`\nAV-Tools server is up and running. The user interface is available at:`)
+  console.log(`\nAV-Tools server is up and running on ${os.type()}.`)
+  console.log(`The user interface is available at:`)
   console.log(`http://localhost:${port}`)
   const NICs = getNICs()
   Object.values(NICs).forEach(key => {

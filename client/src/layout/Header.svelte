@@ -92,7 +92,7 @@
     align-items: flex-end;
     flex-wrap: nowrap;
     padding: .25rem 0 .25rem 1rem;
-    padding: .25rem 1rem .25rem 1rem;
+    /* padding: .25rem 1rem .25rem 1rem; */
     margin-left: auto
   }
 </style>
