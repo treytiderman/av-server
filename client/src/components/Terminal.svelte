@@ -7,30 +7,10 @@
   // Exports
   export let lines = [
     {
-      wasReceived: false,
+      wasReceived: true,
       ISOtimestamp: '2022-10-16T21:05:38.425Z',
-      data: '{"boolean": true, "string": "Yes", "number": 200}',
-    },
-    {
-      wasReceived: true,
-      ISOtimestamp: '2022-10-16T21:05:38.447Z',
-      data: 'OFF',
-    },
-    {
-      wasReceived: false,
-      ISOtimestamp: '2022-10-16T21:05:38.425Z',
-      data: '\x4f\x46\x46',
-    },
-    {
-      wasReceived: true,
-      ISOtimestamp: '2022-10-16T21:05:38.536Z',
-      data: 'OFF\r\n',
-    },
-    {
-      wasReceived: true,
-      ISOtimestamp: '2022-10-16T21:05:38.543Z',
-      data: 'OK',
-    },
+      data: 'No data yet...',
+    }
   ]
 
   // Variables

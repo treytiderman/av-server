@@ -2,10 +2,10 @@
 export async function get(uri, origin = document.location.origin) {
   
   // Fetch options
-  const url = `${origin}${uri}`;
+  const url = `${origin}${uri}`
   const options = {
     method: 'GET',
-  };
+  }
 
   // Fetch
   let failed = false
@@ -17,36 +17,47 @@ export async function get(uri, origin = document.location.origin) {
     return "not a json"
   }
   else {
-    const res = await response.json();
-    return res;
+    const res = await response.json()
+    return res
   }
 
 }
 
 // Send query to server
-export async function post(uri, data) {
+export async function post(uri, body, origin = document.location.origin) {
 
   // Fetch options
-  const origin = document.location.origin;
-  const url = `${origin}${uri}`;
+  const url = `${origin}${uri}`
   const options = {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
     method: 'POST',
-    body: JSON.stringify(data)
-  };
+    body: JSON.stringify(body)
+  }
 
   // Fetch
-  let response = await fetch(url, options);
-  if (!response.ok) { return }
-  const res = await response.json();
-  return res;
+  let failed = false
+  let response = await fetch(url, options).catch(error => failed = true)
+  if (failed) {
+    return null
+  }
+  else if (!response.ok) {
+    return "not a json"
+  }
+  else {
+    const res = await response.json()
+    return res
+  }
 
 }
 
 // Run the callback function if 1s has passed since the last time debounce() was called
 export function debounce(cb, delay = 1000) {
-  let timeout;  
+  let timeout  
   return (...args) => {
-    clearTimeout(timeout);
+    clearTimeout(timeout)
     timeout = setTimeout(() => {
       cb(...args)
     }, delay)
@@ -87,8 +98,8 @@ export function randomBetween(min, max) {
 
 // Force number to range
 export function numMinMax(num, min, max) {
-  const MIN = min || 1;
-  const MAX = max || 20;
+  const MIN = min || 1
+  const MAX = max || 20
   const parsed = parseInt(num)
   return Math.min(Math.max(parsed, MIN), MAX)
 }

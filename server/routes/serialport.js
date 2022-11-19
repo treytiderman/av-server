@@ -1,24 +1,7 @@
 // Create Express router
-const { response } = require('express')
 const express = require('express')
 const router = express.Router()
 const routes = {
-  "/list": {
-    "method": "GET",
-    "description": "List available serial ports (COM)",
-    "response (example)": [
-      {
-        "path": "COM3",
-        "manufacturer": "FTDI",
-        "serialNumber": "FTCK2VXE",
-        "pnpId": "FTDIBUS\\VID_0403+PID_6001+FTCK2VXEA\\0000",
-        "locationId": undefined,
-        "friendlyName": "USB Serial Port (COM3)",
-        "vendorId": "0403",
-        "productId": "6001"
-      }
-    ]
-  },
   "/open": {
     "method": "POST",
     "description": "Open a serial port connection",
@@ -49,32 +32,30 @@ const routes = {
     "description": "Close the serial port",
     "body (example)": {"name": "whatever you want"},
   },
-  "/getData": {
+  "/availablePorts": {
+    "method": "GET",
+    "description": "List available serial ports (COM)",
+    "response (example)": [
+      {
+        "path": "COM3",
+        "manufacturer": "FTDI",
+        "serialNumber": "FTCK2VXE",
+        "pnpId": "FTDIBUS\\VID_0403+PID_6001+FTCK2VXEA\\0000",
+        "locationId": undefined,
+        "friendlyName": "USB Serial Port (COM3)",
+        "vendorId": "0403",
+        "productId": "6001"
+      }
+    ]
+  },
+  "/ports": {
     "method": "GET",
     "description": "Returns a JSON with all serial port data",
     "response (example)": {}
   },
-  "/getTx": {
-    "method": "GET",
-    "description": "Returns a JSON with all transmited data for a named serial port",
-    "body (example)": {"name": "whatever you want"},
-    "response (example)": {}
-  },
-  "/getRx": {
-    "method": "GET",
-    "description": "Returns a JSON with all the delimited received data for a named serial port",
-    "body (example)": {"name": "whatever you want"},
-    "response (example)": {}
-  },
-  "/getRxRaw": {
-    "method": "GET",
-    "description": "Returns a JSON with all raw received data for a named serial port",
-    "body (example)": {"name": "whatever you want"},
-    "response (example)": {}
-  },
-  "/getRxLast": {
-    "method": "GET",
-    "description": "Returns a JSON with the last received data for a named serial port",
+  "/port": {
+    "method": "POST",
+    "description": "Returns a JSON with the named serial port's data",
     "body (example)": {"name": "whatever you want"},
     "response (example)": {}
   },
@@ -84,9 +65,13 @@ const routes = {
 const serialport = require("../modules/serialport")
 
 // Routes
-router.get('/list', async (req, res) => {
-  res.json(await serialport.list())
+router.get('/', (req, res) => {
+  res.json(routes)
 })
+router.get('/help', (req, res) => {
+  res.json(routes)
+})
+
 router.post('/open', (req, res) => {
   const body = req.body
   const output = serialport.open(
@@ -95,8 +80,7 @@ router.post('/open', (req, res) => {
     body.baudRate,
     body.delimiter,
   )
-  // res.status(200)
-  res.status(200).json(output)
+  res.json(output)
 })
 router.post('/send', (req, res) => {
   const body = req.body
@@ -107,36 +91,24 @@ router.post('/send', (req, res) => {
     body.cr,
     body.lf,
   )
-  res.status(200).json(output)
+  res.json(output)
 })
 router.post('/close', (req, res) => {
   const body = req.body
   const output = serialport.close(body.name)
-  res.status(200).json(output)
+  res.json(output)
 })
 
-router.get('/getData', async (req, res) => {
-  res.json(await serialport.getData())
+router.get('/availablePorts', async (req, res) => {
+  res.json(await serialport.getAvailablePorts())
 })
-router.get('/getTx', (req, res) => {
-  const body = req.body
-  const output = serialport.getTx(body.name)
-  res.status(200).json(output)
+router.get('/ports', async (req, res) => {
+  res.json(await serialport.getPorts())
 })
-router.get('/getRx', (req, res) => {
+router.post('/port', (req, res) => {
   const body = req.body
-  const output = serialport.getRx(body.name)
-  res.status(200).json(output)
-})
-router.get('/getRxRaw', (req, res) => {
-  const body = req.body
-  const output = serialport.getRxRaw(body.name)
-  res.status(200).json(output)
-})
-router.get('/getRxLast', (req, res) => {
-  const body = req.body
-  const output = serialport.getRxLast(body.name)
-  res.status(200).json(output)
+  const output = serialport.getPort(body.name)
+  res.json(output)
 })
 
 // Export

@@ -2,15 +2,21 @@
 const fs = require('fs').promises;
 
 // Functions
-function log(text, folderPath, filename) {
+function log(text, folderPath, filename, debug = false) {
   // Time & date
   const timeDate = new Date(Date.now()).toLocaleString();
   const time = timeDate.split(', ')[1];
   const date = timeDate.split(',')[0].replace(/\//ig, "-");
-  // Log text to path
+  // Log text to the file path
   const line = `${time} > ${text}`;
   const path = `${folderPath}${filename} ${date}.log`;
   fs.appendFile(path, line + '\n')
+  // Log text to a log all file
+  const allLine = `${time} > ${filename} | ${text}`;
+  const allPath = `../public/logs/all ${date}.log`;
+  fs.appendFile(allPath, allLine + '\n')
+  // Log to Console
+  if (debug) console.log(filename, line)
 }
 
 // Exports

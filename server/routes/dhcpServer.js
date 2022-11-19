@@ -1,6 +1,6 @@
 // Create Express router
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 const routes = {
   // "/nics": {
   //   "method": "GET",
@@ -20,28 +20,34 @@ const routes = {
 }
 
 // Module
-const dhcp = require("../modules/dhcpServer");
+const dhcp = require("../modules/dhcpServer")
 
 // Routes
+router.get('/', (req, res) => {
+  res.json(routes)
+})
+router.get('/help', (req, res) => {
+  res.json(routes)
+})
 router.get('/clients', (req, res) => {
-  res.json(dhcp.state.clients);
-});
+  res.json(dhcp.state.clients)
+})
 router.get('/serverRunning', (req, res) => {
-  res.json(dhcp.state.running);
-});
+  res.json(dhcp.state.running)
+})
 router.get('/serverOptions', (req, res) => {
-  res.json(dhcp.options);
-});
+  res.json(dhcp.options)
+})
 router.get('/start', (req, res) => {
   const output = dhcp.start(dhcp.state.options)
-  res.status(200).json(output);
-});
+  res.status(200).json(output)
+})
 router.get('/stop', (req, res) => {
   const output = dhcp.stop()
-  res.status(200).json(output);
-});
+  res.status(200).json(output)
+})
 router.post('/serverOptions', (req, res) => {
-  const options = JSON.parse(req.body);
+  const options = JSON.parse(req.body)
   const output = dhcp.setOptions(
     options.ip,
     options.rangeStart,
@@ -52,9 +58,9 @@ router.post('/serverOptions', (req, res) => {
     options.dns2,
     options.leasePeriod
   )
-  res.status(200).json(output);
-});
+  res.status(200).json(output)
+})
 
 // Export
-exports.router = router;
-exports.routes = routes;
+exports.router = router
+exports.routes = routes

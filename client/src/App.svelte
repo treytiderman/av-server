@@ -72,7 +72,15 @@
       pageComponent: Page,
     },
   ]
-  $router.pageObj = navMenu[0]
+  // $router.pageObj = navMenu[0]
+  $router.pageObj = {
+    name: {
+      header: "SerialPort",
+      nav: "SerialPort"
+    },
+    icon: "terminal",
+    pageComponent: SerialPort,
+  }
 
   $: screenWidth = document.documentElement.offsetWidth
   let navHide = true

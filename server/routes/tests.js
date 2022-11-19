@@ -16,6 +16,12 @@ const routes = {
 const auth = require('../middleware/auth');
 
 // Routes
+router.get('/', (req, res) => {
+  res.json(routes)
+})
+router.get('/help', (req, res) => {
+  res.json(routes)
+})
 router.get('/time', async (req, res) => {
   const time = new Date(Date.now()).toISOString()
   res.status(200).json(time);

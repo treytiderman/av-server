@@ -12,7 +12,7 @@ function start() {
 
   // Allow requests that didn't originate from this server
   const cors = require('cors')
-  app.use(cors())
+  app.use(cors({origin: true}))
 
   // Process request body (req.body) for urlencoded, json, and plain text bodys
   app.use(express.urlencoded({ extended: true }));

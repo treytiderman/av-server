@@ -21,51 +21,14 @@ let ports = {
 }
 
 // Functions
+const logInConsole = true
 function log(text) {
   const logger = require('../modules/log')
   text = text.replace("\n", "\\n")
   text = text.replace("\r", "\\r")
-  logger.log(text, "../public/logs/", 'serial')
+  logger.log(text, "../public/logs/", 'serial', logInConsole)
 }
-async function list() {
-  log(`list()`)
-  let list = await SerialPort.list()
-  return list
-  /* Example response
-  [
-    {
-      path: 'COM1',
-      manufacturer: '(Standard port types)',
-      serialNumber: undefined,
-      pnpId: 'ACPI\\PNP0501\\0',
-      locationId: undefined,
-      friendlyName: 'Communications Port (COM1)',
-      vendorId: undefined,
-      productId: undefined
-    },
-    {
-      path: 'COM3',
-      manufacturer: 'FTDI',
-      serialNumber: 'FTCK2VXE',
-      pnpId: 'FTDIBUS\\VID_0403+PID_6001+FTCK2VXEA\\0000',
-      locationId: undefined,
-      friendlyName: 'USB Serial Port (COM3)',
-      vendorId: '0403',
-      productId: '6001'
-    },
-    {
-      path: 'COM4',
-      manufacturer: 'FTDI',
-      serialNumber: 'AB0OJ5M6',
-      pnpId: 'FTDIBUS\\VID_0403+PID_6001+AB0OJ5M6A\\0000',
-      locationId: undefined,
-      friendlyName: 'USB Serial Port (COM4)',
-      vendorId: '0403',
-      productId: '6001'
-    }
-  ]
-  */
-}
+
 function open(name, path, baudRate = 9600, delimiter = "\r\n") {
   log(`open(${name}, ${path}, ${baudRate}, ${delimiter})`)
 
@@ -166,7 +129,46 @@ function close(name) {
   return portCopy
 }
 
-function getData() {
+async function getAvailablePorts() {
+  log(`list()`)
+  let list = await SerialPort.list()
+  return list
+  /* Example response
+  [
+    {
+      path: 'COM1',
+      manufacturer: '(Standard port types)',
+      serialNumber: undefined,
+      pnpId: 'ACPI\\PNP0501\\0',
+      locationId: undefined,
+      friendlyName: 'Communications Port (COM1)',
+      vendorId: undefined,
+      productId: undefined
+    },
+    {
+      path: 'COM3',
+      manufacturer: 'FTDI',
+      serialNumber: 'FTCK2VXE',
+      pnpId: 'FTDIBUS\\VID_0403+PID_6001+FTCK2VXEA\\0000',
+      locationId: undefined,
+      friendlyName: 'USB Serial Port (COM3)',
+      vendorId: '0403',
+      productId: '6001'
+    },
+    {
+      path: 'COM4',
+      manufacturer: 'FTDI',
+      serialNumber: 'AB0OJ5M6',
+      pnpId: 'FTDIBUS\\VID_0403+PID_6001+AB0OJ5M6A\\0000',
+      locationId: undefined,
+      friendlyName: 'USB Serial Port (COM4)',
+      vendorId: '0403',
+      productId: '6001'
+    }
+  ]
+  */
+}
+function getPorts() {
   log(`getData()`)
   let portsReturn = {}
   Object.entries(ports).forEach(port => {
@@ -177,41 +179,27 @@ function getData() {
   })
   return portsReturn
 }
-function getTx(name) {
-  log(`getTx(${name})`)
-  return ports[name].tx
-}
-function getRx(name) {
-  log(`getRx(${name})`)
-  return ports[name].rx
-}
-function getRxRaw(name) {
-  log(`getRxRaw(${name})`)
-  return ports[name].rxRaw
-}
-function getRxLast(name) {
-  log(`getRxLast(${name})`)
-  const length = ports[name].rx.length
-  return ports[name].rx[length-1]
+function getPort(name) {
+  log(`getPort(${name})`)
+  let portCopy = JSON.parse(JSON.stringify(ports[name]))
+  portCopy.portObj = "for server use only"
+  return portCopy
 }
 
 // Export
-exports.list = list
 exports.open = open
 exports.send = send
 exports.close = close
 
-exports.getData = getData
-exports.getTx = getTx
-exports.getRx = getRx
-exports.getRxRaw = getRxRaw
-exports.getRxLast = getRxLast
+exports.getAvailablePorts = getAvailablePorts
+exports.getPorts = getPorts
+exports.getPort = getPort
 
 /* Example
 
 const serialport = require("./serialport.js")
 
-serialport.list().then(list => console.log(list))
+serialport.getAvailablePorts().then(list => console.log(list))
 
 serialport.open("serial1", "COM3", 9600, "\r\n")
 serialport.open("serial2", "COM4", 38400, "\r\n")
@@ -234,7 +222,7 @@ setTimeout(() => {
 }, 4000)
 
 setTimeout(() => {
-  console.log(serialport.getData())
+  console.log(serialport.getPorts())
 }, 5000)
 
 */

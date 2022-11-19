@@ -19,7 +19,7 @@
   // Component Startup
   import { onMount } from 'svelte';
   onMount(async () => {
-    let timeISO = await get("/api/v1/test/time", "http://192.168.1.1:4620")
+    let timeISO = await get("/api/test/v1/time", "http://192.168.1.1:4620")
     if (timeISO !== null) {
       let timeDate = new Date(timeISO)
       date = dateObjToDate(timeDate)
@@ -32,7 +32,7 @@
     }
 
     setInterval(async () => {
-      let timeISO = await get("/api/v1/test/time", "http://192.168.1.1:4620")
+      let timeISO = await get("/api/test/v1/time", "http://192.168.1.1:4620")
       if (timeISO !== null) {
         let timeDate = new Date(timeISO)
         date = dateObjToDate(timeDate)
