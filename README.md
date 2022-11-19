@@ -24,4 +24,8 @@ Serial v0
 - [ ] 
 
 
-
+# Linux: The USER needs added to the dialout group to open serial connections
+```
+sudo gpasswd --add ${USER} dialout
+sudo reboot
+```

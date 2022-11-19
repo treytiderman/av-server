@@ -9,37 +9,48 @@ const server = ws.start(app)
 
 // Routes /
 const pages = require('./routes/pages')
-app.use('/', pages.router)
+pages.path = '/'
+app.use(pages.path, pages.router)
 
 // Routes /api
 const api = require('./routes/api')
-app.use('/api/v1', api.router)
+api.path = '/api'
+api.routesAll[pages.path] = pages.routes
+api.routesAll[api.path] = api.routes
+app.use(api.path, api.router)
 
 // Routes /test
 const tests = require('./routes/tests')
-app.use('/api/v1/test', tests.router)
+tests.path = '/api/test/v1'
+api.routesAll[tests.path] = tests.routes
+app.use(tests.path, tests.router)
 
 // Router /api/net - Change computers IP/Network settings
 // const net = require(__dirname + '/src/routes/net');
 const network = require('./routes/network');
-app.use('/api/network', network.router);
+network.path = '/api/network/v1'
+api.routesAll[network.path] = network.routes
+app.use(network.path, network.router);
 
-// // Router /api/dhcp - DHCP Server
+// Router /api/dhcp/server - DHCP Server
 const dhcpServer = require('./routes/dhcpServer');
-app.use('/api/dhcp/server', dhcpServer.router);
+dhcpServer.path = '/api/dhcp/server/v1'
+api.routesAll[dhcpServer.path] = dhcpServer.routes
+app.use(dhcpServer.path, dhcpServer.router);
+
+// Router /api/serial - DHCP Server
+const serialport = require('./routes/serialport')
+serialport.path = '/api/serial/v1'
+api.routesAll[serialport.path] = serialport.routes
+app.use(serialport.path, serialport.router)
 
 // Routes /login
 const auth = require('./middleware/auth')
-app.use('/api/v1/login', auth.router)
+auth.path = '/api/login/v1'
+app.use(auth.path, auth.router)
+api.routesAll[auth.path] = auth.routes
 
-// Add all routes to api.routesAll
-api.routesAll['/'] = pages.routes
-api.routesAll['/api/v1'] = api.routes
-api.routesAll['/api/v1/test'] = tests.routes
-api.routesAll['/api/v1/network'] = network.routes
-api.routesAll['/api/v1/dhcp'] = dhcpServer.routes
-api.routesAll['/api/v1/login'] = auth.routes
-
+// Get IP addresses
 const { networkInterfaces } = require('os')
 function getNICs() {
   const nets = networkInterfaces()

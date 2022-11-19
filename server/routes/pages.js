@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
   res.redirect(302, '/web/ui');
 });
 router.get('/api', async (req, res) => {
-  res.redirect(302, '/api/v1');
+  res.send( await fs.readFile('./api.html','utf8') )
 });
 
 // Export

@@ -7,20 +7,28 @@ const LF = { hex: "0A", ascii: "\n" }
 const baudRates = [9600, 14400, 19200, 38400, 57600, 115200]
 let ports = {
   // example: {
-  //   path: path,
+  //   path: "path",
   //   isOpen: false,
-  //   baudRate: baudRate,
-  //   delimiter: delimiter,
+  //   baudRate: "baudRate",
+  //   delimiter: "delimiter",
   //   tx: [],
   //   txFail: [],
   //   rx: [],
   //   rxRaw: [],
   //   error: null,
-  //   portObj: new SerialPort({ path: path, baudRate: baudRate })
+  //   portObj: "new SerialPort({ path: path, baudRate: baudRate })"
   // }
 }
 
+// Functions
+function log(text) {
+  const logger = require('../modules/log')
+  text = text.replace("\n", "\\n")
+  text = text.replace("\r", "\\r")
+  logger.log(text, "../public/logs/", 'serial')
+}
 async function list() {
+  log(`list()`)
   let list = await SerialPort.list()
   return list
   /* Example response
@@ -58,7 +66,10 @@ async function list() {
   ]
   */
 }
-function add(name, path, baudRate = 9600, delimiter = "\r\n") {
+function open(name, path, baudRate = 9600, delimiter = "\r\n") {
+  log(`open(${name}, ${path}, ${baudRate}, ${delimiter})`)
+
+  // Open connection and create port object
   ports[name] = {
     path: path,
     isOpen: false,
@@ -105,8 +116,15 @@ function add(name, path, baudRate = 9600, delimiter = "\r\n") {
     if (ports[name].rx.length > 1000) ports[name].rx.shift()
   })
 
+  // Return
+  let portCopy = JSON.parse(JSON.stringify(ports[name]))
+  portCopy.portObj = "for server use only"
+  return portCopy
 }
-function send(name, message, messageType, cr = true, lf = true) {
+function send(name, message, messageType, cr = false, lf = false) {
+  log(`send(${name}, ${message}, ${messageType}, ${cr}, ${lf})`)
+
+  // Create send object
   let txObj = {
     timestamp: new Date(Date.now()).toISOString(),
     message: message,
@@ -138,30 +156,56 @@ function send(name, message, messageType, cr = true, lf = true) {
   return txObj
 
 }
-function remove(name) {
+function close(name) {
+  log(`close(${name})`)
   ports[name].portObj.close((err) => ports[name].closeError)
+
+  // Return
+  let portCopy = JSON.parse(JSON.stringify(ports[name]))
+  portCopy.portObj = "for server use only"
+  return portCopy
 }
 
-function getData() { return ports }
-function getTx(name) { return ports[name].tx }
-function getRx(name) { return ports[name].rx }
-function getRxRaw(name) { return ports[name].rxRaw }
+function getData() {
+  log(`getData()`)
+  let portsReturn = {}
+  Object.entries(ports).forEach(port => {
+    const [name, object] = port
+    let portCopy = JSON.parse(JSON.stringify(ports[name]))
+    portCopy.portObj = "for server use only"
+    portsReturn[name] = portCopy
+  })
+  return portsReturn
+}
+function getTx(name) {
+  log(`getTx(${name})`)
+  return ports[name].tx
+}
+function getRx(name) {
+  log(`getRx(${name})`)
+  return ports[name].rx
+}
+function getRxRaw(name) {
+  log(`getRxRaw(${name})`)
+  return ports[name].rxRaw
+}
 function getRxLast(name) {
+  log(`getRxLast(${name})`)
   const length = ports[name].rx.length
   return ports[name].rx[length-1]
 }
 
 // Export
-exports.list = list;
-exports.add = add;
-exports.send = send;
-exports.remove = remove;
+exports.list = list
+exports.open = open
+exports.send = send
+exports.close = close
 
-exports.getData = getData;
-exports.getTx = getTx;
-exports.getRx = getRx;
-exports.getRxRaw = getRxRaw;
-exports.getRxLast = getRxLast;
+exports.getData = getData
+exports.getTx = getTx
+exports.getRx = getRx
+exports.getRxRaw = getRxRaw
+exports.getRxLast = getRxLast
 
 /* Example
 
@@ -169,28 +213,28 @@ const serialport = require("./serialport.js")
 
 serialport.list().then(list => console.log(list))
 
-serialport.add("serial1", "COM3", 9600, "\r\n")
-serialport.add("serial2", "COM4", 38400, "\r\n")
-serialport.add("serial3", "COM87", 9600, "\r\n")
+serialport.open("serial1", "COM3", 9600, "\r\n")
+serialport.open("serial2", "COM4", 38400, "\r\n")
+serialport.open("serial3", "COM87", 9600, "\r\n")
 
 setTimeout(() => {
   serialport.send("serial1", "PWR", "ascii", true, true)
-}, 1000);
+}, 1000)
 
 setTimeout(() => {
   serialport.send("serial2", "PWR", "ascii", true, true)
-}, 2000);
+}, 2000)
 
 setTimeout(() => {
   serialport.send("serial1", "PWR2", "ascii", true, true)
-}, 3000);
+}, 3000)
 
 setTimeout(() => {
   serialport.send("serial3", "PWR3", "ascii", true, true)
-}, 4000);
+}, 4000)
 
 setTimeout(() => {
-  console.log(serialport.getData());
-}, 5000);
+  console.log(serialport.getData())
+}, 5000)
 
 */
