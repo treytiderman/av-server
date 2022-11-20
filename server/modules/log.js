@@ -16,7 +16,7 @@ function log(text, folderPath, filename, debug = false) {
   const allPath = `../public/logs/all ${date}.log`;
   fs.appendFile(allPath, allLine + '\n')
   // Log to Console
-  if (debug) console.log(filename, line)
+  if (debug) console.log(allLine)
 }
 
 // Exports

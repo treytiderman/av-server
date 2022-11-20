@@ -6,7 +6,7 @@ const CR = { hex: "0D", ascii: "\r" }
 const LF = { hex: "0A", ascii: "\n" }
 const baudRates = [9600, 14400, 19200, 38400, 57600, 115200]
 let ports = {
-  // example: {
+  // examplePath: {
   //   path: "path",
   //   isOpen: false,
   //   baudRate: "baudRate",
@@ -29,28 +29,34 @@ function log(text) {
   logger.log(text, "../public/logs/", 'serial', logInConsole)
 }
 
-function open(name, path, baudRate = 9600, delimiter = "\r\n") {
-  log(`open(${name}, ${path}, ${baudRate}, ${delimiter})`)
+function open(path, baudRate = 9600, delimiter = "\r\n") {
+  log(`open(${path}, ${baudRate}, ${delimiter})`)
+
+  // Stop if the path is already open
+  if (ports[path] !== undefined) {
+    return { "error": "port already open" }
+  }
 
   // Open connection and create port object
-  ports[name] = {
+  ports[path] = {
     path: path,
+    portObj: new SerialPort({ path: path, baudRate: baudRate }),
     isOpen: false,
     baudRate: baudRate,
     delimiter: delimiter,
+    txrx: [],
     tx: [],
     txFail: [],
     rx: [],
     rxRaw: [],
     error: null,
-    portObj: new SerialPort({ path: path, baudRate: baudRate })
   }
-  ports[name].portObj.on('error', (err) => {ports[name].error = err; console.log(ports[name].error)})
-  ports[name].portObj.on('open', () => ports[name].isOpen = true)
-  ports[name].portObj.on('close', () => ports[name].isOpen = false)
+  ports[path].portObj.on('error', (err) => {ports[path].error = err; log(ports[path].error)})
+  ports[path].portObj.on('open', () => ports[path].isOpen = true)
+  ports[path].portObj.on('close', () => ports[path].isOpen = false)
   
   // Listen for any new data
-  ports[name].portObj.on('data', (data) => {
+  ports[path].portObj.on('data', (data) => {
     // Create rxObj
     let rxObj = { buffer: data }
     rxObj.timestamp = new Date(Date.now()).toISOString(),
@@ -60,13 +66,13 @@ function open(name, path, baudRate = 9600, delimiter = "\r\n") {
     rxObj.lf = rxObj.ascii.endsWith("\n"),
     rxObj.cr = rxObj.ascii.endsWith("\r"),
     // Add rxObj to array
-    ports[name].rxRaw.push(rxObj)
+    ports[path].rxRaw.push(rxObj)
     // Remove the first element from the array if its length is greater than 1000
-    if (ports[name].rxRaw.length > 1000) ports[name].rxRaw.shift()
+    if (ports[path].rxRaw.length > 1000) ports[path].rxRaw.shift()
   })
 
   // Listen for new data that ends with the delimiter
-  const parser = ports[name].portObj.pipe(new DelimiterParser({ delimiter: delimiter }))
+  const parser = ports[path].portObj.pipe(new DelimiterParser({ delimiter: delimiter }))
   parser.on('data', (data) => {
     // Create rxObj
     let rxObj = { buffer: data }
@@ -74,18 +80,24 @@ function open(name, path, baudRate = 9600, delimiter = "\r\n") {
     rxObj.ascii = rxObj.buffer.toString('ascii'),
     rxObj.hex = rxObj.buffer.toString('hex'),
     // Add rxObj to array
-    ports[name].rx.push(rxObj)
+    ports[path].rx.push(rxObj)
     // Remove the first element from the array if its length is greater than 1000
-    if (ports[name].rx.length > 1000) ports[name].rx.shift()
+    if (ports[path].rx.length > 1000) ports[path].rx.shift()
   })
 
   // Return
-  let portCopy = JSON.parse(JSON.stringify(ports[name]))
+  let portCopy = JSON.parse(JSON.stringify(ports[path]))
   portCopy.portObj = "for server use only"
   return portCopy
 }
-function send(name, message, messageType, cr = false, lf = false) {
-  log(`send(${name}, ${message}, ${messageType}, ${cr}, ${lf})`)
+function send(path, message, messageType, cr = false, lf = false) {
+  log(`send(${path}, ${message}, ${messageType}, ${cr}, ${lf})`)
+
+  // Stop if the path is already open
+  console.log("\n", ports[path] === undefined);
+  if (ports[path] === undefined) {
+    return { "error": "port is not defined, open the port first then send" }
+  }
 
   // Create send object
   let txObj = {
@@ -97,9 +109,9 @@ function send(name, message, messageType, cr = false, lf = false) {
   }
 
   // If the serial port isn't open exit
-  if (ports[name].isOpen === false) {
-    ports[name].txFail.push(txObj)
-    if (ports[name].txFail.length > 1000) ports[name].txFail.shift()
+  if (ports[path].isOpen === false) {
+    ports[path].txFail.push(txObj)
+    if (ports[path].txFail.length > 1000) ports[path].txFail.shift()
     return txObj
   }
 
@@ -112,19 +124,19 @@ function send(name, message, messageType, cr = false, lf = false) {
     txObj.messageToSend = message + (cr ? CR.hex : "") + (lf ? LF.hex : "")
     txObj.buffer = Buffer.from(txObj.messageToSend, "hex")
   }
-  ports[name].portObj.write(txObj.buffer)
-  ports[name].tx.push(txObj)
+  ports[path].portObj.write(txObj.buffer)
+  ports[path].tx.push(txObj)
   // Remove the first element from the array if its length is greater than 1000
-  if (ports[name].tx.length > 1000) ports[name].tx.shift()
+  if (ports[path].tx.length > 1000) ports[path].tx.shift()
   return txObj
 
 }
-function close(name) {
-  log(`close(${name})`)
-  ports[name].portObj.close((err) => ports[name].closeError)
+function close(path) {
+  log(`close(${path})`)
+  ports[path].portObj.close((err) => ports[path].closeError)
 
   // Return
-  let portCopy = JSON.parse(JSON.stringify(ports[name]))
+  let portCopy = JSON.parse(JSON.stringify(ports[path]))
   portCopy.portObj = "for server use only"
   return portCopy
 }
@@ -179,9 +191,13 @@ function getPorts() {
   })
   return portsReturn
 }
-function getPort(name) {
-  log(`getPort(${name})`)
-  let portCopy = JSON.parse(JSON.stringify(ports[name]))
+function getPort(path) {
+  if (ports[path] === undefined) {
+    log(`getPort(${path}) doesn't exist`)
+    return { "error": "port hasn't been open before" }
+  }
+  log(`getPort(${path})`)
+  let portCopy = JSON.parse(JSON.stringify(ports[path]))
   portCopy.portObj = "for server use only"
   return portCopy
 }
@@ -201,24 +217,24 @@ const serialport = require("./serialport.js")
 
 serialport.getAvailablePorts().then(list => console.log(list))
 
-serialport.open("serial1", "COM3", 9600, "\r\n")
-serialport.open("serial2", "COM4", 38400, "\r\n")
-serialport.open("serial3", "COM87", 9600, "\r\n")
+serialport.open("COM3", 9600, "\r\n")
+serialport.open("COM4", 38400, "\r\n")
+serialport.open("COM87", 9600, "\r\n")
 
 setTimeout(() => {
-  serialport.send("serial1", "PWR", "ascii", true, true)
+  serialport.send("COM3", "PWR", "ascii", true, true)
 }, 1000)
 
 setTimeout(() => {
-  serialport.send("serial2", "PWR", "ascii", true, true)
+  serialport.send("COM4", "PWR", "ascii", true, true)
 }, 2000)
 
 setTimeout(() => {
-  serialport.send("serial1", "PWR2", "ascii", true, true)
+  serialport.send("COM3", "PWR2", "ascii", true, true)
 }, 3000)
 
 setTimeout(() => {
-  serialport.send("serial3", "PWR3", "ascii", true, true)
+  serialport.send("COM87", "PWR3", "ascii", true, true)
 }, 4000)
 
 setTimeout(() => {

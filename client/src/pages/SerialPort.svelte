@@ -10,12 +10,11 @@
   import { onMount } from 'svelte';
   let availablePorts = []
   let port = { isOpen: false }
-  let connections = []
   let doneLoading = false
   onMount(async () => {
 
     // Available ports
-    const availablePortsResponse = await get("/api/serial/v1/availablePorts", "http://192.168.1.1:4620")
+    const availablePortsResponse = await get("/api/serial/v1/availablePorts", "http://192.168.1.154:4620")
     // Remove ports that don't have a serial number
     availablePortsResponse.forEach(port => {
       if (port.serialNumber !== undefined) availablePorts = [...availablePorts, port];
@@ -25,11 +24,11 @@
 
     // Device info
     if (availablePorts.length > 0) {
-      const body = { "name": devicePath }
-      port = await post("/api/serial/v1/port", body, "http://192.168.1.1:4620")
+      const body = { "path": devicePath }
+      port = await post("/api/serial/v1/port", body, "http://192.168.1.154:4620")
       setInterval(async () => {
-        const body = { "name": devicePath }
-        port = await post("/api/serial/v1/port", body, "http://192.168.1.1:4620")
+        const body = { "path": devicePath }
+        port = await post("/api/serial/v1/port", body, "http://192.168.1.154:4620")
       }, 2000)
     }
 
@@ -53,16 +52,15 @@
   // }
   async function openConnection(path, baudRate, delimiter) {
     const body = {
-      "name": path,
       "path": path,
       "baudRate": baudRate,
       "delimiter": delimiter
     }
-    const openResponse = await post("/api/serial/v1/open", body, "http://192.168.1.1:4620")
+    const openResponse = await post("/api/serial/v1/open", body, "http://192.168.1.154:4620")
   }
   async function closeConnection(path) {
-    const body = { "name": path }
-    const openResponse = await post("/api/serial/v1/close", body, "http://192.168.1.1:4620")
+    const body = { "path": path }
+    const openResponse = await post("/api/serial/v1/close", body, "http://192.168.1.154:4620")
   }
   async function toggleConnectionClick() {
     if (port.isOpen) closeConnection(devicePath)
@@ -75,13 +73,13 @@
   let send3 = ""
   async function sendClick(text) {
     const body = {
-      "name": devicePath,
+      "path": devicePath,
       "message": text,
       "messageType": encodingMode,
       "cr": false,
       "lf": false
     }
-    const sendResponse = await post("/api/serial/v1/send", body, "http://192.168.1.1:4620")
+    const sendResponse = await post("/api/serial/v1/send", body, "http://192.168.1.154:4620")
   }
   
   // Terminal lines

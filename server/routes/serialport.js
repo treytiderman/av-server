@@ -2,11 +2,26 @@
 const express = require('express')
 const router = express.Router()
 const routes = {
+  "/availablePorts": {
+    "method": "GET",
+    "description": "List available serial ports (COM)",
+    "response (example)": [
+      {
+        "path": "COM3",
+        "manufacturer": "FTDI",
+        "serialNumber": "FTCK2VXE",
+        "pnpId": "FTDIBUS\\VID_0403+PID_6001+FTCK2VXEA\\0000",
+        "locationId": undefined,
+        "friendlyName": "USB Serial Port (COM3)",
+        "vendorId": "0403",
+        "productId": "6001"
+      }
+    ]
+  },
   "/open": {
     "method": "POST",
     "description": "Open a serial port connection",
     "body (example)": {
-      "name": "whatever you want",
       "path": "COM3"
     },
     "body (optional)": {
@@ -31,22 +46,6 @@ const routes = {
     "method": "POST",
     "description": "Close the serial port",
     "body (example)": {"name": "whatever you want"},
-  },
-  "/availablePorts": {
-    "method": "GET",
-    "description": "List available serial ports (COM)",
-    "response (example)": [
-      {
-        "path": "COM3",
-        "manufacturer": "FTDI",
-        "serialNumber": "FTCK2VXE",
-        "pnpId": "FTDIBUS\\VID_0403+PID_6001+FTCK2VXEA\\0000",
-        "locationId": undefined,
-        "friendlyName": "USB Serial Port (COM3)",
-        "vendorId": "0403",
-        "productId": "6001"
-      }
-    ]
   },
   "/ports": {
     "method": "GET",
@@ -75,7 +74,6 @@ router.get('/help', (req, res) => {
 router.post('/open', (req, res) => {
   const body = req.body
   const output = serialport.open(
-    body.name,
     body.path,
     body.baudRate,
     body.delimiter,
@@ -85,7 +83,7 @@ router.post('/open', (req, res) => {
 router.post('/send', (req, res) => {
   const body = req.body
   const output = serialport.send(
-    body.name,
+    body.path,
     body.message,
     body.messageType,
     body.cr,
@@ -95,7 +93,7 @@ router.post('/send', (req, res) => {
 })
 router.post('/close', (req, res) => {
   const body = req.body
-  const output = serialport.close(body.name)
+  const output = serialport.close(body.path)
   res.json(output)
 })
 
@@ -107,7 +105,7 @@ router.get('/ports', async (req, res) => {
 })
 router.post('/port', (req, res) => {
   const body = req.body
-  const output = serialport.getPort(body.name)
+  const output = serialport.getPort(body.path)
   res.json(output)
 })
 
