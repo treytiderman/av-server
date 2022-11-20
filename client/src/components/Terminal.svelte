@@ -5,10 +5,12 @@
   import Icon from '../components/Icon.svelte'
 
   // Exports
+  export let showCRLF = true
+  // export let hexSpaces = true
   export let lines = [
     {
       wasReceived: true,
-      ISOtimestamp: '2022-10-16T21:05:38.425Z',
+      timestampISO: '2022-10-16T21:05:38.425Z',
       data: 'No data yet...',
     }
   ]
@@ -50,12 +52,28 @@
     }
   }
   $: if (lines) scrollToBottomOfElement(terminalElement)
+  
+  // Unescape the delimiter if needed
+  $: if (showCRLF) escapeCRLF(lines)
+  function escapeCRLF(lines) {
+    lines.forEach(line => {
+      line.data = line.data.replace(/\r/g, "\\r")
+      line.data = line.data.replace(/\n/g, "\\n")
+      // delimiter = delimiter.replace(/\\x/g, "")
+      // delimiter = delimiter.replace(/0x/g, "")
+    })
+  }
+  // delimiter = delimiter.replace(/\\r/g, CR.ascii)
+  // delimiter = delimiter.replace(/\\n/g, LF.ascii)
+  // delimiter = delimiter.replace(/ /g, "")
+  // delimiter = delimiter.replace(/\\x/g, "")
+  // delimiter = delimiter.replace(/0x/g, "")
 
   // Test Received Data
   // let testSends = false
   // setInterval(() => {
   //   if (testSends) {
-  //     lines.push({wasReceived: lines.length%4, ISOtimestamp: new Date(Date.now()).toISOString(), data: lines.length * 89 * 53})
+  //     lines.push({wasReceived: lines.length%4, timestampISO: new Date(Date.now()).toISOString(), data: lines.length * 89 * 53})
   //     lines = lines
   //   }
   // }, 100)
@@ -98,12 +116,12 @@
         <!-- Col2 -->
         <div class="terminal-col2">
           {#if timeColFormat === "datetime"}
-            <span>{line.ISOtimestamp.split('T')[0]}</span>
-            <span>{line.ISOtimestamp.split('T')[1].split('Z')[0]}</span>
+            <span>{line.timestampISO.split('T')[0]}</span>
+            <span>{line.timestampISO.split('T')[1].split('Z')[0]}</span>
           {:else if timeColFormat === "time"}
-            <span>{line.ISOtimestamp.split('T')[1].split('Z')[0]}</span>
+            <span>{line.timestampISO.split('T')[1].split('Z')[0]}</span>
           {:else}
-            <span>{line.ISOtimestamp.split('T')[1].slice(3).split('.')[0]}</span>
+            <span>{line.timestampISO.split('T')[1].slice(3).split('.')[0]}</span>
           {/if}
         </div>
 

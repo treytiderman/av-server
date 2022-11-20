@@ -7,11 +7,14 @@ function log(text, folderPath, filename, debug = false) {
   const timeDate = new Date(Date.now()).toLocaleString();
   const time = timeDate.split(', ')[1];
   const date = timeDate.split(',')[0].replace(/\//ig, "-");
+  // If the ./public/logs folder doesn't exist create it
+  // *TODO*
   // Log text to the file path
   const line = `${time} > ${text}`;
   const path = `${folderPath}${filename} ${date}.log`;
   fs.appendFile(path, line + '\n')
   // Log text to a log all file
+  // *TODO* add spaces so that all filenames are the same length when added to the log everything file
   const allLine = `${time} > ${filename} | ${text}`;
   const allPath = `../public/logs/all ${date}.log`;
   fs.appendFile(allPath, allLine + '\n')

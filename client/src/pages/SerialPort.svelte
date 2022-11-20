@@ -29,7 +29,7 @@
       setInterval(async () => {
         const body = { "path": devicePath }
         port = await post("/api/serial/v1/port", body, "http://192.168.1.154:4620")
-      }, 2000)
+      }, 1 * 1000)
     }
 
     // Startup complete
@@ -68,9 +68,9 @@
   }
 
   // Sending
-  let send1 = ""
-  let send2 = ""
-  let send3 = ""
+  let send1 = "ka 01 01\\r"
+  let send2 = "ka 01 00\\r"
+  let send3 = "mc 01 02\\r"
   async function sendClick(text) {
     const body = {
       "path": devicePath,
@@ -84,42 +84,39 @@
   
   // Terminal lines
   let lines
-  $: updateLineData(port)
-  function updateLineData(port) {
-    if (port?.tx) {
+  $: updateLineData(port, encodingMode)
+  function updateLineData(port, encodingMode) {
+    if (port?.data) {
       let linesFromServer = []
       // Add sends to the array
-      port.tx.forEach(tx => {
-        linesFromServer.push({
-          wasReceived: false,
-          ISOtimestamp: tx.timestamp,
-          data: tx.message,
+      if (encodingMode === "hex") {        
+        port.data.forEach(data => {
+          if (data.error !== "") data.hex += " <- " + data.error
+          linesFromServer.push({
+            wasReceived: data.wasReceived,
+            timestampISO: data.timestampISO,
+            data: data.hex,
+          })
         })
-      })
-      // Add receives to the array
-      port.rx.forEach(rx => {
-        linesFromServer.push({
-          wasReceived: true,
-          ISOtimestamp: rx.timestamp,
-          data: rx.ascii,
+      }
+      else {
+        port.data.forEach(data => {
+          if (data.error !== "") data.ascii += " <- " + data.error
+          linesFromServer.push({
+            wasReceived: data.wasReceived,
+            timestampISO: data.timestampISO,
+            data: data.ascii,
+          })
         })
-      })
-      // Sort lines by timestamp
-      linesFromServer.sort((a, b) => {
-        let keyA = new Date(a.ISOtimestamp)
-        let keyB = new Date(b.ISOtimestamp)
-        // Compare the 2 dates
-        if (keyA < keyB) return -1
-        if (keyA > keyB) return 1
-        return 0
-      })
+      }
       // Set lines equal to the info from the server
       lines = linesFromServer
     }
   }
-  
+
   // Debug
   $: console.log("port", port)
+  // $: console.log("lines", lines)
 
 </script>
 
