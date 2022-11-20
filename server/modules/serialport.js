@@ -27,7 +27,7 @@ const PORT_MODEL = {
 }
 
 // Logging
-const logInConsole = true
+const logInConsole = false
 function log(text) {
   const logger = require('../modules/log')
   text = text.replace("\n", "\\n")

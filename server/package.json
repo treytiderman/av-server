@@ -8,7 +8,9 @@
     "dev": "nodemon server.js",
     "electron": "electron-forge start",
     "make": "electron-forge make",
-    "pkg": "pkg -t node16-win-x64 --out-path build/pkg server.js"
+    "pkg-win": "pkg -t node18-win-x64 --out-path out/pkg server.js",
+    "pkg-mac": "pkg -t node18-macos-arm64 --out-path out/pkg server.js",
+    "pkg-linux": "pkg -t node18-linux-x64 --out-path out/pkg server.js"
   },
   "keywords": [],
   "author": "trey",
@@ -26,6 +28,7 @@
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.64",
     "@electron-forge/maker-deb": "^6.0.0-beta.64",
+    "@electron-forge/maker-dmg": "^6.0.3",
     "@electron-forge/maker-rpm": "^6.0.0-beta.64",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.64",
     "@electron-forge/maker-zip": "^6.0.0-beta.64",
@@ -34,9 +37,9 @@
     "pkg": "^5.8.0"
   },
   "pkg": {
-    "scripts": "**",
+    "scripts": "../**",
     "assets": [
-      "../client/**"
+      "../public/**"
     ],
     "targets": [
       "node16-win-x64"
@@ -58,6 +61,10 @@
           "platforms": [
             "darwin"
           ]
+        },
+        {
+          "name": "@electron-forge/maker-dmg",
+          "config": {}
         },
         {
           "name": "@electron-forge/maker-deb",
