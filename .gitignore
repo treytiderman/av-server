@@ -1,3 +1,6 @@
+# Custom ignores
+out
+
 # Logs
 *.log
 npm-debug.log*

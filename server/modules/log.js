@@ -1,5 +1,6 @@
 // Log to console and file
 const fs = require('fs').promises;
+const fss = require('fs');
 
 // Functions
 function log(text, folderPath, filename, debug = false) {
@@ -7,8 +8,8 @@ function log(text, folderPath, filename, debug = false) {
   const timeDate = new Date(Date.now()).toLocaleString();
   const time = timeDate.split(', ')[1];
   const date = timeDate.split(',')[0].replace(/\//ig, "-");
-  // If the ./public/logs folder doesn't exist create it
-  // *TODO*
+  // If folderPath doesn't exist create it
+  if (!fss.existsSync(folderPath)) fss.mkdirSync(folderPath)
   // Log text to the file path
   const line = `${time} > ${text}`;
   const path = `${folderPath}${filename} ${date}.log`;

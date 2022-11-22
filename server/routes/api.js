@@ -35,7 +35,7 @@ async function getClientFiles(folder) {
 
 // Routes
 router.get('/', async (req, res) => {
-  res.send( await fs.readFile('./routes/api.html','utf8') )
+  res.send( await fs.readFile('../public/web/api/api.html','utf8') )
 })
 router.get('/help', (req, res) => {
   res.json(routes)

@@ -2,6 +2,8 @@
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
+const os = require("os");
+
 // Classes | Network interface cards
 class NIC { 
   constructor(text) {
@@ -189,7 +191,6 @@ function validMetric(metric) {
 }
 
 // Run a cli command
-const os = require("os"); // Comes with node.js
 async function runCmd(cmd) {
   if (os.type() === "Windows_NT") {     
     if (cmd !== 'netsh interface ipv4 show config') console.log(cmd);

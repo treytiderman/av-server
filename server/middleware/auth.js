@@ -31,7 +31,7 @@ async function middleware(req, res, next) {
 
 // Login
 router.get('/', async (req, res) => {
-  res.send( await fs.readFile('./middleware/login.html','utf8') );
+  res.send( await fs.readFile('../public/web/api/login.html','utf8') );
 });
 router.post('/', async (req, res) => {
   if (req.body.password !== password) { return res.redirect('/api/v1/login') }

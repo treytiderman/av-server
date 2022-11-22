@@ -26,7 +26,6 @@ api.routesAll[tests.path] = tests.routes
 app.use(tests.path, tests.router)
 
 // Router /api/net - Change computers IP/Network settings
-// const net = require(__dirname + '/src/routes/net');
 const network = require('./routes/network');
 network.path = '/api/network/v1'
 api.routesAll[network.path] = network.routes
@@ -38,7 +37,7 @@ dhcpServer.path = '/api/dhcp/server/v1'
 api.routesAll[dhcpServer.path] = dhcpServer.routes
 app.use(dhcpServer.path, dhcpServer.router);
 
-// Router /api/serial - DHCP Server
+// Router /api/serial - Serial Port
 const serialport = require('./routes/serialport')
 serialport.path = '/api/serial/v1'
 api.routesAll[serialport.path] = serialport.routes
