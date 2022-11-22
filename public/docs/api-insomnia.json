@@ -1,1 +1,412 @@
-{"_type":"export","__export_format":4,"__export_date":"2022-11-20T01:03:26.879Z","__export_source":"insomnia.desktop.app:v2022.1.0","resources":[{"_id":"req_5501e8904ca54c9dab54ce62aa057a85","parentId":"fld_f7076d51e81a4d76ae38ef4c28338b01","modified":1668821043275,"created":1668821039588,"url":"http://192.168.1.1:4620/api/serial/v1/help","name":"/help","description":"","method":"GET","body":{},"parameters":[],"headers":[],"authentication":{},"metaSortKey":-1668807557315,"isPrivate":false,"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"fld_f7076d51e81a4d76ae38ef4c28338b01","parentId":"wrk_3e9026aeb83c4b298032f1d3dca540eb","modified":1668778137849,"created":1668778097623,"name":"/api/serial/v1","description":"","environment":{},"environmentPropertyOrder":null,"metaSortKey":-1668778097623,"_type":"request_group"},{"_id":"wrk_3e9026aeb83c4b298032f1d3dca540eb","parentId":null,"modified":1668778076842,"created":1668778076842,"name":"AV-Tools","description":"","scope":"collection","_type":"workspace"},{"_id":"req_fa9d102895344c3984287cc6ff691ffa","parentId":"fld_f7076d51e81a4d76ae38ef4c28338b01","modified":1668905657599,"created":1668811753726,"url":"http://192.168.1.1:4620/api/serial/v1/open","name":"/open","description":"","method":"POST","body":{"mimeType":"application/json","text":"{\n\t\"name\": \"/dev/ttyUSB0\",\n\t\"path\": \"/dev/ttyUSB0\",\n\t\"baudRate\": 9600,\n\t\"delimiter\": \"\\r\\n\"\n}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json","id":"pair_bdc106ee261f4de4b9e34d9fe2c35e1d"}],"authentication":{},"metaSortKey":-1668807557290,"isPrivate":false,"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"req_d687c73982a14a419d8207a06bacfaa0","parentId":"fld_f7076d51e81a4d76ae38ef4c28338b01","modified":1668892780704,"created":1668815352563,"url":"http://192.168.1.1:4620/api/serial/v1/send","name":"/send","description":"","method":"POST","body":{"mimeType":"application/json","text":"{\n\t\"name\": \"/dev/ttyUSB0\",\n\t\"message\": \"POWON\",\n\t\"messageType\": \"ascii\",\n\t\"cr\": false,\n\t\"lf\": true\n}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"}],"authentication":{},"metaSortKey":-1660780527520,"isPrivate":false,"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"req_36a8f15018e441f79499350cbffd70cd","parentId":"fld_f7076d51e81a4d76ae38ef4c28338b01","modified":1668892850957,"created":1668815635950,"url":"http://192.168.1.1:4620/api/serial/v1/close","name":"/close","description":"","method":"POST","body":{"mimeType":"application/json","text":"{\n\t\"name\": \"/dev/ttyUSB1\"\n}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"}],"authentication":{},"metaSortKey":-1656767012635,"isPrivate":false,"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"req_34258cfa3d2e4dab9d10e7173398e662","parentId":"fld_f7076d51e81a4d76ae38ef4c28338b01","modified":1668865355189,"created":1668807557340,"url":"http://192.168.1.1:4620/api/serial/v1/availablePorts","name":"/availablePorts","description":"","method":"GET","body":{},"parameters":[],"headers":[],"authentication":{},"metaSortKey":-1656767012610,"isPrivate":false,"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"req_b50b667d9b184043ae975a99de337b3b","parentId":"fld_f7076d51e81a4d76ae38ef4c28338b01","modified":1668865374909,"created":1668813651235,"url":"http://192.168.1.1:4620/api/serial/v1/ports","name":"/ports","description":"","method":"GET","body":{},"parameters":[],"headers":[],"authentication":{},"metaSortKey":-1656767012585,"isPrivate":false,"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"req_17c85613569b4027ba73bdbfedcb24cb","parentId":"fld_f7076d51e81a4d76ae38ef4c28338b01","modified":1668891313134,"created":1668816348869,"url":"http://192.168.1.1:4620/api/serial/v1/port","name":"/port","description":"","method":"POST","body":{"mimeType":"application/json","text":"{\"name\": \"/dev/ttyUSB0\"}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"}],"authentication":{},"metaSortKey":-1654760255167.5,"isPrivate":false,"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"env_72f4c7df7459e93c3e9ab917566dcb0fefa39c17","parentId":"wrk_3e9026aeb83c4b298032f1d3dca540eb","modified":1668892206033,"created":1668778076849,"name":"Base Environment","data":{},"dataPropertyOrder":{},"color":null,"isPrivate":false,"metaSortKey":1668778076849,"_type":"environment"},{"_id":"jar_72f4c7df7459e93c3e9ab917566dcb0fefa39c17","parentId":"wrk_3e9026aeb83c4b298032f1d3dca540eb","modified":1668778076854,"created":1668778076854,"name":"Default Jar","cookies":[],"_type":"cookie_jar"},{"_id":"spc_31f101c593eb40b6be200da0fcc43d8a","parentId":"wrk_3e9026aeb83c4b298032f1d3dca540eb","modified":1668778076843,"created":1668778076843,"fileName":"AV-Tools","contents":"","contentType":"yaml","_type":"api_spec"}]}
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2022-11-22T00:32:11.809Z",
+  "__export_source": "insomnia.desktop.app:v2022.6.0",
+  "resources": [
+    {
+      "_id": "req_5501e8904ca54c9dab54ce62aa057a85",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668971636199,
+      "created": 1668821039588,
+      "url": "http://192.168.1.154:4620/api/serial/v1/help",
+      "name": "/help",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1668807557315,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "parentId": "wrk_3e9026aeb83c4b298032f1d3dca540eb",
+      "modified": 1668778137849,
+      "created": 1668778097623,
+      "name": "/api/serial/v1",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1668778097623,
+      "_type": "request_group"
+    },
+    {
+      "_id": "wrk_3e9026aeb83c4b298032f1d3dca540eb",
+      "parentId": null,
+      "modified": 1668778076842,
+      "created": 1668778076842,
+      "name": "AV-Tools",
+      "description": "",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "req_34258cfa3d2e4dab9d10e7173398e662",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668971669293,
+      "created": 1668807557340,
+      "url": "http://192.168.1.154:4620/api/serial/v1/availablePorts",
+      "name": "/availablePorts",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1668807557302.5,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_fa9d102895344c3984287cc6ff691ffa",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668975277458,
+      "created": 1668811753726,
+      "url": "http://192.168.1.154:4620/api/serial/v1/open",
+      "name": "/open",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"path\": \"/dev/tty.usbserial-FTCK2VXE\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_bdc106ee261f4de4b9e34d9fe2c35e1d"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1668807557290,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_b0d87107bfd7479697a6ee38b2608c38",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1669077106865,
+      "created": 1668974497292,
+      "url": "http://192.168.1.154:4620/api/serial/v1/open",
+      "name": "/open (all)",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"path\": \"/dev/tty.usbserial-FTCK2VXE\",\n\t\"baudRate\": 9600,\n\t\"delimiter\": \"\\\\x0D\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_bdc106ee261f4de4b9e34d9fe2c35e1d"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1664794042405,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_d687c73982a14a419d8207a06bacfaa0",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668975357424,
+      "created": 1668815352563,
+      "url": "http://192.168.1.154:4620/api/serial/v1/send",
+      "name": "/send",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"path\": \"/dev/tty.usbserial-FTCK2VXE\",\n\t\"message\": \"mc 01 02\\\\r\",\n\t\"messageType\": \"ascii\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1660780527520,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_3375d92ec1714fc68598e7860710c75c",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668975531164,
+      "created": 1668974512125,
+      "url": "http://192.168.1.154:4620/api/serial/v1/send",
+      "name": "/send (all)",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"path\": \"/dev/tty.usbserial-FTCK2VXE\",\n\t\"message\": \"6d63203031203032\",\n\t\"messageType\": \"hex\",\n\t\"cr\": true,\n\t\"lf\": false\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1658773770077.5,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_a5ea7d68b7394b61a318a05ebcb9035d",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668975570310,
+      "created": 1668975171949,
+      "url": "http://192.168.1.154:4620/api/serial/v1/send",
+      "name": "/send (hex 1)",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"path\": \"/dev/tty.usbserial-FTCK2VXE\",\n\t\"message\": \"6d 63 20 30 31 20 30 32 0d\",\n\t\"messageType\": \"hex\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1657770391356.25,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_a6816f5b767c4dc1a8958596986b1336",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668975595968,
+      "created": 1668975369594,
+      "url": "http://192.168.1.154:4620/api/serial/v1/send",
+      "name": "/send (hex 2)",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"path\": \"/dev/tty.usbserial-FTCK2VXE\",\n\t\"message\": \"\\\\x6d \\\\x63 \\\\x20 \\\\x30 \\\\x31 \\\\x20 \\\\x30 \\\\x32 \\\\x0d\",\n\t\"messageType\": \"hex\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1657268701995.625,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_eb079fc6beaa4d6f8a5ceabf7c749221",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668975658629,
+      "created": 1668975529291,
+      "url": "http://192.168.1.154:4620/api/serial/v1/send",
+      "name": "/send (hex 3)",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"path\": \"/dev/tty.usbserial-FTCK2VXE\",\n\t\"message\": \"0x6d 0x63 0x20 0x30 0x31 0x20 0x30 0x32 0x0d\",\n\t\"messageType\": \"hex\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1657017857315.3125,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_36a8f15018e441f79499350cbffd70cd",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668975342544,
+      "created": 1668815635950,
+      "url": "http://192.168.1.154:4620/api/serial/v1/close",
+      "name": "/close",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"path\": \"/dev/tty.usbserial-FTCK2VXE\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1656767012635,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_b50b667d9b184043ae975a99de337b3b",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668971680247,
+      "created": 1668813651235,
+      "url": "http://192.168.1.154:4620/api/serial/v1/ports",
+      "name": "/ports",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1655763633901.25,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_17c85613569b4027ba73bdbfedcb24cb",
+      "parentId": "fld_f7076d51e81a4d76ae38ef4c28338b01",
+      "modified": 1668974900994,
+      "created": 1668816348869,
+      "url": "http://192.168.1.154:4620/api/serial/v1/port",
+      "name": "/port",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"path\": \"/dev/tty.usbserial-FTCK2VXE\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1654760255167.5,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "env_72f4c7df7459e93c3e9ab917566dcb0fefa39c17",
+      "parentId": "wrk_3e9026aeb83c4b298032f1d3dca540eb",
+      "modified": 1668892206033,
+      "created": 1668778076849,
+      "name": "Base Environment",
+      "data": {},
+      "dataPropertyOrder": {},
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1668778076849,
+      "_type": "environment"
+    },
+    {
+      "_id": "jar_72f4c7df7459e93c3e9ab917566dcb0fefa39c17",
+      "parentId": "wrk_3e9026aeb83c4b298032f1d3dca540eb",
+      "modified": 1668778076854,
+      "created": 1668778076854,
+      "name": "Default Jar",
+      "cookies": [],
+      "_type": "cookie_jar"
+    },
+    {
+      "_id": "spc_31f101c593eb40b6be200da0fcc43d8a",
+      "parentId": "wrk_3e9026aeb83c4b298032f1d3dca540eb",
+      "modified": 1668778076843,
+      "created": 1668778076843,
+      "fileName": "AV-Tools",
+      "contents": "",
+      "contentType": "yaml",
+      "_type": "api_spec"
+    }
+  ]
+}
