@@ -18,6 +18,8 @@
   // Pages 
   import Page from './pages/Page.svelte';
   import Home from './pages/Home.svelte';
+  import Network from './pages/Network.svelte';
+  import Dhcp from './pages/Dhcp.svelte';
   import SerialPort from './pages/SerialPort.svelte';
 
   let navMenu = [
@@ -27,7 +29,8 @@
         nav: "Home"
       },
       icon: "house",
-      pageComponent: Home,
+      // pageComponent: Home,
+      pageComponent: Network,
     },
     {
       name: {
@@ -39,19 +42,11 @@
       subMenu: [
           {
             name: {
-              header: "SerialPort",
-              nav: "SerialPort"
-            },
-            icon: "terminal",
-            pageComponent: SerialPort,
-          },
-          {
-            name: {
-              header: "Network",
+              header: "Network Settings",
               nav: "Network"
             },
             icon: "network-wired",
-            pageComponent: Page,
+            pageComponent: Network,
           },
           {
             name: {
@@ -59,7 +54,15 @@
               nav: "DHCP"
             },
             icon: "server",
-            pageComponent: Page,
+            pageComponent: Dhcp,
+          },
+          {
+            name: {
+              header: "SerialPort",
+              nav: "SerialPort"
+            },
+            icon: "terminal",
+            pageComponent: SerialPort,
           },
         ],
       },
@@ -72,15 +75,15 @@
       pageComponent: Page,
     },
   ]
-  // $router.pageObj = navMenu[0]
-  $router.pageObj = {
-    name: {
-      header: "SerialPort",
-      nav: "SerialPort"
-    },
-    icon: "terminal",
-    pageComponent: SerialPort,
-  }
+  $router.pageObj = navMenu[0]
+  // $router.pageObj = {
+  //   name: {
+  //     header: "SerialPort",
+  //     nav: "SerialPort"
+  //   },
+  //   icon: "terminal",
+  //   pageComponent: SerialPort,
+  // }
 
   $: screenWidth = document.documentElement.offsetWidth
   let navHide = true
