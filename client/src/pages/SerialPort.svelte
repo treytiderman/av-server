@@ -14,7 +14,8 @@
   onMount(async () => {
 
     // Available ports
-    const availablePortsResponse = await get("/api/serial/v1/availablePorts", "http://192.168.1.9:4620")
+    // const availablePortsResponse = await get("/api/serial/v1/availablePorts", "http://192.168.1.9:4620")
+    const availablePortsResponse = await get("/api/serial/v1/availablePorts")
     // Remove ports that don't have a serial number
     availablePortsResponse.forEach(port => {
       if (port.serialNumber !== undefined) availablePorts = [...availablePorts, port];
@@ -25,10 +26,12 @@
     // Device info
     if (availablePorts.length > 0) {
       const body = { "path": devicePath }
-      port = await post("/api/serial/v1/port", body, "http://192.168.1.9:4620")
+      // port = await post("/api/serial/v1/port", body, "http://192.168.1.9:4620")
+      port = await post("/api/serial/v1/port", body)
       setInterval(async () => {
         const body = { "path": devicePath }
-        port = await post("/api/serial/v1/port", body, "http://192.168.1.9:4620")
+        // port = await post("/api/serial/v1/port", body, "http://192.168.1.9:4620")
+        port = await post("/api/serial/v1/port", body)
       }, 1 * 1000)
     }
 
@@ -56,11 +59,13 @@
       "baudRate": baudRate,
       "delimiter": delimiter
     }
-    const openResponse = await post("/api/serial/v1/open", body, "http://192.168.1.9:4620")
+    // const openResponse = await post("/api/serial/v1/open", body, "http://192.168.1.9:4620")
+    const openResponse = await post("/api/serial/v1/open", body)
   }
   async function closeConnection(path) {
     const body = { "path": path }
-    const openResponse = await post("/api/serial/v1/close", body, "http://192.168.1.9:4620")
+    // const openResponse = await post("/api/serial/v1/close", body, "http://192.168.1.9:4620")
+    const openResponse = await post("/api/serial/v1/close", body)
   }
   async function toggleConnectionClick() {
     if (port.isOpen) closeConnection(devicePath)
@@ -79,7 +84,8 @@
       "cr": false,
       "lf": false
     }
-    const sendResponse = await post("/api/serial/v1/send", body, "http://192.168.1.9:4620")
+    // const sendResponse = await post("/api/serial/v1/send", body, "http://192.168.1.9:4620")
+    const sendResponse = await post("/api/serial/v1/send", body)
   }
   
   // Terminal lines

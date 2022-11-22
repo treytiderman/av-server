@@ -20,7 +20,7 @@ function start() {
   app.use(express.text());
 
   // Public folder, everything in this folder is available to anyone
-  app.use(express.static("../public"));
+  app.use(express.static("/Users/trey/Projects/AV-Tools/public"));
 
   return app;
 }

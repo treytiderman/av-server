@@ -8,12 +8,14 @@ const routes = {
 }
 let routesAll = {}
 
+const remote = require('electron')
+
 // Require FS - File system
 const fs = require('fs').promises
 
 // Functions
 async function getClientFiles(folder) {
-  const path = `../public${folder.name}`
+  const path = `../../../public${folder.name}`
   const files = await fs.readdir(path)
   for (const file of files) {
     const stat = await fs.stat(`${path}/${file}`)
@@ -51,6 +53,10 @@ router.get('/files', async (req, res) => {
   }
   await getClientFiles(folder)
   res.json(folder)
+})
+router.get('/path', async (req, res) => {
+  res.json( { "path": remote.app.getPath('userData') } )
+  // res.json( { "path": __dirname } )
 })
 
 // Export

@@ -9,7 +9,7 @@ function log(text, folderPath, filename, debug = false) {
   const time = timeDate.split(', ')[1];
   const date = timeDate.split(',')[0].replace(/\//ig, "-");
   // If folderPath doesn't exist create it
-  if (!fss.existsSync(folderPath)) fss.mkdirSync(folderPath)
+  // if (!fss.existsSync(folderPath)) fss.mkdirSync(folderPath)
   // Log text to the file path
   const line = `${time} > ${text}`;
   const path = `${folderPath}${filename} ${date}.log`;
