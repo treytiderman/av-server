@@ -1,5 +1,6 @@
 # Custom ignores
 out
+.DS_Store
 
 # Logs
 *.log
