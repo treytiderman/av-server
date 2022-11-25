@@ -9,11 +9,12 @@
 <!-- HTML -->
 <section>
 
-  <!-- Connection Settings -->
+  <!-- This Computer -->
   <aside>
     <h4>This Computer</h4>
-    <div>
 
+    <!-- NIC Info -->
+    <div class="nicInfo">
       <label>
         Interface <br>
         <select>
@@ -21,34 +22,50 @@
           <option>WiFi</option>
         </select>
       </label>
-
-      <!-- nicInfo -->
-      <div>
-        <span class="w90-t     ">xxx.xxx.xxx.xxx</span>
-        <span class="w50-t t-sm mb-1">Mask: xxx.xxx.xxx.xxx</span>
-        <div class="grid gap-0 t-mono">
-          <!-- For added IPs -->
-        </div>
-        <span class="w50-t t-sm mb-1">Gate: xxx.xxx.xxx.xxx</span>
-        <span class="w50-t t-sm">DNS1: xxx.xxx.xxx.xxx</span>
-        <span class="w50-t t-sm mb-1">DNS2: xxx.xxx.xxx.xxx</span>
-        <span class="w50-t t-sm">DHCP: true</span>
-        <span
-          onclick="dialogOpen('interfaceMetricPopup')" 
-          style="width: fit-content;">
-          Metric: 99
-        </span>
-      </div>
-
+      <div>xxx.xxx.xxx.xxx</div>
+      <div>Mask: xxx.xxx.xxx.xxx</div>
+      <!-- {#if nic.ips}        
+        <div></div>
+      {/if} -->
+      <div>Gate: xxx.xxx.xxx.xxx</div>
+      <div>DNS1: xxx.xxx.xxx.xxx</div>
+      <div>DNS2: xxx.xxx.xxx.xxx</div>
+      <div>DHCP: true</div>
+      <div>Metric: 99</div>
     </div>
+
   </aside>
 
-  <!-- Terminal -->
+  <!-- Preset Actions + Presets -->
   <article>
-    <h4>This Computer</h4>
-    <div>
-      
+
+    <!-- Preset Actions -->
+    <div class="actions">
+      <h4>Preset Actions</h4>
+      <div class="actionButtons">
+        <button>
+          Set 
+          <Icon name="check" size=1 />
+        </button>
+        <button>
+          Add 
+          <Icon name="plus" size=1 />
+        </button>
+        <button>
+          <span>Remove</span>
+          <Icon name="trash" size=1 />
+        </button>
+      </div>
     </div>
+
+    <!-- Presets -->
+    <div>
+      <h4>Presets</h4>
+      <div>
+        
+      </div>
+    </div>
+
   </article>
 
 </section>
@@ -96,6 +113,29 @@
     aside {
       border-right: var(--border);
     }
+  }
+
+  .nicInfo {
+    display: grid;
+    align-content: flex-start;
+    gap: var(--pad);
+    width: 300px;
+  }
+  .actions {
+    display: grid;
+    align-content: flex-start;
+    gap: var(--pad);
+  }
+  .actionButtons {
+    display: flex;
+    align-items: center;
+    gap: var(--pad);
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: var(--pad);
   }
 
 </style>

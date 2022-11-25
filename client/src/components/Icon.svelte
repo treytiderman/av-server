@@ -66,6 +66,5 @@
   div {
     display: grid;
     place-items: center;
-    display: inline;
   }
 </style>
