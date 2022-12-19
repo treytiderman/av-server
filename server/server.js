@@ -3,51 +3,14 @@ const http = require('./modules/http')
 const app = http.start()
 app.use(http.middlware)
 
+// HTTP Routes
+const routes = require('./routes/routes')
+app.use(routes.router)
+
 // WebSocket server
 const wsServer = require('./modules/wsServer')
 const server = wsServer.start(app)
-
-// Routes /
-const pages = require('./routes/pages')
-pages.path = '/'
-app.use(pages.path, pages.router)
-
-// Routes /api
-const api = require('./routes/api')
-api.path = '/api'
-api.routesAll[pages.path] = pages.routes
-api.routesAll[api.path] = api.routes
-app.use(api.path, api.router)
-
-// Routes /test
-const tests = require('./routes/tests')
-tests.path = '/api/test/v1'
-api.routesAll[tests.path] = tests.routes
-app.use(tests.path, tests.router)
-
-// Router /api/net - Change computers IP/Network settings
-const network = require('./routes/network');
-network.path = '/api/network/v1'
-api.routesAll[network.path] = network.routes
-app.use(network.path, network.router);
-
-// Router /api/dhcp/server - DHCP Server
-const dhcpServer = require('./routes/dhcpServer');
-dhcpServer.path = '/api/dhcp/server/v1'
-api.routesAll[dhcpServer.path] = dhcpServer.routes
-app.use(dhcpServer.path, dhcpServer.router);
-
-// Router /api/serial - Serial Port
-const serialport = require('./routes/serialport')
-serialport.path = '/api/serial/v1'
-api.routesAll[serialport.path] = serialport.routes
-app.use(serialport.path, serialport.router)
-
-// Routes /login
-const auth = require('./middleware/auth')
-auth.path = '/api/login/v1'
-app.use(auth.path, auth.router)
-api.routesAll[auth.path] = auth.routes
+const routes_ws = require('./routes-ws/routes')
 
 // Get IP addresses
 const { networkInterfaces } = require('os')

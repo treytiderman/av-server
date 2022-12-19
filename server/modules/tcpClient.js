@@ -271,15 +271,15 @@ exports.getTcpClient = getTcpClient
 // Testing
 const IP = "192.168.1.246"
 const PORT = "23"
-open(IP, PORT)
+// open(IP, PORT)
 // setTimeout(() => send(IP, PORT, "PWON\r"), 1 * 1000)
 // setTimeout(() => send(IP, PORT, "NSA\r"), 2 * 1000)
-setTimeout(() => send(IP, PORT, "MV?\r"), 3 * 1000)
+// setTimeout(() => send(IP, PORT, "MV?\r"), 3 * 1000)
 // setTimeout(() => send(IP, PORT, "MVUP\r"), 4 * 1000)
 // setTimeout(() => send(IP, PORT, "MVUP\r"), 5 * 1000)
 // setTimeout(() => send(IP, PORT, "MV?\r"), 6 * 1000)
 // setTimeout(() => send(IP, PORT, "PWSTANDBY\r"), 9 * 1000)
-setTimeout(() => close(IP, PORT), 10 * 1000)
+// setTimeout(() => close(IP, PORT), 10 * 1000)
 
 event.on("rx", rxObj => {
   console.log("rxObj", rxObj)
