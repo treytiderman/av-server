@@ -31,7 +31,7 @@
   "internetMusicPause": "NS9B",
   "internetMusicSkip": "NS9D",
   "internetMusicBack": "NS9E",
-  "internetMusicStatus": "NSE",
-  "internetMusicStatus2": "NSA",
+  "internetMusicStatus": "NSA",
+  "internetMusicStatus2": "NSE",
 }
 ```

@@ -1,6 +1,6 @@
 const { SerialPort } = require('serialport')
 const { DelimiterParser } = require('@serialport/parser-delimiter')
-const { Buffer } = require('node:buffer')
+// const { Buffer } = require('node:buffer')
 
 // Constants
 const CR = { hex: "0D", ascii: "\r" }
@@ -176,7 +176,7 @@ function close(path) {
     return { "error": "port is not defined, open the port first then close" }
   }
   
-  // Stop if the path is already open
+  // Stop if the path is already closed
   if (ports[path]?.isOpen === false) {
     return { "error": "port already closed" }
   }
