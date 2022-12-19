@@ -4,8 +4,8 @@ const app = http.start()
 app.use(http.middlware)
 
 // WebSocket server
-const ws = require('./modules/ws')
-const server = ws.start(app)
+const wsServer = require('./modules/wsServer')
+const server = wsServer.start(app)
 
 // Routes /
 const pages = require('./routes/pages')

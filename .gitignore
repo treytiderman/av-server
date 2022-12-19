@@ -1,6 +1,7 @@
 # Custom ignores
 out
 .DS_Store
+!example.log
 
 # Logs
 *.log

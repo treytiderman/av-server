@@ -44,8 +44,11 @@ function isJSON(text) {
 }
 
 // Functions
-function start(server) {
+function start(app) {
+  const server = require('http').createServer(app)
   wsServer = new WebSocket.Server({ server: server })
+
+  // Events
   wsServer.on('connection', newConnection)
   wsServer.on('close', () => clearInterval(interval))
 
@@ -59,6 +62,9 @@ function start(server) {
       ws.ping()
     })
   }, 30 * 1000)
+
+  // Return
+  return server
 }
 function newConnection(ws, req) {
 
@@ -159,3 +165,16 @@ setInterval(() => {
 exports.start = start
 exports.set = set
 exports.emitter = emitter
+
+/* Examples
+
+// express - Web server
+const http = require('./modules/http');
+const app = http.start();
+app.use(http.middlware);
+
+// ws - WebSockets
+const ws = require('./modules/ws');
+const server = ws.start(app);
+
+*/

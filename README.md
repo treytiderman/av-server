@@ -2,7 +2,7 @@
 
 Download a release to the right
 
-Demo: [link](https://trey.app/html/av/ip.html)
+Demo: [link](https://trey.app/svelte/#/av-tools/network)
 
 ## Versions
 
@@ -30,3 +30,59 @@ Serial v1
   sudo gpasswd --add ${USER} dialout
   sudo reboot
   ```
+
+## Download App
+
+Get app under releases (to the right on desktop)
+
+# Run source code
+
+First clone the github repo
+
+## Server
+
+1. Run the following commands in the `./server` folder
+2. Install project dependencies (package.json) with
+```
+npm install
+```
+3. Then to start the server (server.js) with
+```
+npm run start
+```
+4. Or in development mode (Reloads every file change) with
+```
+npm run dev
+```
+5. Go to http://SERVER_IP:4620
+    - Example: http://192.168.1.1:4620
+
+## Svelte
+
+1. Run the following commands in the `./svelte` folder
+2. Install project dependencies (package.json) with
+```
+npm install
+```
+3. Then to start the bundler Vite (Updates live) with
+```
+npm run dev
+```
+4. Go to http://SERVER_IP:5173
+    - Example: http://192.168.1.1:5173
+5. Build a bundle and put it in the public folder `./public/svelte` with
+```
+npm run build
+```
+6. Build and Preview the bundle if needed with
+```
+npm run preview
+```
+
+## Build Electron (for the os you are on)
+
+1. Run the following commands in the `./server` folder
+2. Build the electron installer with
+```
+npm run electron-build
+```
