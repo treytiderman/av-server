@@ -3,7 +3,7 @@ const events = require('events')
 
 // Constants
 const tcpClients = {}
-const event = new events.EventEmitter()
+const emitter = new events.EventEmitter()
 const CR = { hex: "0D", ascii: "\r" }
 const LF = { hex: "0A", ascii: "\n" }
 const MAX_HISTORY_LENGTH = 1000
@@ -88,7 +88,7 @@ function open(ip, port = 23, delimiter = "\r\n") {
 
     // Emit the "open" event
     const tcpClientCopy = copyClientObj(tcpClients[address])
-    event.emit('open', tcpClientCopy)
+    emitter.emit('open', tcpClientCopy)
   })
 
   // Error event
@@ -104,7 +104,7 @@ function open(ip, port = 23, delimiter = "\r\n") {
     
     // Emit the "close" event
     const tcpClientCopy = copyClientObj(tcpClients[address])
-    event.emit('close', tcpClientCopy)
+    emitter.emit('close', tcpClientCopy)
   })
 
   // Listen for new data
@@ -128,7 +128,7 @@ function open(ip, port = 23, delimiter = "\r\n") {
     if (tcpClients[address].history.length > MAX_HISTORY_LENGTH) tcpClients[address].history.shift()
 
     // Emit the "rx" event
-    event.emit('rx', rxObj)
+    emitter.emit('/tcp/v1/client/rx', rxObj)
   })
 
   // Return
@@ -189,7 +189,7 @@ function send(ip, port, message, messageType = "ascii", cr = false, lf = false) 
   if (tcpClients[address].history.length > MAX_HISTORY_LENGTH) tcpClients[address].history.shift()
 
   // Emit the "tx" event
-  event.emit('tx', txObj)
+  emitter.emit('/tcp/v1/client/tx', txObj)
 
   // Return
   log(`return ${JSON.stringify(txObj)}`)
@@ -261,7 +261,7 @@ function getTcpClient(ip, port) {
 }
 
 // Export
-exports.event = event
+exports.emitter = emitter
 exports.open = open
 exports.send = send
 exports.close = close
@@ -281,10 +281,10 @@ const PORT = "23"
 // setTimeout(() => send(IP, PORT, "PWSTANDBY\r"), 9 * 1000)
 // setTimeout(() => close(IP, PORT), 10 * 1000)
 
-event.on("rx", rxObj => {
+emitter.on("/tcp/v1/client/rx", rxObj => {
   console.log("rxObj", rxObj)
 })
 
-event.on("tx", txObj => {
+emitter.on("/tcp/v1/client/tx", txObj => {
   console.log("txObj", txObj)
 })

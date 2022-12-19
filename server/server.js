@@ -3,19 +3,14 @@ const http = require('./modules/http')
 const app = http.start()
 app.use(http.middlware)
 
-// HTTP Routes
-const routes = require('./routes/routes')
-app.use(routes.router)
-
 // WebSocket server
 const wsServer = require('./modules/wsServer')
 const server = wsServer.start(app)
-const routes_ws = require('./routes-ws/routes')
 
 // Get IP addresses
-const { networkInterfaces } = require('os')
+const os = require("os")
 function getNICs() {
-  const nets = networkInterfaces()
+  const nets = os.networkInterfaces()
   const results = {}
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
@@ -33,7 +28,6 @@ function getNICs() {
 
 // Start web server
 const port = 4620
-const os = require("os"); // Comes with node.js
 server.listen(port, () => {
   console.log(`\nAV-Tools server is up and running on ${os.type()}.`)
   console.log(`The user interface is available at:`)
@@ -41,5 +35,6 @@ server.listen(port, () => {
   const NICs = getNICs()
   Object.values(NICs).forEach(key => {
     console.log(`http://${key[0]}:${port}`)
-  });
+  })
+  console.log("")
 })

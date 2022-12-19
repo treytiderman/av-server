@@ -17,6 +17,10 @@ const CLIENT_SUBSCRIBE_OBJ = {
   "method": "subscribe",
   "data": "server_uptime"
 }
+const CLIENT_SUBSCRIBED_OBJ = {
+  "method": "subscribed",
+  "data": ""
+}
 const CLIENT_UNSUBSCRIBE_OBJ = {
   "method": "unsubscribe",
   "data": "server_uptime"
@@ -62,6 +66,9 @@ function start(app) {
       ws.ping()
     })
   }, 30 * 1000)
+
+  // API Routes
+  require('../routes-ws/routes')
 
   // Return
   return server
@@ -110,6 +117,12 @@ function receiveData(ws, req) {
     ws.subs.push(req.data)
     send(ws, req)
     publish(ws, req.data)
+  }
+
+  // Get all subscriptions
+  else if (req.method === "subscribed") {
+    req.data = ws.subs
+    send(ws, req)
   }
 
   // Unsubscribe from a value in the store
@@ -169,12 +182,12 @@ exports.emitter = emitter
 /* Examples
 
 // express - Web server
-const http = require('./modules/http');
-const app = http.start();
-app.use(http.middlware);
+const http = require('./modules/http')
+const app = http.start()
+app.use(http.middlware)
 
 // ws - WebSockets
-const ws = require('./modules/ws');
-const server = ws.start(app);
+const ws = require('./modules/ws')
+const server = ws.start(app)
 
 */
