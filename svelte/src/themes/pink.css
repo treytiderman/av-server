@@ -1,0 +1,71 @@
+html.pink {
+  color-scheme: light;
+
+  /* Text */
+  --font-size: 16px;
+  --font-text: 'Open Sans', helvetica, arial, sans-serif;
+  --font-mono: 'Fira Code', Menlo, Consolas, monospace;
+  --line-height: 1.7;
+  --char-width: 80ch;
+
+  /* Margin, Padding, Gap */ 
+  --pad: 0.7rem;
+  --gap: 1.2rem;
+  --pad-input: var(--pad) calc(1.2*var(--pad));
+
+  /* Colors */
+  --color-bg: var(--color-grey-950);
+  --color-bg-header: var(--color-pink-900);
+  --color-bg-section: var(--color-pink-900);
+
+  --color-text: var(--color-pink-100);
+  --color-text-bright: var(--color-pink-600);
+  --color-text-dim: var(--color-pink-700);
+  
+  --color-bg-input: var(--color-pink-800);
+  --color-text-input: var(--color-text-bright);
+  --color-text-link: var(--color-pink-500);
+  
+  --color-bg-highlight: var(--color-pink-700);
+  --color-text-highlight: var(--color-pink-100);
+  
+  --color-border: var(--color-bg-input);
+  --color-border-header: var(--color-bg-input);
+  --color-border-section: var(--color-bg-input);
+  --color-shadow: #00000099;
+
+  /* Filters for hover, disable, active */
+  --filter-brightness-hover: brightness(105%);
+  --filter-brightness-disable: brightness(65%);
+  --filter-brightness-active: brightness(85%);
+  
+  /*  Border, Border Radius, Outline */
+  --border-thickness: 0.125rem;
+  --border: var(--border-thickness) solid var(--color-border);
+  --radius: 0.4rem;
+  --radius-lg: 0.8rem;
+
+  /* Other colors */
+  --color-bg-grey:     var(--color-grey-700);
+  --color-bg-red:      var(--color-red-700);
+  --color-bg-orange:   var(--color-orange-700);
+  --color-bg-yellow:   var(--color-yellow-700);
+  --color-bg-lime:     var(--color-lime-700);
+  --color-bg-green:    var(--color-green-700);
+  --color-bg-cyan:     var(--color-cyan-700);
+  --color-bg-blue:     var(--color-blue-700);
+  --color-bg-purple:   var(--color-purple-700);
+  --color-bg-pink:     var(--color-pink-700);
+
+  --color-text-grey:   var(--color-grey-100);
+  --color-text-red:    var(--color-red-100);
+  --color-text-yellow: var(--color-yellow-100);
+  --color-text-orange: var(--color-orange-100);
+  --color-text-lime:   var(--color-lime-100);
+  --color-text-green:  var(--color-green-100);
+  --color-text-cyan:   var(--color-cyan-100);
+  --color-text-blue:   var(--color-blue-100);
+  --color-text-purple: var(--color-purple-100);
+  --color-text-pink:   var(--color-pink-100);
+
+}
