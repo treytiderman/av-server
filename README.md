@@ -26,10 +26,11 @@ Serial v1
 - [x] Open an available serial port and send / receive data from it
 - [ ] Other send methods, Device saving, Visca tool
 - Linux: The USER needs added to the dialout group to open serial connections
-  ```
-  sudo gpasswd --add ${USER} dialout
-  sudo reboot
-  ```
+
+```
+sudo gpasswd --add ${USER} dialout
+sudo reboot
+```
 
 ## Download App
 
@@ -39,7 +40,7 @@ Get app under releases (to the right on desktop)
 
 First clone the github repo
 
-## Server
+## Server | AV-Tools
 
 1. Run the following commands in the `./server` folder
 2. Install project dependencies (package.json) with
@@ -57,9 +58,9 @@ npm run dev
 5. Go to http://SERVER_IP:4620
     - Example: http://192.168.1.1:4620
 
-## Svelte
+## Client | Web UI made with Svelte
 
-1. Run the following commands in the `./svelte` folder
+1. Run the following commands in the `./client` folder
 2. Install project dependencies (package.json) with
 ```
 npm install
@@ -79,7 +80,7 @@ npm run build
 npm run preview
 ```
 
-## Build Electron (for the os you are on)
+## Build | Electron App (for the OS you are on)
 
 1. Run the following commands in the `./server` folder
 2. Build the electron installer with

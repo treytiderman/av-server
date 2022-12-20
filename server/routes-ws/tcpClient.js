@@ -31,3 +31,49 @@ wsServer.emitter.on("/tcp/v1/client/close", (ws, req) => {
 tcpClient.emitter.on("/tcp/v1/client/rx", rxObj => {
   wsServer.set('/tcp/v1/client/rx', rxObj)
 })
+
+/*
+## /api/serial/v1/available
+
+`Send`
+
+```json
+{
+  "event": "[get, subscribe, unsubscribe]",
+  "data": "/api/serial/v1/available"
+}
+```
+
+`Response`
+
+```json
+{
+  "name": "/api/serial/v1/available",
+  "data": [
+    {
+      "path": "COM3",
+      "manufacturer": "FTDI",
+      "serialNumber": "FTCK2VXE",
+      "pnpId": "FTDIBUS\\VID_0403+PID_6001+FTCK2VXEA\\0000",
+      "locationId": undefined,
+      "friendlyName": "USB Serial Port (COM3)",
+      "vendorId": "0403",
+      "productId": "6001"
+    }
+  ]
+}
+[
+  {
+    "path": "COM3",
+    "manufacturer": "FTDI",
+    "serialNumber": "FTCK2VXE",
+    "pnpId": "FTDIBUS\\VID_0403+PID_6001+FTCK2VXEA\\0000",
+    "locationId": undefined,
+    "friendlyName": "USB Serial Port (COM3)",
+    "vendorId": "0403",
+    "productId": "6001"
+  }
+]
+```
+
+*/

@@ -11,30 +11,44 @@ const store = {
 }
 const CLIENT_GET_OBJ = {
   "method": "get",
-  "data": "server_uptime"
+  "name": "/api/v1/clients"
 }
 const CLIENT_SUBSCRIBE_OBJ = {
   "method": "subscribe",
-  "data": "server_uptime"
-}
-const CLIENT_SUBSCRIBED_OBJ = {
-  "method": "subscribed",
-  "data": ""
+  "name": "/api/v1/time"
 }
 const CLIENT_UNSUBSCRIBE_OBJ = {
   "method": "unsubscribe",
-  "data": "server_uptime"
+  "name": "/api/v1/time"
 }
-const CLIENT_UNSUBSCRIBE_ALL_OBJ = {
-  "method": "unsubscribeAll",
-  "data": ""
+const CLIENT_PUBLISH_OBJ = {
+  "method": "publish",
+  "name": "/api/v1/position",
+  "data": "value"
 }
 const CLIENT_API_CALL_OBJ = {
-  "method": "/api/v1/time",
-  "data": "whatever data goes with the function"
+  "method": "call",
+  "name": "/api/v1/send",
+  "data": "whatever data goes with the function",
+  "echo": true
+}
+const CLIENT_SUBSCRIBED_OBJ = {
+  "method": "get",
+  "name": "subscriptions"
+}
+const CLIENT_UNSUBSCRIBE_ALL_OBJ = {
+  "method": "unsubscribe",
+  "name": "*"
+}
+const CLIENT_ECHO_OBJ = {
+  "method": "",
+  "name": "",
+  "echo": true
 }
 const SERVER_PUBLISH_OBJ = {
-  "server_uptime": "value"
+  "method": "publish",
+  "name": "server_uptime",
+  "data": "value"
 }
 
 // Helper Functions
