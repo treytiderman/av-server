@@ -32,15 +32,15 @@ sudo gpasswd --add ${USER} dialout
 sudo reboot
 ```
 
-## Download App
+### Download App
 
 Get app under releases (to the right on desktop)
 
-# Run source code
+## Run source code
 
 First clone the github repo
 
-## Server | AV-Tools
+### Server | AV-Tools
 
 1. Run the following commands in the `./server` folder
 2. Install project dependencies (package.json) with
@@ -58,7 +58,7 @@ npm run dev
 5. Go to http://SERVER_IP:4620
     - Example: http://192.168.1.1:4620
 
-## Client | Web UI made with Svelte
+### Client | Web UI made with Svelte
 
 1. Run the following commands in the `./client` folder
 2. Install project dependencies (package.json) with
