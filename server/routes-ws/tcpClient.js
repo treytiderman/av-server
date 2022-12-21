@@ -3,31 +3,45 @@ const wsServer = require('../modules/wsServer')
 // Module
 const tcpClient = require('../modules/tcpClient')
 
-// Requests to module
-wsServer.emitter.on("/tcp/v1/client/open", (ws, req) => {
-  const exampleData = {
-    ip: "192.168.1.246",
-    port: "23",
-  }
-  tcpClient.open(req.data.ip, req.data.port)
+// Function calls
+wsServer.emitter.on("/tcp/client/v1/open", (ws, req) => {
+  // Subscribe to the client
+  wsServer.subscribe(ws, `/tcp/client/v1/client/${req.body.ip}:${req.body.port}`)
+  // Module function call
+  tcpClient.open(
+    req.body.ip,
+    req.body.port,
+    req.body.expectedDelimiter
+  )
 })
-wsServer.emitter.on("/tcp/v1/client/send", (ws, req) => {
-  const exampleData = {
-    ip: "192.168.1.246",
-    port: "23",
-    message: "PWON\r",
-  }
-  tcpClient.send(req.data.ip, req.data.port, req.data.message)
+wsServer.emitter.on("/tcp/client/v1/send", (ws, req) => {
+  // Subscribe to the client
+  wsServer.subscribe(ws, `/tcp/client/v1/client/${req.body.ip}:${req.body.port}`)
+  // Module function call
+  tcpClient.send(
+    req.body.ip,
+    req.body.port,
+    req.body.data,
+    req.body.encoding,
+    req.body.cr,
+    req.body.lf
+  )
 })
-wsServer.emitter.on("/tcp/v1/client/close", (ws, req) => {
-  const exampleData = {
-    ip: "192.168.1.246",
-    port: "23",
-  }
-  tcpClient.close(req.data.ip, req.data.ip)
+wsServer.emitter.on("/tcp/client/v1/close", (ws, req) => {
+  // Subscribe to the client
+  wsServer.subscribe(ws, `/tcp/client/v1/client/${req.body.ip}:${req.body.port}`)
+  // Module function call
+  tcpClient.close(
+    req.body.ip,
+    req.body.port
+  )
 })
 
-// Module emitting
-tcpClient.emitter.on("/tcp/v1/client/rx", rxObj => {
-  wsServer.set('/tcp/v1/client/rx', rxObj)
+// For Websocket store
+tcpClient.emitter.on("client", (address, obj) => {
+  wsServer.set(`/tcp/client/v1/client/${address}`, obj)
+
+  // Also set the "clients" key
+  const clients = tcpClient.getTcpClients()
+  wsServer.set(`/tcp/client/v1/clients`, clients)
 })

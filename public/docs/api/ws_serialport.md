@@ -8,7 +8,7 @@
 
 ```json
 {
-  "method": "get",
+  "request": "get",
   "name": "/api/v1/clients"
 }
 ```
@@ -18,7 +18,7 @@
 ```json
 {
   "name": "/api/v1/clients",
-  "value": "bla bla bla"
+  "body": "bla bla bla"
 }
 ```
 
@@ -28,7 +28,7 @@
 
 ```json
 {
-  "method": "subscribe",
+  "request": "subscribe",
   "name": "/api/v1/clients"
 }
 ```
@@ -38,7 +38,7 @@
 ```json
 {
   "name": "/api/v1/clients",
-  "value": "bla bla bla"
+  "body": "bla bla bla"
 }
 ```
 
@@ -48,7 +48,7 @@
 
 ```json
 {
-  "method": "unsubscribe",
+  "request": "unsubscribe",
   "name": "/api/v1/clients"
 }
 ```
@@ -59,7 +59,7 @@
 
 ```json
 {
-  "method": "unsubscribe",
+  "request": "unsubscribe",
   "name": "*"
 }
 ```
@@ -70,9 +70,9 @@
 
 ```json
 {
-  "method": "call",
+  "request": "call",
   "name": "/api/v1/send",
-  "value": "something to send"
+  "body": "something to send"
 }
 ```
 
@@ -81,7 +81,7 @@
 ```json
 {
   "name": "/api/v1/send",
-  "value": "bla bla bla"
+  "body": "bla bla bla"
 }
 ```
 
@@ -91,9 +91,9 @@
 
 ```json
 {
-  "method": "publish",
+  "request": "publish",
   "name": "/api/v1/position",
-  "value": [32, 67]
+  "body": [32, 67]
 }
 ```
 
@@ -103,7 +103,7 @@
 
 ```json
 {
-  "method": "[get, subscribe, unsubscribe]",
+  "request": "[get, subscribe, unsubscribe]",
   "name": "/serial/v1/available"
 }
 ```
@@ -113,7 +113,7 @@
 ```json
 {
   "name": "/serial/v1/available",
-  "value": [
+  "body": [
     {
       "path": "COM3",
       "manufacturer": "FTDI",
@@ -134,9 +134,9 @@
 
 ```json
 {
-  "method": "call",
+  "request": "call",
   "name": "/serial/v1/open",
-  "value": {
+  "body": {
     "path": "/dev/tty.usbserial-FTCK2VXE"
   }
 }
@@ -144,9 +144,9 @@
 
 ```json
 {
-  "method": "call",
+  "request": "call",
   "name": "/serial/v1/open",
-  "value": {
+  "body": {
     "path": "/dev/tty.usbserial-FTCK2VXE",
     "baudRate": 9600,
     "delimiter": "\r\n"
@@ -159,7 +159,7 @@
 ```json
 {
   "name": "/serial/v1/open",
-  "value": [
+  "body": [
     {
       "path": "COM3",
       "manufacturer": "FTDI",

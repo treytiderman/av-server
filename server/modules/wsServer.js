@@ -9,51 +9,10 @@ const store = {
   uptime: 0,
   test: 'success',
 }
-const CLIENT_GET_OBJ = {
-  "method": "get",
-  "name": "/api/v1/clients"
-}
-const CLIENT_SUBSCRIBE_OBJ = {
-  "method": "subscribe",
-  "name": "/api/v1/time"
-}
-const CLIENT_UNSUBSCRIBE_OBJ = {
-  "method": "unsubscribe",
-  "name": "/api/v1/time"
-}
-const CLIENT_PUBLISH_OBJ = {
-  "method": "publish",
-  "name": "/api/v1/position",
-  "data": "value"
-}
-const CLIENT_API_CALL_OBJ = {
-  "method": "call",
-  "name": "/api/v1/send",
-  "data": "whatever data goes with the function",
-  "echo": true
-}
-const CLIENT_SUBSCRIBED_OBJ = {
-  "method": "get",
-  "name": "subscriptions"
-}
-const CLIENT_UNSUBSCRIBE_ALL_OBJ = {
-  "method": "unsubscribe",
-  "name": "*"
-}
-const CLIENT_ECHO_OBJ = {
-  "method": "",
-  "name": "",
-  "echo": true
-}
-const SERVER_PUBLISH_OBJ = {
-  "method": "publish",
-  "name": "server_uptime",
-  "data": "value"
-}
 
 // Helper Functions
 function log(text) {
-  console.log(text)
+  // console.log(text)
 }
 function isJSON(text) {
   try { JSON.parse(text) }
@@ -103,10 +62,18 @@ function newConnection(ws, req) {
   ws.on('message', data => {
     if (isJSON(data)) {
       log(`${ws.ip} sent ${data}`)
-      receiveData(ws, JSON.parse(data))
+      receive(ws, JSON.parse(data))
     }
     else {
       log(`${ws.ip} sent invalid JSON`)
+      const response = {
+        "error": "invalid JSON",
+        "try this": {
+          "request": "get",
+          "name": "time"
+        }
+      }
+      send(ws, response)
     }
   })
 
@@ -116,48 +83,64 @@ function newConnection(ws, req) {
   })
 
 }
-function receiveData(ws, req) {
+function receive(ws, rx) {
+
+  // Expected structure
+  const example_rx = {
+    "request": "get",
+    "name": "time",
+    "body": "if needed"
+  }
   
   // Get a value in the store
-  if (req.method === "get") {
-    log(`get ${ws.ip} ${req.data}`)
-    send(ws, req)
-    publish(ws, req.data)
+  if (rx.request === "get") {
+    log(`get ${ws.ip} ${rx.name}`)
+    if (rx.name === "*") send(ws, store)
+    else publish(ws, rx.name)
   }
 
   // Subscribe to a value in the store
-  else if (req.method === "subscribe") {
-    log(`subscribe ${ws.ip} ${req.data}`)
-    ws.subs.push(req.data)
-    send(ws, req)
-    publish(ws, req.data)
+  else if (rx.request === "subscribe") {
+    log(`subscribe ${ws.ip} to ${rx.name}`)
+    if (ws.subs.indexOf(rx.name) === -1) ws.subs.push(rx.name)
+    publish(ws, rx.name)
   }
 
   // Get all subscriptions
-  else if (req.method === "subscribed") {
-    req.data = ws.subs
-    send(ws, req)
+  else if (rx.request === "subscribed") {
+    rx.body = ws.subs
+    send(ws, rx)
   }
 
   // Unsubscribe from a value in the store
-  else if (req.method === "unsubscribe") {
-    log(`unsubscribe ${ws.ip} ${req.data}`)
-    ws.subs = ws.subs.filter(sub => sub !== req.data)
-    send(ws, req)
-  }
-
-  // Unsubscribe from everything
-  else if (req.method === "unsubscribeAll") {
-    log(`unsubscribeAll ${ws.ip} ${JSON.stringify(ws.subs)}`)
-    req.data = ws.subs
-    send(ws, req)
-    ws.subs = []
+  else if (rx.request === "unsubscribe") {
+    log(`unsubscribe ${ws.ip} from ${rx.name}`)
+    if (rx.name === "*") ws.subs = []
+    else ws.subs = ws.subs.filter(sub => sub !== rx.name)
   }
 
   // Emit event for external module
-  else if (req?.method) {
-    log(`emit event ${ws.ip} ${req.method} data ${req.data}`)
-    emitter.emit(req.method, ws, req)
+  else if (rx.request === "call") {
+    log(`emit event ${ws.ip} ${rx.request} data ${rx.name}`)
+    emitter.emit(rx.name, ws, rx)
+  }
+
+  // Client publishes a value
+  else if (rx.request === "publish") {
+    log(`publish ${ws.ip} ${rx.name} = ${rx.body}`)
+    store[ws.ip] = {
+      [rx.name]: rx.body
+    }
+  }
+
+  else {
+    log(`request unknown ${ws.ip}`)
+    rx.error = "request unknown"
+    rx.try_this = {
+      "request": "get",
+      "name": "time"
+    }
+    send(ws, rx)
   }
 
 }
@@ -168,8 +151,11 @@ function send(ws, obj) {
   }
 }
 function publish(ws, sub) {
-  const obj = {[sub]: store[sub] || null}
-  send(ws, obj)
+  const tx = {
+    "name": sub,
+    "body": store[sub] || null
+  }
+  send(ws, tx)
 }
 function set(sub, value) {
   // Update and publish to all subscribed clients
@@ -178,6 +164,9 @@ function set(sub, value) {
     if (ws.subs.includes(sub)) publish(ws, sub)
   })
   // log(`store update ${sub}, ${value}`)
+}
+function subscribe(ws, name) {
+  if (ws.subs.indexOf(name) === -1) ws.subs.push(name)
 }
 
 // Global uptime
@@ -189,9 +178,12 @@ setInterval(() => {
 }, 1000)
 
 // Export
-exports.start = start
-exports.set = set
 exports.emitter = emitter
+exports.start = start
+exports.send = send
+exports.set = set
+exports.subscribe = subscribe
+exports.publish = publish
 
 /* Examples
 
