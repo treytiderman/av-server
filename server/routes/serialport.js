@@ -2,7 +2,7 @@
 const express = require('express')
 const router = express.Router()
 const routes = {
-  "/availablePorts": {
+  "/available": {
     "method": "GET",
     "description": "List available serial ports (COM)",
     "response (example)": [
@@ -318,7 +318,7 @@ router.post('/close', (req, res) => {
   res.json(output)
 })
 
-router.get('/availablePorts', async (req, res) => {
+router.get('/available', async (req, res) => {
   res.json(await serialport.getAvailablePorts())
 })
 router.get('/ports', async (req, res) => {

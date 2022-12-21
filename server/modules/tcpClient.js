@@ -27,9 +27,11 @@ const TCP_CLIENT_MODEL = {
 }
 
 // Helper Functions
+const logInConsole = false
 function log(text) {
   text = addEscapeCharsToAscii(text)
-  console.log(text)
+  const logger = require('../modules/log')
+  logger.log(text, "../public/logs/", 'tcp client', logInConsole)
 }
 function addEscapeCharsToAscii(text) {
   text = text.replace(/\r/g, "\\r")
@@ -129,8 +131,11 @@ function open(ip, port = 23, delimiter = "\r\n") {
     // Add to history
     tcpClients[address].history.push(rxObj)
   
-    // If the history length is greater than MAX_HISTORY_LENGTH then remove the first/oldest element
-    if (tcpClients[address].history.length > MAX_HISTORY_LENGTH) tcpClients[address].history.shift()
+    // If the history length is greater than MAX_HISTORY_LENGTH
+    if (tcpClients[address].history.length > MAX_HISTORY_LENGTH) {
+      // Then remove the first/oldest element
+      tcpClients[address].history.shift()
+    }
 
     // Emit event
     const tcpClientCopy = copyClientObj(tcpClients[address])
@@ -143,7 +148,7 @@ function open(ip, port = 23, delimiter = "\r\n") {
   return tcpClientCopy
 }
 function send(ip, port, data, encoding = "ascii", cr = false, lf = false) {
-  log(`send(${ip}, ${port}, ${data})`)
+  log(`send(${ip}, ${port}, ${data}, ${cr}, ${lf})`)
   const address = `${ip}:${port}`
 
   // Return if client is not defined
@@ -247,7 +252,7 @@ function close(ip, port) {
 
   // Return
   let tcpClientCopy = copyClientObj(tcpClients[address])
-  tcpClientCopy.isOpen = false
+  // tcpClientCopy.isOpen = false
   log(`return ${JSON.stringify(tcpClientCopy)}`)
   return tcpClientCopy
 }
