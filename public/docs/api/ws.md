@@ -101,98 +101,101 @@ Publish data to whoever is listening
 
 ### Example 1
 
-`Empty Request`
+Empty Request
 
 ```json
 ```
 
-`Response`
+Response
 
 ```json
 {
   "error": "invalid JSON",
   "try this": {
-    "request": "get",
-    "name": "time"
+    "name": "time",
+    "event": "get"
   }
 }
 ```
 
 ### Example 2
 
-`Request`
-
-```json
-{
-  "request": "get",
-  "name": "time"
-}
-```
-
-`Response`
+Send
 
 ```json
 {
   "name": "time",
+  "event": "get"
+}
+```
+
+Receive
+
+```json
+{
+  "name": "time",
+  "event": "get",
   "body": "2022-12-21T02:23:29.418Z"
 }
 ```
 
 ### Example 3
 
-`Request`
-
-```json
-{
-  "request": "subscribe",
-  "name": "time"
-}
-```
-
-`Response everytime "time" is updated`
+Send
 
 ```json
 {
   "name": "time",
+  "event": "subscribe"
+}
+```
+
+Receive everytime "time" is updated
+
+```json
+{
+  "name": "time",
+  "event": "publish",
   "body": "2022-12-21T02:24:14.778Z"
 }
 ```
 
 ### Example 4
 
-`Request`
-
-```json
-{
-  "request": "subscribe",
-  "name": "uptime"
-}
-```
-
-`Response everytime "uptime" is updated`
+Send
 
 ```json
 {
   "name": "uptime",
+  "event": "subscribe"
+}
+```
+
+Receive everytime "uptime" is updated
+
+```json
+{
+  "name": "uptime",
+  "event": "publish",
   "body": "72"
 }
 ```
 
 ### Example 5
 
-`Request`
+Send
 
 ```json
 {
-  "request": "subscribed"
+  "event": "subscribed"
 }
 ```
 
-`Response`
+Receive
 
 ```json
 {
-  "request": "subscribed",
+  "event": "subscribed",
   "body": [
     "time",
     "uptime"
@@ -202,106 +205,88 @@ Publish data to whoever is listening
 
 ### Example 6
 
-`Request`
+Send
 
 ```json
 {
-  "request": "unsubscribe",
-  "name": "time"
+  "name": "time",
+  "event": "unsubscribe"
 }
 ```
 
-`No updates for "time" anymore`
+Stop receiving "uptime" events
 
 ```json
 ```
 
 ### Example 7
 
-`Request`
+Send
 
 ```json
 {
-  "request": "unsubscribeAll"
+  "name": "*",
+  "event": "unsubscribe"
 }
 ```
 
-`No more updates`
+Stop receiving all events
 
 ```json
 ```
 
 ### Example 8
 
-`Request`
+Send
 
 ```json
 {
-  "request": "idk",
-  "name": "?"
+  "name": "?",
+  "event": "idk"
 }
 ```
 
-`Response`
+Response
 
 ```json
-{
-  "request": "idk",
-  "name": "?",
-  "error": "request unknown",
-  "try_this": {
-    "request": "get",
-    "name": "time"
-  }
-}
 ```
 
 ### Example 9
 
-`Request`
+Request
 
 ```json
 {
-  "request": "publish",
   "name": "key",
-  "body": "value",
-}
-```
-
-`Response`
-
-```json
-{
-  "request": "idk",
-  "name": "?",
-  "error": "request unknown",
-  "try_this": {
-    "request": "get",
-    "name": "time"
-  }
+  "event": "publish",
+  "body": "value"
 }
 ```
 
 ### Example 10
 
-`Request`
+Request
 
 ```json
 {
-  "request": "get",
-  "name": "*"
+  "name": "*",
+  "event": "get"
 }
 ```
 
-`Response`
+Response
 
 ```json
 {
-  "time": "2022-12-21T02:42:01.228Z",
-  "uptime": 154,
-  "test": "success",
-  "192.168.1.9": {
-    "key": "value"
+  "name": "*",
+  "event": "get",
+  "body": {    
+    "time": "2022-12-21T02:42:01.228Z",
+    "uptime": 154,
+    "test": "success",
+    "192.168.1.9": {
+      "key": "value"
+    }
   }
 }
 ```

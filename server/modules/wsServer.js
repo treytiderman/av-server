@@ -11,8 +11,10 @@ const store = {
 }
 
 // Helper Functions
+const logInConsole = false
 function log(text) {
-  // console.log(text)
+  const logger = require('../modules/log')
+  logger.log(text, "../public/logs/", 'ws server', logInConsole)
 }
 function isJSON(text) {
   try { JSON.parse(text) }
@@ -61,16 +63,15 @@ function newConnection(ws, req) {
   // Received message from client
   ws.on('message', data => {
     if (isJSON(data)) {
-      log(`${ws.ip} sent ${data}`)
       receive(ws, JSON.parse(data))
     }
     else {
-      log(`${ws.ip} sent invalid JSON`)
+      log(`Invalid JSON from ${ws.ip}`)
       const response = {
         "error": "invalid JSON",
         "try this": {
-          "request": "get",
-          "name": "time"
+          "name": "time",
+          "event": "get"
         }
       }
       send(ws, response)
@@ -87,83 +88,94 @@ function receive(ws, rx) {
 
   // Expected structure
   const example_rx = {
-    "request": "get",
     "name": "time",
+    "event": "get",
     "body": "if needed"
   }
   
   // Get a value in the store
-  if (rx.request === "get") {
+  if (rx.event === "get") {
     log(`get ${ws.ip} ${rx.name}`)
-    if (rx.name === "*") send(ws, store)
-    else publish(ws, rx.name)
+    if (rx.name === "*") send(ws, {
+      "name": "*",
+      "event": "get",
+      "body": store
+    })
+    else get(ws, rx.name)
   }
 
   // Subscribe to a value in the store
-  else if (rx.request === "subscribe") {
+  else if (rx.event === "subscribe") {
     log(`subscribe ${ws.ip} to ${rx.name}`)
     if (ws.subs.indexOf(rx.name) === -1) ws.subs.push(rx.name)
-    publish(ws, rx.name)
   }
 
   // Get all subscriptions
-  else if (rx.request === "subscribed") {
+  else if (rx.event === "subscribed") {
     rx.body = ws.subs
     send(ws, rx)
   }
 
   // Unsubscribe from a value in the store
-  else if (rx.request === "unsubscribe") {
+  else if (rx.event === "unsubscribe") {
     log(`unsubscribe ${ws.ip} from ${rx.name}`)
     if (rx.name === "*") ws.subs = []
     else ws.subs = ws.subs.filter(sub => sub !== rx.name)
   }
 
-  // Emit event for external module
-  else if (rx.request === "call") {
-    log(`emit event ${ws.ip} ${rx.request} data ${rx.name}`)
-    emitter.emit(rx.name, ws, rx)
-  }
-
   // Client publishes a value
-  else if (rx.request === "publish") {
+  else if (rx.event === "publish") {
     log(`publish ${ws.ip} ${rx.name} = ${rx.body}`)
     store[ws.ip] = {
       [rx.name]: rx.body
     }
   }
 
+  // Event for external module
   else {
-    log(`request unknown ${ws.ip}`)
-    rx.error = "request unknown"
-    rx.try_this = {
-      "request": "get",
-      "name": "time"
-    }
-    send(ws, rx)
+    log(`${ws.ip} emit event ${rx.event} name ${rx.name}`)
+    emitter.emit(rx.name, ws, rx)
   }
 
 }
-function send(ws, obj) {
+function send(ws, payload) {
   if (ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify(obj))
-    log(`send ${ws.ip} ${JSON.stringify(obj)}`)
+    ws.send(JSON.stringify(payload))
+    log(`send ${ws.ip} ${JSON.stringify(payload)}`)
   }
 }
-function publish(ws, sub) {
+function get(ws, name) {
   const tx = {
-    "name": sub,
-    "body": store[sub] || null
+    "name": name,
+    "event": "get",
+    "body": store[name] || null
   }
   send(ws, tx)
 }
-function set(sub, value) {
-  // Update and publish to all subscribed clients
-  store[sub] = value
+function publish(name, body) {
+  store[name] = body
   wsServer.clients.forEach(ws => {
-    if (ws.subs.includes(sub)) publish(ws, sub)
+    if (ws.subs.includes(name)) {
+      const tx = {
+        "name": name,
+        "event": "publish",
+        "body": body || null
+      }
+      send(ws, tx)
+    }
   })
-  // log(`store update ${sub}, ${value}`)
+}
+function event(name, event, body) {
+  wsServer.clients.forEach(ws => {
+    if (ws.subs.includes(name)) {
+      const tx = {
+        "name": name,
+        "event": event,
+        "body": body || null
+      }
+      send(ws, tx)
+    }
+  })
 }
 function subscribe(ws, name) {
   if (ws.subs.indexOf(name) === -1) ws.subs.push(name)
@@ -173,17 +185,18 @@ function subscribe(ws, name) {
 let globalCount = 0
 setInterval(() => {
   globalCount++
-  set("uptime", globalCount)
-  set("time", new Date(Date.now()).toISOString())
+  publish("uptime", globalCount)
+  publish("time", new Date(Date.now()).toISOString())
 }, 1000)
 
 // Export
 exports.emitter = emitter
 exports.start = start
 exports.send = send
-exports.set = set
-exports.subscribe = subscribe
+exports.get = get
+exports.event = event
 exports.publish = publish
+exports.subscribe = subscribe
 
 /* Examples
 

@@ -1,13 +1,13 @@
 # TCP Client API | WebSocket
 
-## /tcp/client/v1/open
+## open
 
 Send
 
 ```json
 {
-  "request": "call",
-  "name": "/tcp/client/v1/open",
+  "name": "/tcp/client/v1",
+  "event": "open",
   "body": {
     "ip": "192.168.1.246",
     "port": 23,
@@ -16,31 +16,25 @@ Send
 }
 ```
 
-Subscribes to "/tcp/client/v1/client/192.168.1.246:23"
+Subscribes to "/tcp/client/v1/192.168.1.246:23"
+Receive event updates [open, close, send, receive, error]
 
 ```json
 {
-  "name": "/tcp/client/v1/client/192.168.1.246:23",
-  "body": {
-    "isOpen": true,
-    "ip": "192.168.1.246",
-    "port": 23,
-    "address": "192.168.1.246:23",
-    "expectedDelimiter": "\r",
-    "history": [],
-    "error": null
-  }
+  "name": "/tcp/client/v1/192.168.1.246:23",
+  "event": "open",
+  "body": true
 }
 ```
 
-## /tcp/client/v1/send
+## send
 
-`Send`
+Send
 
 ```json
 {
-  "request": "call",
-  "name": "/tcp/client/v1/send",
+  "name": "/tcp/client/v1",
+  "event": "send",
   "body": {
     "ip": "192.168.1.246",
     "port": 23,
@@ -52,43 +46,53 @@ Subscribes to "/tcp/client/v1/client/192.168.1.246:23"
 }
 ```
 
-`Response`
+Subscribes to "/tcp/client/v1/192.168.1.246:23"
+Receive event updates [open, close, send, receive, error]
 
 ```json
 {
-  "name": "/tcp/client/v1/client/192.168.1.246:23",
+  "name": "/tcp/client/v1/192.168.1.246:23",
+  "event": "send",
   "body": {
-    "isOpen": true,
-    "ip": "192.168.1.246",
-    "port": 23,
-    "address": "192.168.1.246:23",
-    "expectedDelimiter": "\r",
-    "history": [
-      {
-        "wasReceived": false,
-        "timestampISO": "2022-12-21T05:19:44.262Z",
-        "hex": "4d563f0d",
-        "ascii": "MV?\r",
-        "buffer": {
-          "type": "Buffer",
-          "data": [77,86,63,13]
-        },
-        "error": null
-      }
-    ],
+    "wasReceived": false,
+    "timestampISO": "2022-12-22T02:43:09.981Z",
+    "hex": "4d563f0d",
+    "ascii": "MV?\r",
+    "buffer": {
+      "type": "Buffer",
+      "data": [77,86,63,13]
+    },
     "error": null
   }
 }
 ```
 
-## /tcp/client/v1/close
+```json
+{
+  "name": "/tcp/client/v1/192.168.1.246:23",
+  "event": "receive",
+  "body": {
+    "wasReceived": true,
+    "timestampISO": "2022-12-22T02:43:10.005Z",
+    "hex": "4d5634300d",
+    "ascii": "MV40\r",
+    "buffer": {
+      "type": "Buffer",
+      "data": [77,86,52,48,13]
+    },
+    "error": null
+  }
+}
+```
 
-`Send`
+## close
+
+Send
 
 ```json
 {
-  "request": "call",
-  "name": "/tcp/client/v1/close",
+  "name": "/tcp/client/v1",
+  "event": "close",
   "body": {
     "ip": "192.168.1.246",
     "port": 23
@@ -96,11 +100,38 @@ Subscribes to "/tcp/client/v1/client/192.168.1.246:23"
 }
 ```
 
-`Response`
+Subscribes to "/tcp/client/v1/192.168.1.246:23"
+Receive event updates [open, close, send, receive, error]
 
 ```json
 {
-  "name": "/tcp/client/v1/client/192.168.1.246:23",
+  "name": "/tcp/client/v1/192.168.1.246:23",
+  "event": "close",
+  "body": true
+}
+```
+
+## getClient
+
+Send
+
+```json
+{
+  "name": "/tcp/client/v1/",
+  "event": "getClient",
+  "body": {
+    "ip": "192.168.1.246",
+    "port": 23
+  }
+}
+```
+
+Receive the whole client obj
+
+```json
+{
+  "name": "/tcp/client/v1/192.168.1.246:23",
+  "event": "getClient",
   "body": {
     "isOpen": false,
     "ip": "192.168.1.246",
@@ -110,7 +141,7 @@ Subscribes to "/tcp/client/v1/client/192.168.1.246:23"
     "history": [
       {
         "wasReceived": false,
-        "timestampISO": "2022-12-21T05:19:44.262Z",
+        "timestampISO": "2022-12-22T02:47:22.098Z",
         "hex": "4d563f0d",
         "ascii": "MV?\r",
         "buffer": {
@@ -121,25 +152,25 @@ Subscribes to "/tcp/client/v1/client/192.168.1.246:23"
       },
       {
         "wasReceived": true,
-        "timestampISO": "2022-12-21T05:19:44.304Z",
+        "timestampISO": "2022-12-22T02:47:22.134Z",
         "hex": "4d5634300d",
         "ascii": "MV40\r",
         "buffer": {
           "type": "Buffer",
           "data": [77,86,52,48,13]
         },
-        "error": ""
+        "error": null
       },
       {
         "wasReceived": true,
-        "timestampISO": "2022-12-21T05:19:44.358Z",
+        "timestampISO": "2022-12-22T02:47:22.179Z",
         "hex": "4d564d41582039380d",
         "ascii": "MVMAX 98\r",
         "buffer": {
           "type": "Buffer",
           "data": [77,86,77,65,88,32,57,56,13]
         },
-        "error": ""
+        "error": null
       }
     ],
     "error": null
@@ -147,50 +178,23 @@ Subscribes to "/tcp/client/v1/client/192.168.1.246:23"
 }
 ```
 
-## /tcp/client/v1/client/{ip}:{port}
+## getClients
 
-`Send`
+Send
 
 ```json
 {
-  "request": "{get, subscribe, unsubscribe}",
-  "name": "/tcp/client/v1/client/192.168.1.246:23"
+  "name": "/tcp/client/v1",
+  "event": "getClients"
 }
 ```
 
-`Response`
+Receive event updates [open, close, send, receive, error]
 
 ```json
 {
-  "name": "/tcp/client/v1/client/192.168.1.246:23",
-  "body": {
-    "isOpen": false,
-    "ip": "192.168.1.246",
-    "port": 23,
-    "address": "192.168.1.246:23",
-    "expectedDelimiter": "\r",
-    "history": [],
-    "error": null
-  }
-}
-```
-
-## /tcp/client/v1/clients
-
-`Send`
-
-```json
-{
-  "request": "{get, subscribe, unsubscribe}",
-  "name": "/tcp/client/v1/clients"
-}
-```
-
-`Response`
-
-```json
-{
-  "name": "/tcp/client/v1/clients",
+  "name": "/tcp/client/v1",
+  "event": "getClients",
   "body": {
     "192.168.1.246:23": {
       "isOpen": false,
@@ -204,4 +208,3 @@ Subscribes to "/tcp/client/v1/client/192.168.1.246:23"
   }
 }
 ```
-

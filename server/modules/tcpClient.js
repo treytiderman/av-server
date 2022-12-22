@@ -27,7 +27,7 @@ const TCP_CLIENT_MODEL = {
 }
 
 // Helper Functions
-const logInConsole = false
+const logInConsole = true
 function log(text) {
   text = addEscapeCharsToAscii(text)
   const logger = require('../modules/log')
@@ -53,7 +53,6 @@ function copyClientObj(obj) {
   const objCopy = Object.assign({}, obj);
   // const objCopy = JSON.parse(JSON.stringify(obj))
   delete objCopy["clientObj"]; 
-  log(`return ${JSON.stringify(objCopy)}`)
   return objCopy
 }
 
@@ -64,8 +63,13 @@ function open(ip, port = 23, delimiter = "\r\n") {
 
   // Return if the connection is already open
   if (tcpClients[address]?.isOpen === true) {
-    const error = { "error": "connection already open" }
-    log(`return ${JSON.stringify(error)}`)
+    const error = "connection already open"
+
+    // Emit event
+    log(`open ${address} ${error}`)
+    emitter.emit('open', address, error)
+
+    // Return
     return error
   }
 
@@ -84,39 +88,35 @@ function open(ip, port = 23, delimiter = "\r\n") {
     error: null,
   }
 
-  // Open Connection
+  // Open Connection event
   tcpClients[address].clientObj.connect(port, ip, () => {
     tcpClients[address].isOpen = true
-    log(`connected to ${address}`)
-
+    
     // Emit event
-    const tcpClientCopy = copyClientObj(tcpClients[address])
-    emitter.emit('client', address, tcpClientCopy)
+    log(`open ${address}`)
+    emitter.emit('open', address, true)
   })
 
   // Error event
-  tcpClients[address].clientObj.on('error', (err) => {
-    tcpClients[address].error = err
-    log(err)
-
+  tcpClients[address].clientObj.on('error', (error) => {
+    tcpClients[address].error = error
+    
     // Emit event
-    const tcpClientCopy = copyClientObj(tcpClients[address])
-    emitter.emit('client', address, tcpClientCopy)
+    log(`error ${address} ${error}`)
+    emitter.emit('error', address, error)
   })
 
   // Close event
   tcpClients[address].clientObj.on('close', () => {
     tcpClients[address].isOpen = false
-    log(`closed connection to ${address}`)
     
     // Emit event
-    const tcpClientCopy = copyClientObj(tcpClients[address])
-    emitter.emit('client', address, tcpClientCopy)
+    log(`close ${address}`)
+    emitter.emit('close', address, true)
   })
 
   // Listen for new data
   tcpClients[address].clientObj.on('data', (data) => {
-    log(`received ${data}`)
 
     // Create receive object
     const rxObj = { 
@@ -125,7 +125,7 @@ function open(ip, port = 23, delimiter = "\r\n") {
       hex: data.toString('hex'),
       ascii: data.toString('ascii'),
       buffer: data,
-      error: "",
+      error: null,
     }
 
     // Add to history
@@ -138,14 +138,12 @@ function open(ip, port = 23, delimiter = "\r\n") {
     }
 
     // Emit event
-    const tcpClientCopy = copyClientObj(tcpClients[address])
-    emitter.emit('client', address, tcpClientCopy)
+    log(`received ${address} ${JSON.stringify(data)}`)
+    emitter.emit('receive', address, rxObj)
   })
 
   // Return
-  const tcpClientCopy = copyClientObj(tcpClients[address])
-  log(`return ${JSON.stringify(tcpClientCopy)}`)
-  return tcpClientCopy
+  return "OK"
 }
 function send(ip, port, data, encoding = "ascii", cr = false, lf = false) {
   log(`send(${ip}, ${port}, ${data}, ${cr}, ${lf})`)
@@ -154,14 +152,12 @@ function send(ip, port, data, encoding = "ascii", cr = false, lf = false) {
   // Return if client is not defined
   if (tcpClients[address] === undefined) {
     const error = "client is not defined, open the connection first"
-    tcpClients[address] = {error: error}
-    log(`error ${error}`)
-
+    
     // Emit event
-    const tcpClientCopy = copyClientObj(tcpClients[address])
-    emitter.emit('client', address, tcpClientCopy)
-
+    emitter.emit('send', address, error)
+    
     // Return
+    log(`send ${address} ${error}`)
     return error
   }
 
@@ -209,8 +205,8 @@ function send(ip, port, data, encoding = "ascii", cr = false, lf = false) {
   }
 
   // Emit event
-  const tcpClientCopy = copyClientObj(tcpClients[address])
-  emitter.emit('client', address, tcpClientCopy)
+  log(`send ${address} ${JSON.stringify(txObj)}`)
+  emitter.emit('send', address, txObj)
 
   // Return
   log(`return ${JSON.stringify(txObj)}`)
@@ -223,27 +219,24 @@ function close(ip, port) {
   // Return if client is not defined
   if (tcpClients[address] === undefined) {
     const error = "client is not defined, open the connection first"
-    tcpClients[address] = {error: error}
-    log(`error ${error}`)
-
+    
     // Emit event
-    const tcpClientCopy = copyClientObj(tcpClients[address])
-    emitter.emit('client', address, tcpClientCopy)
-
+    emitter.emit('close', address, error)
+    
     // Return
+    log(`close ${address} ${error}`)
     return error
   }
 
   // Return if the client is already closed
   if (tcpClients[address]?.isOpen === false) {
     const error = "client already closed"
-    log(`error ${error}`)
 
     // Emit event
-    const tcpClientCopy = copyClientObj(tcpClients[address])
-    emitter.emit('client', address, tcpClientCopy)
-  
+    emitter.emit('close', address, error)
+    
     // Return
+    log(`close ${address} ${error}`)
     return error
   }
 
@@ -251,13 +244,31 @@ function close(ip, port) {
   tcpClients[address].clientObj.end()
 
   // Return
-  let tcpClientCopy = copyClientObj(tcpClients[address])
-  // tcpClientCopy.isOpen = false
+  return "OK"
+}
+function getClient(ip, port) {
+  log(`getClient(${ip}, ${port})`)
+  const address = `${ip}:${port}`
+
+  // Return if client is not defined
+  if (tcpClients[address] === undefined) {
+    const error = "client is not defined, open the connection first"
+    
+    // Emit event
+    // emitter.emit('error', address, error)
+    
+    // Return
+    log(`getClient ${address} ${error}`)
+    return error
+  }
+
+  // Return client
+  const tcpClientCopy = copyClientObj(tcpClients[address])
   log(`return ${JSON.stringify(tcpClientCopy)}`)
   return tcpClientCopy
 }
-function getTcpClients() {
-  log(`getTcpClients()`)
+function getClients() {
+  log(`getClients()`)
 
   // Remove clientObj from returned object
   let tcpClientsCopy = {}
@@ -269,26 +280,6 @@ function getTcpClients() {
   // Return
   log(`return ${JSON.stringify(tcpClientsCopy)}`)
   return tcpClientsCopy
-
-}
-function getTcpClient(ip, port) {
-  const address = `${ip}:${port}`
-  log(`getTcpClient(${ip}, ${port})`)
-
-  // Return if client is not defined
-  if (tcpClients[address] === undefined) {
-    const error = "client is not defined, open the connection first"
-    tcpClients[address] = {error: error}
-    log(`error ${error}`)
-
-    // Return
-    return error
-  }
-
-  // Return client
-  const tcpClientCopy = copyClientObj(tcpClients[address])
-  log(`return ${JSON.stringify(tcpClientCopy)}`)
-  return tcpClientCopy
 }
 
 // Export
@@ -296,8 +287,8 @@ exports.emitter = emitter
 exports.open = open
 exports.send = send
 exports.close = close
-exports.getTcpClients = getTcpClients
-exports.getTcpClient = getTcpClient
+exports.getClient = getClient
+exports.getClients = getClients
 
 // Testing
 // const IP = "192.168.1.246"
