@@ -1,13 +1,13 @@
 <!-- Javascript -->
 <script>
-  import { validIPv4, validMask } from "../../js/helper.js"
+  import { validIPv4, validMask } from "../js/helper.js"
 
   // Event Dispatcher
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
 
   // Import Components
-  import Icon from '../../components/Icon.svelte'
+  import Icon from './Icon.svelte'
 
   // Data
   export let data = {

@@ -1,11 +1,11 @@
 <!-- Javascript -->
 <script>
-  import { sortArrayByObjKey } from "../../js/helper.js"
+  import { sortArrayByObjKey } from "../js/helper.js"
 
   // Components
-  import Icon from '../../components/Icon.svelte'
-  import Dialog from '../../components/Dialog.svelte'
-  import SetIP from '../../pages/AV-Tools/SetIP.svelte'
+  import Icon from '../components/Icon.svelte'
+  import Dialog from '../components/Dialog.svelte'
+  import SetIP from '../components/SetIP.svelte'
 
   // Data
   let data = {

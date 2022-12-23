@@ -2,7 +2,7 @@
 <script>
 
   // Components
-  import Icon from '../../components/Icon.svelte'
+  import Icon from './Icon.svelte'
 
   // Exports
   export let showCRLF = true

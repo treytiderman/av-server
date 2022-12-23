@@ -1,9 +1,9 @@
 <!-- Javascript -->
 <script>
-  import { validIPv4, validMask, validLeasePeriod } from "../../js/helper.js"
+  import { validIPv4, validMask, validLeasePeriod } from "../js/helper.js"
 
   // Import Components
-  import Icon from '../../components/Icon.svelte'
+  import Icon from '../components/Icon.svelte'
 
   // Data
   const data = {

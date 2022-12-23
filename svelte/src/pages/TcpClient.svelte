@@ -1,11 +1,11 @@
 <!-- Javascript -->
 <script>
-  import { get, post } from "../../js/helper.js"
+  import { get, post } from "../js/helper.js"
 
   // Components
-  import Icon from '../../components/Icon.svelte'
-  import Terminal from './Terminal.svelte'
-  
+  import Icon from '../components/Icon.svelte'
+  import Terminal from '../components/Terminal.svelte'
+
   // Data
   let data = {
     isOpen: false,
@@ -227,8 +227,8 @@
     }
   }
 
-  input,
-  select {
+  /* select, */
+  input {
     width: 100%;
   }
 
