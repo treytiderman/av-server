@@ -49,37 +49,73 @@ function connect(options, restart = false) {
     log(`WebSocket: ERROR ${url}`)
   })
   websocket.addEventListener('message', (event) => {
-    log(`WebSocket: MESSGAGE ${event.data}`)
-    if (isJSON(event.data)) receive(JSON.parse(event.data))
+    // log(`WebSocket: MESSGAGE ${event.data}`)
   })
   websocket.addEventListener('close', (event) => {
     log(`WebSocket: CLOSE ${url}`)
-    setTimeout(() => connect(options, true), reconnectTimeout_ms)
   })
 }
 function send(obj) {
   if (websocket.readyState === 1) websocket.send(JSON.stringify(obj))
   else console.log("didn't send");
 }
-function receive(obj) {
-  if (obj.event === "get") {
-    console.log("get", obj)
-    
-  }
+function get(name) {
+  send({ "name": name, "event": "get" })
 }
-function on(message) {
-  console.log(message)
-  if (message.event === "get") {
-    
-  }
+function subscribe(name) {
+  send({ "name": name, "event": "subscribe" })
+}
+function unsubscribe(name) {
+  send({ "name": name, "event": "unsubscribe" })
+}
+function event(name, event, body = null) {
+  send({ "name": name, "event": event, "body": body })
+}
+function publish(name, body) {
+  event(name, "publish", body)
+}
+function subscribed() {
+  send({ "event": "subscribed" })
+}
+function unsubscribeAll() {
+  send({ "name": "*", "event": "unsubscribe" })
+}
+function receive(callback) {
+  websocket.addEventListener('message', (event) => {
+    callback(event.data)
+  })
+}
+function receiveJSON(callback) {
+  receive(data => {
+    if (isJSON(data)) callback(JSON.parse(data))
+  })
+}
+function receiveEvent(name, callback) {
+  receiveJSON(obj => {
+    if (obj.name === name) {
+      callback(obj.event, obj.body)
+    }
+  })
 }
 
 // Exports
 export const ws = {
+  // Main Functions
   setDebug,
   connect,
   send,
-  on,
+  receive,
+  // Receive Functions
+  receiveJSON,
+  receiveEvent,
+  // Send Functions
+  get,
+  subscribe,
+  unsubscribe,
+  event,
+  publish,
+  subscribed,
+  unsubscribeAll,
 }
 
 
