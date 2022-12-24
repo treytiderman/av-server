@@ -9,6 +9,10 @@
   import Header from './layout/Header.svelte'
   import Nav from './layout/Nav.svelte'
 
+  // Server Connection
+  import { ws } from './js/ws'
+  const IP = ""
+
   // Variables
   let navShow = false
   let navItem
@@ -60,12 +64,30 @@
     addToNavItems(navItems, split, urlPathHash)
   }
 
+  // Component Startup
+  import { onMount } from 'svelte';
+  let doneLoading = false
+  onMount(async () => {
+
+    // Start WebSocket Connection
+    ws.setDebug(true)
+    ws.connect({
+      ip: "192.168.1.9",
+      port: "4620",
+    })
+
+    // Startup complete
+    doneLoading = true
+
+  })
+
   // Subscribe to screen width
   $: screenWidth = document.documentElement.offsetWidth
   
 </script>
 
 <!-- HTML -->
+{#if $ws.status === "open"}
 <Header title={$location}
   on:nav={() => navShow = !navShow}/>
 <div class="navMain">
@@ -78,6 +100,16 @@
     <Router {routes}/>
   </main>
 </div>
+
+<!-- Server Offline -->
+{:else}
+<main class="grid" style="padding: var(--gap)">
+  <h2>Lost connection to server on {localStorage.getItem("server_offline")}</h2>
+  <section>
+    <button on:click={() => window.location.reload(true)}>Reload?</button>
+  </section>
+</main>
+{/if}
 
 <!-- CSS -->
 <style>

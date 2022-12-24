@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store'
 
 // Debug
-let debug = false;
+let debug = false
 function log(text) {
   if (debug) console.log(text)
 }
@@ -17,33 +17,25 @@ function isJSON(text) {
   return true
 }
 function setDebug(bool) { debug = bool }
-function connect(options, restart = false) {
+function start(options) {
 
   // Options
-  const path = options.path || '';
-  const port = options.port || 4620;
-  const ip = options.ip || document.location.hostname;
-  const reconnectTimeout_ms = options.reconnectTimeout_ms || 5000;
-  const protocol = options.protocol || document.location.protocol === 'http:' ? 'ws' : 'wss';
+  const path = options.path || ''
+  const port = options.port || 4620
+  const ip = options.ip || document.location.hostname
+  // const reconnectTimeout_ms = options.reconnectTimeout_ms || 5000
+  const protocol = options.protocol || document.location.protocol === 'http:' ? 'ws' : 'wss'
   const host = options.protocol === 'wss' ? `${ip}` : `${ip}:${port}`
   const url = `${protocol}://${host}/${path}`
 
-  // Failed to Connect, Start reconnect Timer
-  reconnectInterval = setTimeout(() => {
-    log(`WebSocket ${url}: FAILED TO CONNECT`)
-    log(`WebSocket ${url}: PLEASE REFRESH`)
-  }, reconnectTimeout_ms)
-
   // Connection request
   websocket = new WebSocket(url)
-  log(`WebSocket: REQUESTED at ${url}`)
+  log(`WebSocket: REQUESTED ${url}`)
 
   // Events
   websocket.addEventListener('open', (event) => {
-    log(`WebSocket: OPEN ${url}`)
-    // Connection active, Clear reconnect timer
-    clearTimeout(reconnectInterval)
-    if (restart) location.reload(true)
+    localStorage.setItem("server_offline", "false")
+    log(`WebSocket: OPENED ${url}`)
   })
   websocket.addEventListener('error', (event) => {
     log(`WebSocket: ERROR ${url}`)
@@ -52,32 +44,45 @@ function connect(options, restart = false) {
     // log(`WebSocket: MESSGAGE ${event.data}`)
   })
   websocket.addEventListener('close', (event) => {
-    log(`WebSocket: CLOSE ${url}`)
+    if (localStorage.getItem("server_offline") === "false") {
+      const date = new Date()
+      log(`WebSocket: CLOSED ${url} on ${date}`)
+      localStorage.setItem("server_offline", date)
+    }
+    else {
+      log(`WebSocket: STILL CLOSED ${url} on ${localStorage.getItem("server_offline")}`)
+    }
+    // log(`WebSocket: RECONNECTING in 5 sec... ${url}`)
+    // setTimeout(() => {
+    //   log(`WebSocket: TRY TO CONNECT ${url}`)
+    //   start(options)
+    // }, reconnectTimeout_ms)
   })
+
 }
 function send(obj) {
   if (websocket.readyState === 1) websocket.send(JSON.stringify(obj))
-  else console.log("didn't send");
+  else console.log("didn't send")
 }
-function get(name) {
+function sendGet(name) {
   send({ "name": name, "event": "get" })
 }
-function subscribe(name) {
+function sendSubscribe(name) {
   send({ "name": name, "event": "subscribe" })
 }
-function unsubscribe(name) {
+function sendUnsubscribe(name) {
   send({ "name": name, "event": "unsubscribe" })
 }
-function event(name, event, body = null) {
+function sendEvent(name, event, body = null) {
   send({ "name": name, "event": event, "body": body })
 }
-function publish(name, body) {
+function sendPublish(name, body) {
   event(name, "publish", body)
 }
-function subscribed() {
+function sendSubscribed() {
   send({ "event": "subscribed" })
 }
-function unsubscribeAll() {
+function sendUnsubscribeAll() {
   send({ "name": "*", "event": "unsubscribe" })
 }
 function receive(callback) {
@@ -90,6 +95,13 @@ function receiveJSON(callback) {
     if (isJSON(data)) callback(JSON.parse(data))
   })
 }
+function receivePublish(callback) {
+  receiveJSON(obj => {
+    if (obj.event === "publish") {
+      callback(obj.name, obj.body)
+    }
+  })
+}
 function receiveEvent(name, callback) {
   receiveJSON(obj => {
     if (obj.name === name) {
@@ -98,74 +110,83 @@ function receiveEvent(name, callback) {
   })
 }
 
-// Exports
-export const ws = {
-  // Main Functions
-  setDebug,
-  connect,
-  send,
-  receive,
-  // Receive Functions
-  receiveJSON,
-  receiveEvent,
-  // Send Functions
-  get,
-  subscribe,
-  unsubscribe,
-  event,
-  publish,
-  subscribed,
-  unsubscribeAll,
+// Svelte Store
+function createStore() {
+
+  // Create Store
+	const { subscribe, set, update } = writable({
+    "status": "",
+    "time": "2022-12-23T21:32:03.004Z"
+  })
+
+  // Return WebSocket functions with a svelte store
+  return {
+
+    // Svelte Functions
+		subscribe,
+
+    // Main Functions
+    setDebug,
+    connect: (options) => {
+
+      // Connect to Websocket
+      start(options)
+
+      // Events
+      websocket.addEventListener('open', event => {
+        update(store => {
+          store["status"] = "open"
+          return store
+        })
+      })
+      websocket.addEventListener('error', event => {
+        update(store => {
+          store["status"] = "error"
+          return store
+        })
+      })
+      websocket.addEventListener('close', event => {
+        update(store => {
+          store["status"] = "close"
+          return store
+        })
+      })
+      
+      // Save published and get values to the Svelte store
+      receiveJSON(obj => {
+        if (obj.event === "publish" || obj.event === "get") {
+          update(store => {
+            store[obj.name] = obj.body
+            return store
+          })
+        }
+      })
+
+    },
+
+    // Send Functions
+    send: {
+      raw: send,
+      get: sendGet,
+      subscribe: sendSubscribe,
+      unsubscribe: sendUnsubscribe,
+      unsubscribeAll: sendUnsubscribeAll,
+      subscribed: sendSubscribed,
+      publish: sendPublish,
+      event: sendEvent,
+    },
+
+    // Receive Functions
+    receive: {
+      raw: receive,
+      json: receiveJSON,
+      publish: receivePublish,
+      event: receiveEvent,
+    },
+
+  }
+
 }
 
-
-// -------------------------------------------------------------------
-
-
-// ws.get("time")
-
-// ws.subscribe("time")
-
-// ws.subscribed()
-
-// ws.unsubscribe("time")
-
-// ws.publish("name", "body")
-
-// ws.event("name", "event", "body")
-
-// ws.event("/tcp/client/v1", "open", {
-//   "ip": "192.168.1.246",
-//   "port": 23,
-//   "expectedDelimiter": "\r"
-// })
-
-// $ws["/tcp/client/v1/192.168.1.246:23"]
-
-// ws.on("/tcp/client/v1/192.168.1.246:23", (event, body) => {
-//   if (event === "open") {
-    
-//   }
-//   else if (event === "receive") {
-//     data.lines.push(body)
-//   }
-// })
-
-
-
-// const sliderChange = throttle(volume => {
-//   ws.debug(`Audio id ${volume.id} "${volume.label}" set to ${volume.slider.value}${volume.slider.units}`)
-//   ws.analog(wsSub, volume.id, volume.slider.value)
-// }, 100)
-
-// // Websocket - SIMPL Feedback
-// let wsSub = config.simplSubscriptionID ?? config.file
-// ws.addSubscription(wsSub, rx => {
-//   volumes.forEach(volume => {
-//     volume.mute.state = rx.digital[volume.id]
-//     volume.slider.value = rx.analog[volume.id]
-//   })
-//   volumes = volumes
-// })
-
-
+// Exports
+export const ws = createStore()

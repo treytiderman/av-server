@@ -67,7 +67,7 @@ function open(ip, port = 23, delimiter = "\r\n") {
 
     // Emit event
     log(`open ${address} ${error}`)
-    emitter.emit('open', address, error)
+    emitter.emit('open', address, {error: error})
 
     // Return
     return error
@@ -94,7 +94,7 @@ function open(ip, port = 23, delimiter = "\r\n") {
     
     // Emit event
     log(`open ${address}`)
-    emitter.emit('open', address, true)
+    emitter.emit('open', address, {isOpen: true})
   })
 
   // Error event
@@ -103,7 +103,7 @@ function open(ip, port = 23, delimiter = "\r\n") {
     
     // Emit event
     log(`error ${address} ${error}`)
-    emitter.emit('error', address, error)
+    emitter.emit('error', address, {error: error})
   })
 
   // Close event
@@ -112,7 +112,7 @@ function open(ip, port = 23, delimiter = "\r\n") {
     
     // Emit event
     log(`close ${address}`)
-    emitter.emit('close', address, true)
+    emitter.emit('close', address, {isOpen: false})
   })
 
   // Listen for new data
@@ -154,7 +154,7 @@ function send(ip, port, data, encoding = "ascii", cr = false, lf = false) {
     const error = "client is not defined, open the connection first"
     
     // Emit event
-    emitter.emit('send', address, error)
+    emitter.emit('send', address, {error: error})
     
     // Return
     log(`send ${address} ${error}`)
@@ -221,7 +221,7 @@ function close(ip, port) {
     const error = "client is not defined, open the connection first"
     
     // Emit event
-    emitter.emit('close', address, error)
+    emitter.emit('close', address, {error: error})
     
     // Return
     log(`close ${address} ${error}`)
@@ -233,7 +233,7 @@ function close(ip, port) {
     const error = "client already closed"
 
     // Emit event
-    emitter.emit('close', address, error)
+    emitter.emit('close', address, {error: error})
     
     // Return
     log(`close ${address} ${error}`)
@@ -255,7 +255,7 @@ function getClient(ip, port) {
     const error = "client is not defined, open the connection first"
     
     // Emit event
-    // emitter.emit('error', address, error)
+    // emitter.emit('error', address, {error: error})
     
     // Return
     log(`getClient ${address} ${error}`)
@@ -271,10 +271,12 @@ function getClients() {
   log(`getClients()`)
 
   // Remove clientObj from returned object
-  let tcpClientsCopy = {}
+  // let tcpClientsCopy = {}
+  let tcpClientsCopy = []
   Object.keys(tcpClients).forEach(address => {
     const tcpClientCopy = copyClientObj(tcpClients[address])
-    tcpClientsCopy[address] = tcpClientCopy
+    // tcpClientsCopy[address] = tcpClientCopy
+    tcpClientsCopy.push(tcpClientCopy)
   })
 
   // Return

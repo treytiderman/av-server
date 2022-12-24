@@ -1,25 +1,30 @@
 <!-- Javascript -->
 <script>
+    import { subscribe } from "svelte/internal";
   import { ws } from "../js/ws";
 
   ws.setDebug(true)
   ws.connect({
-    ip: "192.168.1.154",
+    ip: "192.168.1.9",
     port: "4620",
   })
-  ws.receiveJSON(obj => {
+  ws.receive.json(obj => {
     console.log(obj)
-  })
-
-  let time = ""
-  ws.receiveEvent("time", (event, body) => {
-    time = body
   })
 
   const IP = "192.168.1.246"
   const PORT = 23
-  ws.receiveEvent(`/tcp/client/v1${IP}:${PORT}`, (event, body) => {
-    
+  let lines = []
+  ws.receive.event(`/tcp/client/v1/${IP}:${PORT}`, (event, body) => {
+    if (event === "send" || event === "receive") {
+      lines = [...lines, body.ascii]
+    }
+    else if (event === "open") {
+      lines = [...lines, "connection open"]
+    }
+    else if (event === "close") {
+      lines = [...lines, "connection closed"]
+    }
   })
 
 </script>
@@ -27,28 +32,30 @@
 <!-- HTML -->
 <article class="grid">
   <h1>Testing WS</h1>
-  <p>{time}</p>
+  <p>{$ws.time}</p>
   <div class="flex">
-    <button on:click={event => ws.get("time")}>
+    <button on:click={() => ws.send.get("time")}>
       get "time"
     </button>
-    <button on:click={event => ws.subscribe("time")}>
+    <button on:click={() => ws.send.subscribe("time")}>
       subscribe "time"
     </button>
-    <button on:click={event => ws.unsubscribe("time")}>
+    <button on:click={() => ws.send.unsubscribe("time")}>
       unsubscribe "time"
     </button>
   </div>
+
   <hr>
+
   <div class="flex">
-    <button on:click={event => ws.event("/tcp/client/v1", "open", {
+    <button on:click={() => ws.send.event("/tcp/client/v1", "open", {
       "ip": IP,
       "port": PORT,
       "expectedDelimiter": "\r"
     })}>
       open
     </button>
-    <button on:click={event => ws.event("/tcp/client/v1", "send", {
+    <button on:click={() => ws.send.event("/tcp/client/v1", "send", {
       "ip": IP,
       "port": PORT,
       "data": "MV?",
@@ -58,13 +65,20 @@
     })}>
       send
     </button>
-    <button on:click={event => ws.event("/tcp/client/v1", "close", {
+    <button on:click={() => ws.send.event("/tcp/client/v1", "close", {
       "ip": IP,
       "port": PORT
     })}>
       close
     </button>
   </div>
+
+  <div class="grid gap-0">
+    {#each lines as line}
+      <div>{line}</div>
+    {/each}
+  </div>
+
 </article>
 
 <!-- CSS -->

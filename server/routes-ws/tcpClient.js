@@ -44,22 +44,31 @@ wsServer.emitter.on("/tcp/client/v1", (ws, req) => {
     const clients = tcpClient.getClients()
     wsServer.event(`/tcp/client/v1`, "getClients", clients)
   }
-
 })
 
 // Module events
 tcpClient.emitter.on("open", (address, body) => {
   wsServer.event(`/tcp/client/v1/${address}`, "open", body)
+  body.address = address
+  wsServer.event(`/tcp/client/v1`, "open", body)
 })
 tcpClient.emitter.on("send", (address, body) => {
   wsServer.event(`/tcp/client/v1/${address}`, "send", body)
+  body.address = address
+  wsServer.event(`/tcp/client/v1`, "send", body)
 })
 tcpClient.emitter.on("receive", (address, body) => {
   wsServer.event(`/tcp/client/v1/${address}`, "receive", body)
+  body.address = address
+  wsServer.event(`/tcp/client/v1`, "receive", body)
 })
 tcpClient.emitter.on("close", (address, body) => {
   wsServer.event(`/tcp/client/v1/${address}`, "close", body)
+  body.address = address
+  wsServer.event(`/tcp/client/v1`, "close", body)
 })
 tcpClient.emitter.on("error", (address, body) => {
   wsServer.event(`/tcp/client/v1/${address}`, "error", body)
+  body.address = address
+  wsServer.event(`/tcp/client/v1`, "error", body)
 })

@@ -1,5 +1,7 @@
 <!-- Javascript -->
 <script>
+  import { dateObjToTime } from "../js/helper.js"
+  import { ws } from "../js/ws.js"
 
   // Custom events
   import { createEventDispatcher } from 'svelte';
@@ -12,16 +14,10 @@
   export let title = "Title"
   const iconSize = 1.5
 
-  // Theme
-  let theme = "dark"
-  let themes = ["dark"]
-  $: document.documentElement.classList = theme
-  const themesGlob = import.meta.glob('../themes/**/*.css')
-  for (const filePath in themesGlob) {
-    themesGlob[filePath]()
-    const themeName = filePath.replace('../themes/', '').replace('.css', '')
-    themes.push(themeName)
-  }
+  // Time
+  ws.send.get("time")
+  ws.send.subscribe("time")
+  $: time = dateObjToTime( new Date($ws.time) )
 
 </script>
 
@@ -31,11 +27,9 @@
     <Icon name="bars" size={iconSize} />
   </button>
   <h2>{title}</h2>
-  <select bind:value={theme}>
-    {#each themes as theme}
-      <option>{theme}</option>
-    {/each}
-  </select>
+  <div>
+    {time}
+  </div>
 </header>
 
 <!-- CSS -->
@@ -64,7 +58,7 @@
     padding: var(--gap);
     background-color: transparent;
   }
-  header select {
+  header div {
     color: var(--color-text-bright);
     margin-right: 1rem;
     margin-left: auto;

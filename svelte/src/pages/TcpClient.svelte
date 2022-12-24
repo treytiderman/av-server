@@ -1,17 +1,108 @@
 <!-- Javascript -->
 <script>
   import { get, post } from "../js/helper.js"
+  import { ws } from "../js/ws.js"
 
   // Components
   import Icon from '../components/Icon.svelte'
   import Terminal from '../components/Terminal.svelte'
 
-  // Data
-  let data = {
+  // Constants
+  const NEW_CONNECTION = {
     isOpen: false,
+    ip: "192.168.1.246",
+    port: 23,
+    address: "New Connection",
+    expectedDelimiter: "\\r",
+    history: [],
+    error: "not a real connection"
+  }
+  const NO_LINES = {
+    wasReceived: true,
+    timestampISO: '0000-00-00T00:00:00.000Z',
+    data: 'No data yet...',
+  }
+  const HEX_SPACER = " "
+
+  // Data
+  $: data = {
+    clientSelected: NEW_CONNECTION,
+    clients: [
+      {
+        isOpen: false,
+        ip: "192.168.1.1",
+        port: 23,
+        address: "New Connection",
+        expectedDelimiter: "\\r\\n",
+        history: [],
+        error: "not a real connection"
+      },
+      {
+        isOpen: false,
+        ip: "192.168.1.9",
+        port: 5000,
+        address: "192.168.1.9:5000",
+        expectedDelimiter: "\\r\\n",
+        history: [],
+        error: "not a real connection"
+      },
+      {
+        isOpen: true,
+        ip: "192.168.246",
+        port: 23,
+        address: "192.168.1.246:23",
+        expectedDelimiter: "\\r",
+        history: [
+          {
+            "wasReceived": false,
+            "timestampISO": "2022-12-24T13:37:26.915Z",
+            "hex": "4d563f0d",
+            "ascii": "MV?\r",
+            "buffer": {
+              "type": "Buffer",
+              "data": [77,86,63,13]
+            },
+            "error": null,
+            "address": "192.168.1.246:23"
+          },
+          {
+            "wasReceived": true,
+            "timestampISO": "2022-12-24T13:37:26.949Z",
+            "hex": "4d5634300d",
+            "ascii": "MV40\r",
+            "buffer": {
+              "type": "Buffer",
+              "data": [77,86,52,48,13]
+            },
+            "error": null,
+            "address": "192.168.1.246:23"
+          },
+          {
+            "wasReceived": true,
+            "timestampISO": "2022-12-24T13:37:26.997Z",
+            "hex": "4d564d41582039380d",
+            "ascii": "MVMAX 98\r",
+            "buffer": {
+              "type": "Buffer",
+              "data": [77,86,77,65,88,32,57,56,13]
+            },
+            "error": null,
+            "address": "192.168.1.246:23"
+          }
+        ],
+        error: "not a real connection"
+      }
+    ],
+    feedback: {
+      message: "",
+      color: "dim"
+    },
+    opened: "",
     settings: {
-      ip: "192.168.1.9",
-      port: 23,
+      client: "New Connection",
+      isOpen: false,
+      ip: "192.168.1.42",
+      port: 5000,
       expectedDelimiter: "\\r\\n",
       encodingMode: "ascii",
       placeholder: {
@@ -20,16 +111,10 @@
         expectedDelimiter: "\\r\\n",
       },
     },
-    lines: [
-      {
-        wasReceived: true,
-        timestampISO: '2022-10-16T21:05:38.425Z',
-        data: 'No data yet...',
-      },
-    ],
+    lines: [NO_LINES],
     sends: [
       {
-        value: "ka 01 01\\r",
+        value: "MV?\\r",
         placeholder: "ka 01 01\\r",
       },
       {
@@ -44,77 +129,212 @@
   }
 
   // Functions
-  function interfaceChange(event) {
-    const selectValue = event.target.value
-    data.nicSelected = data.nics.find(nic => nic.name === selectValue)
-    console.log("Interface selected changed to", selectValue, data.nicSelected)
+  function changeClient(client) {
+    data.settings.client = client
+    updateSettings()
+    updateLines()
   }
-  async function openConnection(path, baudRate, delimiter) {
-    const body = {
-      "path": path,
-      "baudRate": baudRate,
-      "delimiter": delimiter
+  function changeEncoding(mode) {
+    data.settings.encodingMode = mode
+    updateLines()
+  }
+  function updateSettings() {
+    if (data.settings.client === "New Connection") {
+      data.clientSelected = NEW_CONNECTION
+      data.settings.isOpen = false
+      console.log("Interface selected updated to", "New Connection")
     }
-    // const openResponse = await post("/api/serial/v1/open", body)
+    else {
+      const newClient = data.clients.find(client => client.address === data.settings.client)
+      data.clientSelected = newClient
+      data.settings.ip = newClient.ip
+      data.settings.port = newClient.port
+      data.settings.expectedDelimiter = newClient.expectedDelimiter
+      data.settings.isOpen = newClient.isOpen
+      console.log("Interface selected updated to", data.settings)
+    }
+  }
+  function updateLines() {
+    if (data.clientSelected.history.length > 0) {
+      // Add sends to the array
+      let linesFromServer = []
+
+      // HEX
+      if (data.settings.encodingMode === "hex") {        
+        data.clientSelected.history.forEach(data => {
+
+          // Build HEX string with a spacer
+          let hexString = HEX_SPACER !== " " ? HEX_SPACER : ""
+          if (data.hex !== "") {
+            const hexArray = data.hex.match(/.{1,2}/g)
+            hexString += hexArray.join(HEX_SPACER)
+          }
+          else hexString = ""
+
+          // Add error
+          if (data.error !== null) data.hex += " <- " + data.error
+          
+          // Push to array
+          linesFromServer.push({
+            wasReceived: data.wasReceived,
+            timestampISO: data.timestampISO,
+            data: hexString,
+          })
+
+        })
+      }
+
+      // ASCII
+      else {
+        data.clientSelected.history.forEach(data => {
+
+          // Add error
+          if (data.error !== null) data.ascii += " <- " + data.error
+
+          // Push to array
+          linesFromServer.push({
+            wasReceived: data.wasReceived,
+            timestampISO: data.timestampISO,
+            data: data.ascii,
+          })
+
+        })
+      }
+      // Set lines equal to the info from the server
+      data.lines = linesFromServer
+    }
+    else {
+      data.lines = [NO_LINES]
+    }
+  }
+  function connectionToggle() {
+    if (data.settings.isOpen) connectionClose()
+    else {
+      data.opened = `${data.settings.ip}:${data.settings.port}`
+      connectionOpen()
+    }
+  }
+  function connectionOpen() {
+    const body = {
+      "ip": data.settings.ip,
+      "port": data.settings.port,
+      "expectedDelimiter": data.settings.expectedDelimiter,
+    }
+    ws.send.event("/tcp/client/v1", "open", body)
     console.log("Open Connection", body)
   }
-  async function closeConnection(path) {
-    const body = { "path": path }
-    // const openResponse = await post("/api/serial/v1/close", body)
+  function connectionClose() {
+    const body = {
+      "ip": data.settings.ip,
+      "port": data.settings.port,
+    }
+    ws.send.event("/tcp/client/v1", "close", body)
     console.log("Close Connection", body)
   }
-  async function toggleConnectionClick() {
-    // if (data.isOpen) closeConnection(data.path)
-    // else openConnection(data.settings.devicePath, data.settings.baudRate, data.settings.expectedDelimiter)
-  }
-  async function sendClick(text) {
+  function sendMessage(message) {
     const body = {
-      "path": data.settings.devicePath,
-      "message": text,
-      "messageType": data.settings.encodingMode,
+      "ip": data.settings.ip,
+      "port": data.settings.port,
+      "data": message,
+      "encoding": data.settings.port,
       "cr": false,
       "lf": false
     }
-    // const sendResponse = await post("/api/serial/v1/send", body)
+    ws.send.event("/tcp/client/v1", "send", body)
     console.log("Send", body)
   }
-  function updateLineData(port, encodingMode) {
-    // if (port?.data) {
-    //   let linesFromServer = []
-    //   // Add sends to the array
-    //   if (encodingMode === "hex") {        
-    //     port.data.forEach(data => {
-    //       if (data.error !== "") data.hex += " <- " + data.error
-    //       linesFromServer.push({
-    //         wasReceived: data.wasReceived,
-    //         timestampISO: data.timestampISO,
-    //         data: data.hex,
-    //       })
-    //     })
-    //   }
-    //   else {
-    //     port.data.forEach(data => {
-    //       if (data.error !== "") data.ascii += " <- " + data.error
-    //       linesFromServer.push({
-    //         wasReceived: data.wasReceived,
-    //         timestampISO: data.timestampISO,
-    //         data: data.ascii,
-    //       })
-    //     })
-    //   }
-    //   // Set lines equal to the info from the server
-    //   lines = linesFromServer
-    // }
-  }
 
-  // Terminal lines
-  let lines
-  // $: updateLineData(data.settings.devicePath, data.settings.encodingMode)
+  ws.send.subscribe("/tcp/client/v1")
+  ws.receive.json(obj => {
+
+    // Received event
+    if (obj.name === '/tcp/client/v1') {
+      const bodyIsArray = Array.isArray(obj.body)
+      const addresses = bodyIsArray ? obj.body.map(client => client.address) : false
+      const address = obj.body?.address || addresses
+      const event = obj.event
+      const body = obj.body
+      console.log("EVENT", event, "ADDRESS(S)", address, "BODY", body)
+
+      // Received all TCP clients
+      if (event === "getClients") {
+
+        // First time receiving updated TCP Clients. Replace placeholder data
+        if (data.clients[1].error === "not a real connection") {
+          data.clients = [ NEW_CONNECTION ]
+          body.forEach(client => {
+            // client.history = [] // Clear History
+            data.clients = [...data.clients, client]
+          })
+        }
+
+        // Received updated TCP Clients
+        else {
+          data.clients.forEach(client => {
+            const newData = body.find(newClient => client.address === newClient.address)
+            console.log("newData", newData);
+            if (newData !== undefined) {              
+              client.isOpen = newData.isOpen
+              client.ip = newData.ip
+              client.port = newData.port
+              client.error = newData.error
+              client.history = newData.history // Replace with all History
+              client.expectedDelimiter = newData.expectedDelimiter
+            }
+          })
+          data.clients = data.clients
+        }
+
+      }
+
+      // Received "open" event
+      else if (event === "open") {
+        if (body.isOpen === true) {
+          data.feedback = {
+            message: `Client ${address} opened`,
+            color: `green`,
+          }
+          ws.send.event("/tcp/client/v1", "getClients")
+          if (body.address === data.opened) {
+            console.log("I opened this client", body)
+            changeClient(body.address)
+          }
+        }
+      }
+
+      // Received "close" event
+      else if (event === "close") {
+        if (body.isOpen === false) {
+          data.feedback = {
+            message: `Client ${address} closed`,
+            color: `red`,
+          }
+          ws.send.event("/tcp/client/v1", "getClients")
+          if (body.address === data.settings.client) {
+            changeClient("New Connection")
+          }
+        }
+      }
+
+      // Received "send" event
+      else if (event === "send") {
+        
+      }
+
+      // Received "receive" event
+      else if (event === "receive") {
+        
+      }
+
+    }
+  })
 
   // Component Startup
-  import { onMount } from 'svelte';
+  import { onMount } from 'svelte'
   let doneLoading = false
   onMount(async () => {
+
+    ws.send.event("/tcp/client/v1", "getClients")
 
     // Startup complete
     doneLoading = true
@@ -122,8 +342,10 @@
   })
 
   // Debug
-  // $: console.log("port", port)
-  // $: console.log("lines", lines)
+  $: console.log("clients", data.clients)
+  $: console.log("clientSelected", data.clientSelected)
+  $: console.log("lines", data.lines)
+
 
 </script>
 
@@ -134,46 +356,58 @@
   <aside class="grid">
     <h2>Connection Settings</h2>
     <label>
+      Clients <br>
+      <select on:input={event => changeClient(event.target.value)} bind:value={data.settings.client}>
+        <!-- <option>New Connection</option> -->
+        {#each data.clients as client}
+          <!-- {#if client.isOpen} -->
+            <option>{client.address}</option>
+          <!-- {/if} -->
+        {/each}
+      </select>
+    </label>
+    <label>
       IP Address<br>
       <input type="text" bind:value={data.settings.ip}
         placeholder={data.settings.placeholder.ip}
-        disabled={data.isOpen}>
+        disabled={data.settings.isOpen}>
     </label>
     <label>
       Port<br>
       <input type="text" bind:value={data.settings.port}
         placeholder={data.settings.placeholder.port}
-        disabled={data.isOpen}>
+        disabled={data.settings.isOpen}>
     </label>
     <label>
       Expected Delimiter<br>
       <input type="text" bind:value={data.settings.expectedDelimiter}
         placeholder={data.settings.placeholder.expectedDelimiter}
-        disabled={data.isOpen}>
+        disabled={data.settings.isOpen}>
     </label>
     <div>
       Encoding Mode<br>
       <div class="flex even">
         <button class={data.settings.encodingMode === "ascii" ? "" : "dim"}
-          on:click={() => data.settings.encodingMode = "ascii"}
-          disabled={data.isOpen}>
+          on:click={() => changeEncoding("ascii")}>
           ASCII
         </button>
         <button class={data.settings.encodingMode === "hex" ? "" : "dim"}
-          on:click={() => data.settings.encodingMode = "hex"}
-          disabled={data.isOpen}>
+          on:click={() => changeEncoding("hex")}>
           HEX
         </button>
       </div>
     </div>
-    {#if data.isOpen}
-      <button class="red" on:click={toggleConnectionClick}>Close</button>
+    {#if data.settings.isOpen}
+      <button class="red" on:click={connectionToggle}>Close</button>
     {:else}
-      <button class="green" on:click={toggleConnectionClick}>Open</button>
+      <button class="green" on:click={connectionToggle}>Open</button>
     {/if}
+    <div class="dim">
+      <span>Carriage Return [CR] = \r or \x0D</span> <br>
+      <span>Line Feed [LF] = \n or \x0A</span>
+    </div>
     <div>
-      <span class="dim">Carriage Return [CR] = \r or \x0D</span> <br>
-      <span class="dim">Line Feed [LF] = \n or \x0A</span>
+      <span class={data.feedback.color}>{data.feedback.message}</span>
     </div>
   </aside>
 
@@ -187,7 +421,7 @@
       {#each data.sends as send}        
         <div class="flex nowrap">
           <input type="text" placeholder={send.placeholder} bind:value={send.value}>
-          <button class="green" on:click={sendClick(send.value)}>Send</button>
+          <button class="green" on:click={() => sendMessage(send.value)}>Send</button>
         </div>
       {/each}
     </div>
@@ -227,7 +461,7 @@
     }
   }
 
-  /* select, */
+  select,
   input {
     width: 100%;
   }

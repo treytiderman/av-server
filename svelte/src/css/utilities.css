@@ -5,6 +5,39 @@
 .clear {
   background-color: transparent;
 }
+.dim {
+  color: var(--color-text-dim);
+}
+.grey {
+  color: var(--color-bg-grey);
+}
+.red {
+  color: var(--color-bg-red);
+}
+.orange {
+  color: var(--color-bg-orange);
+}
+.yellow {
+  color: var(--color-bg-yellow);
+}
+.lime {
+  color: var(--color-bg-lime);
+}
+.green {
+  color: var(--color-bg-green);
+}
+.cyan {
+  color: var(--color-bg-cyan);
+}
+.blue {
+  color: var(--color-bg-blue);
+}
+.purple {
+  color: var(--color-bg-purple);
+}
+.pink {
+  color: var(--color-bg-pink);
+}
 button.dim {
   background-color: var(--color-bg-dim);
   color: var(--color-text-dim);
