@@ -1,2 +1,0 @@
-import{S as n,i as o,s as l,e as r,a as d,b as c,n as t,d as _}from"./index.eedbf297.js";function p(a){let e;return{c(){e=r("article"),e.innerHTML=`<aside class="grid svelte-8aoddo"><h2>aside</h2></aside> 
-  <section class="grid svelte-8aoddo"><h2>section</h2></section>`,d(e,"class","svelte-8aoddo")},m(s,i){c(s,e,i)},p:t,i:t,o:t,d(s){s&&_(e)}}}class f extends n{constructor(e){super(),o(this,e,null,p,l,{})}}export{f as default};

@@ -4,8 +4,8 @@ const app = http.start()
 app.use(http.middlware)
 
 // WebSocket server
-const wsServer = require('./modules/wsServer')
-const server = wsServer.start(app)
+const ws_server = require('./modules/ws_server')
+const server = ws_server.start(app)
 
 // Get IP addresses
 const os = require("os")

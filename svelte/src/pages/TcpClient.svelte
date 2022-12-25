@@ -1,6 +1,6 @@
 <!-- Javascript -->
 <script>
-  import { get, post } from "../js/helper.js"
+  import { settings } from "../js/settings.js"
   import { ws } from "../js/ws.js"
 
   // Components
@@ -22,7 +22,7 @@
     timestampISO: '0000-00-00T00:00:00.000Z',
     data: 'No data yet...',
   }
-  const HEX_SPACER = " "
+  const HEX_SPACER = $settings.hex_spacer || " "
 
   // Data
   $: data = {
@@ -236,7 +236,7 @@
       "ip": data.settings.ip,
       "port": data.settings.port,
       "data": message,
-      "encoding": data.settings.port,
+      "encoding": data.settings.encodingMode,
       "cr": false,
       "lf": false
     }
@@ -283,6 +283,8 @@
             }
           })
           data.clients = data.clients
+          updateSettings()
+          updateLines()
         }
 
       }
@@ -318,12 +320,12 @@
 
       // Received "send" event
       else if (event === "send") {
-        
+        ws.send.event("/tcp/client/v1", "getClients")
       }
 
       // Received "receive" event
       else if (event === "receive") {
-        
+        ws.send.event("/tcp/client/v1", "getClients")
       }
 
     }
@@ -342,9 +344,9 @@
   })
 
   // Debug
-  $: console.log("clients", data.clients)
-  $: console.log("clientSelected", data.clientSelected)
-  $: console.log("lines", data.lines)
+  // $: console.log("clients", data.clients)
+  // $: console.log("clientSelected", data.clientSelected)
+  // $: console.log("lines", data.lines)
 
 
 </script>

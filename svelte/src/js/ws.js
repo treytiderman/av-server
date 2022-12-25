@@ -8,7 +8,6 @@ function log(text) {
 
 // Global variables
 let websocket = { readyState: 3 }
-let reconnectInterval
 
 // Functions
 function isJSON(text) {
@@ -17,16 +16,16 @@ function isJSON(text) {
   return true
 }
 function setDebug(bool) { debug = bool }
-function start(options) {
+function start(options = {}) {
 
   // Options
-  const path = options.path || ''
-  const port = options.port || 4620
   const ip = options.ip || document.location.hostname
-  // const reconnectTimeout_ms = options.reconnectTimeout_ms || 5000
+  const port = options.port || document.location.port
+  const path = options.path || ''
   const protocol = options.protocol || document.location.protocol === 'http:' ? 'ws' : 'wss'
   const host = options.protocol === 'wss' ? `${ip}` : `${ip}:${port}`
   const url = `${protocol}://${host}/${path}`
+  // const reconnectTimeout_ms = options.reconnectTimeout_ms || 5000
 
   // Connection request
   websocket = new WebSocket(url)

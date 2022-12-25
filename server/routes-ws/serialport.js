@@ -1,19 +1,19 @@
-const wsServer = require('../modules/wsServer')
+const ws_server = require('../modules/ws_server')
 
 // Module
 const serialport = require('../modules/serialport')
 
 // Function calls
-wsServer.emitter.on("/serial/v1/available", async (ws, req) => {
+ws_server.emitter.on("/serial/v1/available", async (ws, req) => {
   // Subscribe to the client
-  wsServer.subscribe(ws, `/serial/v1/available`)
+  ws_server.subscribe(ws, `/serial/v1/available`)
   // Module function call
   const output = await serialport.getAvailablePorts()
-  wsServer.set(`/serial/v1/available`, output)
+  ws_server.set(`/serial/v1/available`, output)
 })
-wsServer.emitter.on("/serial/v1/open", (ws, req) => {
+ws_server.emitter.on("/serial/v1/open", (ws, req) => {
   // Subscribe to the client
-  wsServer.subscribe(ws, `/serial/v1/port/${req.body.path}`)
+  ws_server.subscribe(ws, `/serial/v1/port/${req.body.path}`)
   // Module function call
   serialport.open(
     req.body.path,
@@ -21,9 +21,9 @@ wsServer.emitter.on("/serial/v1/open", (ws, req) => {
     req.body.delimiter
   )
 })
-wsServer.emitter.on("/serial/v1/send", (ws, req) => {
+ws_server.emitter.on("/serial/v1/send", (ws, req) => {
   // Subscribe to the client
-  wsServer.subscribe(ws, `/serial/v1/client/${req.body.ip}:${req.body.port}`)
+  ws_server.subscribe(ws, `/serial/v1/client/${req.body.ip}:${req.body.port}`)
   // Module function call
   serialport.send(
     req.body.ip,
@@ -34,9 +34,9 @@ wsServer.emitter.on("/serial/v1/send", (ws, req) => {
     req.body.lf
   )
 })
-wsServer.emitter.on("/serial/v1/close", (ws, req) => {
+ws_server.emitter.on("/serial/v1/close", (ws, req) => {
   // Subscribe to the client
-  wsServer.subscribe(ws, `/serial/v1/client/${req.body.ip}:${req.body.port}`)
+  ws_server.subscribe(ws, `/serial/v1/client/${req.body.ip}:${req.body.port}`)
   // Module function call
   serialport.close(
     req.body.ip,
@@ -46,9 +46,9 @@ wsServer.emitter.on("/serial/v1/close", (ws, req) => {
 
 // For Websocket store
 // serialport.emitter.on("client", (address, obj) => {
-//   wsServer.set(`/serial/v1/client/${address}`, obj)
+//   ws_server.set(`/serial/v1/client/${address}`, obj)
 
 //   // Also set the "clients" key
 //   const clients = serialport.getTcpClients()
-//   wsServer.set(`/serial/v1/clients`, clients)
+//   ws_server.set(`/serial/v1/clients`, clients)
 // })

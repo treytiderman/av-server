@@ -13,7 +13,7 @@ const store = {
 // Helper Functions
 const logInConsole = false
 function log(text) {
-  const logger = require('../modules/log')
+  const logger = require('./log')
   logger.log(text, "../public/logs/", 'ws server', logInConsole)
 }
 function isJSON(text) {
@@ -115,7 +115,6 @@ function receive(ws, rx) {
     rx.body = ws.subs
     send(ws, rx)
   }
-
   // Unsubscribe from a value in the store
   else if (rx.event === "unsubscribe") {
     log(`unsubscribe ${ws.ip} from ${rx.name}`)

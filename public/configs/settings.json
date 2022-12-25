@@ -1,4 +1,4 @@
 {
-  "theme": "dark",
-  "font-size": "14px"
+  "port": 4620,
+  "localhostOnly": false
 }

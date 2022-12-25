@@ -27,10 +27,10 @@ api.routesAll[network.path] = network.routes
 router.use(network.path, network.router);
 
 // Router /api/dhcp/server - DHCP Server
-const dhcpServer = require('./dhcpServer');
-dhcpServer.path = '/api/dhcp/server/v1'
-api.routesAll[dhcpServer.path] = dhcpServer.routes
-router.use(dhcpServer.path, dhcpServer.router);
+const dhcp_server = require('./dhcp_server');
+dhcp_server.path = '/api/dhcp/server/v1'
+api.routesAll[dhcp_server.path] = dhcp_server.routes
+router.use(dhcp_server.path, dhcp_server.router);
 
 // Router /api/serial - Serial Port
 const serialport = require('./serialport')

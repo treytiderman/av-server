@@ -1,6 +1,18 @@
 <!-- Javascript -->
 <script>
 
+  // Global store
+  import { global, parseQuerystring, getScreenSize } from "./js/global"
+
+  // Settings
+  import { settings } from './js/settings'
+  
+  // Server Connection
+  import { ws } from './js/ws'
+
+  // Pages
+  // import home from "./pages/home.svelte";
+
   // Routing
   import Router, { location, querystring } from 'svelte-spa-router'
   import { wrap } from 'svelte-spa-router/wrap'
@@ -8,10 +20,6 @@
   // Components
   import Header from './layout/Header.svelte'
   import Nav from './layout/Nav.svelte'
-
-  // Server Connection
-  import { ws } from './js/ws'
-  const IP = ""
 
   // Variables
   let navShow = false
@@ -51,7 +59,7 @@
     items.sort((a,b) => a.path && !b.path ? -1 : 0)
   }
 
-  // Get all pages then build routes and navMenu
+  // Routes
   const pagesGlob = import.meta.glob('./pages/**/*.svelte')
   for (const filePath in pagesGlob) {
     // routes
@@ -71,18 +79,40 @@
 
     // Start WebSocket Connection
     ws.setDebug(true)
-    ws.connect({
-      ip: "192.168.1.9",
-      port: "4620",
-    })
+    ws.connect({port: 4620})
 
     // Startup complete
     doneLoading = true
 
   })
 
-  // Subscribe to screen width
-  $: screenWidth = document.documentElement.offsetWidth
+  // Global
+  $: $global.url = {
+    ip: document.location.hostname,
+    protocal: document.location.protocol,
+    port: document.location.port,
+    path: $location,
+    querystring: parseQuerystring($querystring),
+  }
+  $global.screen = getScreenSize()
+  window.addEventListener("resize", () => $global.screen = getScreenSize())
+
+  // Theme
+  const themesGlob = import.meta.glob('../../public/themes/**/*.css')
+  for (const filePath in themesGlob) {
+    themesGlob[filePath]()
+    const themeName = filePath.replace('./themes/', '').replace('.css', '')
+    $settings.themes.push(themeName)
+  }
+  $: document.documentElement.classList = $settings.theme
+
+  // Font Size
+  $: document.documentElement.style.fontSize = $settings.font_size + "px"
+
+  // Debug
+  // $: console.log(routes)
+  // $: console.log($global)
+  $: console.log($settings)
   
 </script>
 
@@ -94,7 +124,7 @@
   <Nav show={navShow} navItems={navItems} 
     on:itemPress={event => {
       navItem = event.detail
-      if (screenWidth < 1200) navShow = false
+      if ($global.screen.width < 1200) navShow = false
     }}/>
   <main>
     <Router {routes}/>
@@ -104,7 +134,7 @@
 <!-- Server Offline -->
 {:else}
 <main class="grid" style="padding: var(--gap)">
-  <h2>Lost connection to server on {localStorage.getItem("server_offline")}</h2>
+  <h2>Lost connection to server {$global.url.ip}:{$global.url.port} on {localStorage.getItem("server_offline")}</h2>
   <section>
     <button on:click={() => window.location.reload(true)}>Reload?</button>
   </section>

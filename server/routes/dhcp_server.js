@@ -20,7 +20,7 @@ const routes = {
 }
 
 // Module
-const dhcp = require("../modules/dhcpServer")
+const dhcp = require("../modules/dhcp_server")
 
 // Routes
 router.get('/', (req, res) => {
