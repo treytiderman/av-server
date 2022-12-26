@@ -9,9 +9,10 @@
     playerObj: null,
     playerCanvas: null,
     watch: {
-      wsUrl: "ws://192.168.1.1:9999",
+      connected: false,
+      wsUrl: "wss://stream.trey.app",
       placeholder: {
-        wsUrl: "ws://192.168.1.1:9999",
+        wsUrl: "wss://stream.trey.app",
       }
     },
     settings: {
@@ -29,26 +30,40 @@
   // Functions
   function connectWsUrl(url) {
     data.playerObj.destroy()
+    data.watch.connected = false
     data.playerObj = new JSMpeg.Player(url, {canvas: data.playerCanvas})
+    setTimeout(() => {
+      if (data.playerObj.source.established) data.watch.connected = true
+    }, 1000);
   }
 
   // Component Startup
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   let doneLoading = false
   onMount(async () => {
 
     // Try to connect to the stream
     data.playerObj = new JSMpeg.Player(`ws://${window.location.hostname}:9999`, {canvas: data.playerCanvas})
+    setTimeout(() => {
+      if (data.playerObj.source.established) data.watch.connected = true
+    }, 1000);
 
     // Startup complete
     doneLoading = true
 
   })
 
+  onDestroy(async () => {
+    data.playerObj.destroy()
+  })
+
+  $: console.log(data.watch.connected)
+
 </script>
 
 <!-- HTML -->
 <article class="grid">
+
   <h2>WebSocket Stream</h2>
   <div class="flex nowrap align-end">
     <label>
@@ -60,7 +75,8 @@
       Connect
     </button>
   </div>
-  <canvas bind:this={data.playerCanvas}></canvas>
+  <canvas bind:this={data.playerCanvas} class:border-red={!data.playerObj?.source?.established}></canvas>
+
   <h2>Settings</h2>
   <label>
     rtspUrl<br>
@@ -94,7 +110,7 @@
     padding: var(--gap);
     max-width: 30rem;
     /* overflow: auto; */
-    margin: auto;
+    /* margin: auto; */
     height: 100%;
   }
   label,
@@ -106,5 +122,9 @@
     border-radius: var(--radius-lg);
     max-width: 100%;
     width: 100%;
+  }
+  canvas.border-red {
+    border: var(--border);
+    border-color: var(--color-bg-red);
   }
 </style>

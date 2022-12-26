@@ -96,7 +96,7 @@
 <style>
   nav {
     z-index: 10;
-    min-width: 12rem;
+    min-width: 16rem;
     background-color: var(--color-bg-header);
     display: flex;
     flex-direction: column;

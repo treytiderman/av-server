@@ -15,7 +15,7 @@ const fs = require('fs').promises
 
 // Functions
 async function getClientFiles(folder) {
-  const path = `../../../public${folder.name}`
+  const path = `../public${folder.name}`
   const files = await fs.readdir(path)
   for (const file of files) {
     const stat = await fs.stat(`${path}/${file}`)

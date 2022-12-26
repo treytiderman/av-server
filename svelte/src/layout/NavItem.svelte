@@ -68,6 +68,7 @@
     display: flex;
     align-items: center;
     gap: var(--gap);
+    white-space: nowrap;
   }
   button {
     border-radius: 0;

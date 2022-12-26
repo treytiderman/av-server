@@ -6,85 +6,72 @@
 
   // Settings
   import { settings } from './js/settings'
-  
+
   // Server Connection
   import { ws } from './js/ws'
 
   // Pages
-  // import home from "./pages/home.svelte";
+  import Home from "./pages/Home.svelte";
+  import Dhcp_server from "./pages/Dhcp_server.svelte";
+  import Network from "./pages/Network.svelte";
+  import Rtsp2ws from "./pages/Rtsp2ws.svelte";
+  import Serial from "./pages/Serial.svelte";
+  import Tcp_client from "./pages/Tcp_client.svelte";
 
-  // Routing
+  // Router
   import Router, { location, querystring } from 'svelte-spa-router'
-  import { wrap } from 'svelte-spa-router/wrap'
-
-  // Components
+  const routes = {
+    "/": Home,
+    "/dhcp/server": Dhcp_server,
+    "/network": Network,
+    "/rtsp2ws": Rtsp2ws,
+    "/serial": Serial,
+    "/tcp/client": Tcp_client,
+  }
+  
+  // Header and Nav
   import Header from './layout/Header.svelte'
   import Nav from './layout/Nav.svelte'
-
-  // Variables
   let navShow = false
   let navItem
-  let navItems = []
-  let routes = {
-    "/": wrap({asyncComponent: () => import("./pages/Home.svelte")}),
-  }
-
-  // Functions
-  function addToNavItems(items, split, urlPath) {
-    // Is in items
-    if (split.length > 1) {
-      // Add subItems if it doesn't exist
-      if (items.find(navItem => navItem.name === split[0]) === undefined) {
-        const subItems = {
-          name: split[0],
-          show: false,
-          subItems: [],
-        }
-        items.push(subItems)
-      }
-      // Recursive
-      let items2 = items.find(navItem => navItem.name === split[0]).subItems
-      addToNavItems(items2, split.slice(1), urlPath)
-    }
-    // Is in root
-    else {
-      const navItem = {
-        name: split[0],
-        icon: "file-lines",
-        path: urlPath,
-      }
-      items.push(navItem)
-    }
-    // Sort
-    items.sort((a,b) => a.path && !b.path ? -1 : 0)
-  }
-
-  // Routes
-  const pagesGlob = import.meta.glob('./pages/**/*.svelte')
-  for (const filePath in pagesGlob) {
-    // routes
-    const urlPath = filePath.replace('./pages','').replace('.svelte','').toLocaleLowerCase()
-    routes[urlPath] = wrap({asyncComponent: pagesGlob[filePath]})
-    // navItems
-    const urlPathHash = filePath.replace('./pages','./#').replace('.svelte','').toLocaleLowerCase()
-    const filePathClean = filePath.replace('./pages/','').replace('.svelte','')
-    const split = filePathClean.split('/')
-    addToNavItems(navItems, split, urlPathHash)
-  }
-
-  // Component Startup
-  import { onMount } from 'svelte';
-  let doneLoading = false
-  onMount(async () => {
-
-    // Start WebSocket Connection
-    ws.setDebug(true)
-    ws.connect({port: 4620})
-
-    // Startup complete
-    doneLoading = true
-
-  })
+  let navItems = [
+    {
+      name: "Home",
+      icon: "house",
+      path: "/#/",
+    },
+    {
+      name: "Tools",
+      show: true,
+      subItems: [
+        {
+          name: "Network",
+          icon: "ethernet",
+          path: "/#/Network",
+        },
+        {
+          name: "DHCP Server",
+          icon: "server",
+          path: "/#/dhcp/server",
+        },
+        {
+          name: "TCP Client",
+          icon: "terminal",
+          path: "/#/tcp/client",
+        },
+        {
+          name: "Serial",
+          icon: "terminal",
+          path: "/#/serial",
+        },
+        {
+          name: "RTSP to WebSocket",
+          icon: "video",
+          path: "/#/rtsp2ws",
+        },
+      ],
+    },
+  ]
 
   // Global
   $: $global.url = {
@@ -97,48 +84,50 @@
   $global.screen = getScreenSize()
   window.addEventListener("resize", () => $global.screen = getScreenSize())
 
-  // Theme
-  const themesGlob = import.meta.glob('../../public/themes/**/*.css')
-  for (const filePath in themesGlob) {
-    themesGlob[filePath]()
-    const themeName = filePath.replace('./themes/', '').replace('.css', '')
-    $settings.themes.push(themeName)
-  }
+  // Settings
   $: document.documentElement.classList = $settings.theme
-
-  // Font Size
   $: document.documentElement.style.fontSize = $settings.font_size + "px"
+
+  // Component Startup
+  import { onMount } from 'svelte';
+  onMount(async () => {
+
+    // Start WebSocket Connection
+    ws.setDebug(true)
+    ws.connect({port: 4620})
+
+  })
 
   // Debug
   // $: console.log(routes)
   // $: console.log($global)
-  $: console.log($settings)
+  // $: console.log($settings)
   
 </script>
 
 <!-- HTML -->
 {#if $ws.status === "open"}
-<Header title={$location}
-  on:nav={() => navShow = !navShow}/>
-<div class="navMain">
-  <Nav show={navShow} navItems={navItems} 
-    on:itemPress={event => {
-      navItem = event.detail
-      if ($global.screen.width < 1200) navShow = false
-    }}/>
-  <main>
-    <Router {routes}/>
-  </main>
-</div>
+  <Header title={$location}
+    on:nav={() => navShow = !navShow}/>
+  <div class="navMain">
+    <Nav show={navShow} navItems={navItems} 
+      on:itemPress={event => {
+        navItem = event.detail
+        if ($global.screen.width < 1200) navShow = false
+      }}/>
+    <main>
+      <Router {routes}/>
+    </main>
+  </div>
 
 <!-- Server Offline -->
 {:else}
-<main class="grid" style="padding: var(--gap)">
-  <h2>Lost connection to server {$global.url.ip}:{$global.url.port} on {localStorage.getItem("server_offline")}</h2>
-  <section>
-    <button on:click={() => window.location.reload(true)}>Reload?</button>
-  </section>
-</main>
+  <main class="grid" style="padding: var(--gap)">
+    <h2>Lost connection to server {$global.url.ip}:{$global.url.port} on {localStorage.getItem("server_offline")}</h2>
+    <section>
+      <button on:click={() => window.location.reload(true)}>Reload?</button>
+    </section>
+  </main>
 {/if}
 
 <!-- CSS -->
