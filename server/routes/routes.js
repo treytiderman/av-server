@@ -33,10 +33,10 @@ api.routesAll[dhcp_server.path] = dhcp_server.routes
 router.use(dhcp_server.path, dhcp_server.router);
 
 // Router /api/serial - Serial Port
-const serialport = require('./serialport')
-serialport.path = '/api/serial/v1'
-api.routesAll[serialport.path] = serialport.routes
-router.use(serialport.path, serialport.router)
+const serial = require('./serial')
+serial.path = '/api/serial/v1'
+api.routesAll[serial.path] = serial.routes
+router.use(serial.path, serial.router)
 
 // Routes /login
 const auth = require('../middleware/auth')

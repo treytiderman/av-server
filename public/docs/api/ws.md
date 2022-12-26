@@ -1,107 +1,13 @@
 # Websocket API
 
-## API sturcture
+### Connect
 
-### `GET`
-
-Get named value from the server
-
-```json
-{
-  "request": "get",
-  "name": "/api/v1/clients"
-}
-```
-
-Server Response
-
-```json
-{
-  "name": "/api/v1/clients",
-  "body": "bla bla bla"
-}
-```
-
-### `SUBSCRIBE`
-
-Subscribe to that named value and receive updates whenever new data is available
-
-```json
-{
-  "request": "subscribe",
-  "name": "/api/v1/clients"
-}
-```
-
-Server Response
-
-```json
-{
-  "name": "/api/v1/clients",
-  "body": "bla bla bla"
-}
-```
-
-### `UNSUBSCRIBE`
-
-Unsubscribe from named value
-
-```json
-{
-  "request": "unsubscribe",
-  "name": "/api/v1/clients"
-}
-```
-
-### `UNSUBSCRIBE ALL`
-
-Unsubscribe from everything
-
-```json
-{
-  "request": "unsubscribe",
-  "name": "*"
-}
-```
-
-### `Call`
-
-Call a function on the server
-
-```json
-{
-  "request": "call",
-  "name": "/api/v1/send",
-  "body": "something to send"
-}
-```
-
-Server Response
-
-```json
-{
-  "name": "/api/v1/send",
-  "body": "bla bla bla"
-}
-```
-
-### `PUBLISH`
-
-Publish data to whoever is listening
-
-```json
-{
-  "request": "publish",
-  "name": "/api/v1/position",
-  "body": [32, 67]
-}
-```
-
-## Examples
+Open a WebSocket connection to ws://HOST:PORT
+- Example: ws://192.168.1.9:4620
 
 ### Example 1
 
-Empty Request
+Empty Send
 
 ```json
 ```
@@ -135,7 +41,7 @@ Receive
 {
   "name": "time",
   "event": "get",
-  "body": "2022-12-21T02:23:29.418Z"
+  "body": "2022-12-26T17:08:20.264Z"
 }
 ```
 
@@ -156,7 +62,7 @@ Receive everytime "time" is updated
 {
   "name": "time",
   "event": "publish",
-  "body": "2022-12-21T02:24:14.778Z"
+  "body": "2022-12-26T17:08:36.407Z"
 }
 ```
 
@@ -177,7 +83,7 @@ Receive everytime "uptime" is updated
 {
   "name": "uptime",
   "event": "publish",
-  "body": "72"
+  "body": 211
 }
 ```
 
@@ -246,14 +152,11 @@ Send
 }
 ```
 
-Response
-
-```json
-```
+Receive nothing
 
 ### Example 9
 
-Request
+Send
 
 ```json
 {
@@ -265,7 +168,7 @@ Request
 
 ### Example 10
 
-Request
+Send
 
 ```json
 {
@@ -274,15 +177,15 @@ Request
 }
 ```
 
-Response
+Receive
 
 ```json
 {
   "name": "*",
   "event": "get",
-  "body": {    
-    "time": "2022-12-21T02:42:01.228Z",
-    "uptime": 154,
+  "body": {
+    "time": "2022-12-26T17:10:04.126Z",
+    "uptime": 279,
     "test": "success",
     "192.168.1.9": {
       "key": "value"

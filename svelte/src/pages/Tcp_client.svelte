@@ -96,6 +96,7 @@
     ],
     feedback: {
       message: "",
+      error: "",
       color: "dim"
     },
     opened: "",
@@ -260,10 +261,9 @@
     ws.send.event("/tcp/client/v1", "getClients")
   }
 
+  // Receive server updates
   ws.send.subscribe("/tcp/client/v1")
   ws.receive.json(obj => {
-
-    // Received event
     if (obj.name === '/tcp/client/v1') {
       const bodyIsArray = Array.isArray(obj.body)
       const addresses = bodyIsArray ? obj.body.map(client => client.address) : false
@@ -309,13 +309,15 @@
 
       // Received "open" event
       else if (event === "open") {
-        if (body.isOpen === true && body.error === null) {
+  
+        // Show UI Feedback
+        data.feedback = {
+          message: `Client ${address} opened`,
+          error: body.error,
+          color: `green`,
+        }
 
-          // Show UI Feedback
-          data.feedback = {
-            message: `Client ${address} opened`,
-            color: `green`,
-          }
+        if (body.isOpen === true && body.error === null) {
 
           // Update client with body data
           const client = data.clients.find(findClient => findClient.address === body.address)
@@ -339,13 +341,15 @@
 
       // Received "close" event
       else if (event === "close") {
-        if (body.isOpen === false && body.error === null) {
 
-          // Show UI Feedback
-          data.feedback = {
-            message: `Client ${address} closed`,
-            color: `red`,
-          }
+        // Show UI Feedback
+        data.feedback = {
+          message: `Client ${address} closed`,
+          error: body.error,
+          color: `red`,
+        }
+
+        if (body.isOpen === false && body.error === null) {
 
           // Update client with body data
           const client = data.clients.find(findClient => findClient.address === body.address)
@@ -363,6 +367,18 @@
           }
           changeClient(data.clientSelected.address)
         }
+      }
+
+      // Received "error" event
+      else if (event === "error") {
+
+        // Show UI Feedback
+        data.feedback = {
+          message: `Client ${address} error`,
+          error: body.error,
+          color: `red`,
+        }
+
       }
 
       // Received "send" event
@@ -408,9 +424,9 @@
 <!-- HTML -->
 <article>
 
-  <!-- Connection Settings -->
+  <!-- Settings -->
   <aside class="grid">
-    <h2>Connection Settings</h2>
+    <h2>Settings</h2>
     <label>
       Clients <br>
       <select on:input={event => changeClient(event.target.value)} bind:value={data.settings.client}>
@@ -474,7 +490,8 @@
       <span>Line Feed [LF] = \n or \x0A</span>
     </div>
     <div>
-      <span class={data.feedback.color}>{data.feedback.message}</span>
+      <span class={data.feedback.color}>{data.feedback.message}</span> <br>
+      <span class={data.feedback.color}>{data.feedback.error || ""}</span>
     </div>
   </aside>
 

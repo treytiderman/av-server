@@ -29,10 +29,10 @@ const PORT_MODEL = {
 }
 
 // Helper Functions
-const logInConsole = false
+const logInConsole = true
 function log(text) {
   text = addEscapeCharsToAscii(text)
-  const logger = require('../modules/log')
+  const logger = require('./log')
   logger.log(text, "../public/logs/", 'serial', logInConsole)
 }
 function addEscapeCharsToAscii(text) {
@@ -41,11 +41,13 @@ function addEscapeCharsToAscii(text) {
   return text
 }
 function removeEscapeCharsFromAscii(text) {
+  if (typeof text !== "string") return text
   text = text.replace(/\\r/g, CR.ascii)
   text = text.replace(/\\n/g, LF.ascii)
   return text
 }
 function removeEscapeCharsFromHex(text) {
+  if (typeof text !== "string") return text
   text = text.replace(/\\x/g, "")
   text = text.replace(/0x/g, "")
   text = text.replace(/ /g, "")
@@ -65,8 +67,13 @@ function open(path, baudRate = 9600, delimiter = "\r\n") {
 
   // Return if the connection is already open
   if (ports[path]?.isOpen === true) {
-    const error = { "error": "port already open" }
-    log(`return ${JSON.stringify(error)}`)
+    const error = "connection already open"
+
+    // Emit event
+    log(`open ${path} ${error}`)
+    emitter.emit('open', path, {error: error})
+
+    // Return
     return error
   }
 
@@ -82,7 +89,7 @@ function open(path, baudRate = 9600, delimiter = "\r\n") {
     isOpen: false,
     path: path,
     baudRate: baudRate,
-    delimiter: delimiter,
+    expectedDelimiter: delimiter,
     history: [],
     historyRaw: [],
     error: null,
@@ -91,45 +98,58 @@ function open(path, baudRate = 9600, delimiter = "\r\n") {
   // Event Open
   ports[path].portObj.on('open', () => {
     ports[path].isOpen = true
-    log(`port ${path} opened`)
 
     // Emit event
-    const portCopy = copyPortObj(ports[path])
-    emitter.emit('port', path, portCopy)
+    log(`open ${path}`)
+    emitter.emit('open', path, {
+      isOpen: true,
+      path: path,
+      baudRate: baudRate,
+      expectedDelimiter: delimiter,
+      error: null,
+    })
   })
 
   // Event Error
-  ports[path].portObj.on('error', (err) => {
-    ports[path].error = err
-    log(err)
+  ports[path].portObj.on('error', (error) => {
+    ports[path].error = error
 
+    // Port not found
+    if (error.message.includes("File not found")) {
+      ports[path].error = "COM port / path not found"
+    }
+    
     // Emit event
-    const portCopy = copyPortObj(ports[path])
-    emitter.emit('port', path, portCopy)
+    log(`error ${path} ${error}`)
+    emitter.emit('error', path, {error: ports[path].error})
   })
 
   // Event Close
   ports[path].portObj.on('close', () => {
     ports[path].isOpen = false
-    log(`closed port ${path}`)
 
     // Emit event
-    const portCopy = copyPortObj(ports[path])
-    emitter.emit('port', path, portCopy)
+    log(`close ${path}`)
+    emitter.emit('close', path, {
+      isOpen: false,
+      path: path,
+      baudRate: baudRate,
+      expectedDelimiter: delimiter,
+      error: ports[path].error,
+    })
   })
   
   // Listen for any new data
   ports[path].portObj.on('data', (data) => {
-    // log(`received raw ${data}`)
 
     // Create rxObj
-    let rxObj = { 
+    const rxObj = { 
       wasReceived: true,
       timestampISO: new Date(Date.now()).toISOString(),
       hex: data.toString('hex'),
       ascii: data.toString('ascii'),
       buffer: data,
-      error: "",
+      error: null,
     }
 
     // Add to history
@@ -142,23 +162,22 @@ function open(path, baudRate = 9600, delimiter = "\r\n") {
     }
 
     // Emit event
-    const portCopy = copyPortObj(ports[path])
-    emitter.emit('port', path, portCopy)
+    log(`received ${path} ${JSON.stringify(data)}`)
+    emitter.emit('receive', path, rxObj)
   })
 
   // Listen for new data that ends with the delimiter
   const parser = ports[path].portObj.pipe(new DelimiterParser({ delimiter: delimiter }))
   parser.on('data', (data) => {
-    log(`received ${data}`)
 
     // Create rxObj
-    let rxObj = { 
+    const rxObj = { 
       wasReceived: true,
       timestampISO: new Date(Date.now()).toISOString(),
       hex: data.toString('hex') + delimiter,
       ascii: data.toString('ascii') + delimiter,
       buffer: data,
-      error: "",
+      error: null,
     }
 
     // Add rxObj to array
@@ -171,13 +190,12 @@ function open(path, baudRate = 9600, delimiter = "\r\n") {
     }
 
     // Emit event
-    const portCopy = copyPortObj(ports[path])
-    emitter.emit('port', path, portCopy)
+    log(`received ${path} ${JSON.stringify(data)}`)
+    emitter.emit('receive', path, rxObj)
   })
 
   // Return
   const portCopy = copyPortObj(ports[path])
-  // portCopy.isOpen = true
   return portCopy
 }
 function send(path, data, encoding = "ascii", cr = false, lf = false) {
@@ -185,15 +203,13 @@ function send(path, data, encoding = "ascii", cr = false, lf = false) {
 
   // Return if client is not defined
   if (ports[path] === undefined) {
-    const error = "port is not defined, open the port first then send"
-    ports[path] = {error: error}
-    log(`error ${error}`)
-
+    const error = "client is not defined, open the connection first"
+    
     // Emit event
-    const portCopy = copyPortObj(ports[path])
-    emitter.emit('port', path, portCopy)
-
+    emitter.emit('send', path, {error: error})
+    
     // Return
+    log(`send ${path} ${error}`)
     return error
   }
 
@@ -236,15 +252,15 @@ function send(path, data, encoding = "ascii", cr = false, lf = false) {
   ports[path].historyRaw.push(txObj)
 
   // If the history length is greater than MAX_HISTORY_LENGTH
-  if (tcpClients[address].history.length > MAX_HISTORY_LENGTH) {
+  if (ports[path].history.length > MAX_HISTORY_LENGTH) {
     // Then remove the first/oldest element
-    tcpClients[address].history.shift()
-    tcpClients[address].historyRaw.shift()
+    ports[path].history.shift()
+    ports[path].historyRaw.shift()
   }
 
   // Emit event
-  const portCopy = copyPortObj(ports[path])
-  emitter.emit('client', path, portCopy)
+  log(`send ${path} ${JSON.stringify(txObj)}`)
+  emitter.emit('send', path, txObj)
 
   // Return
   log(`return ${JSON.stringify(txObj)}`)
@@ -255,28 +271,25 @@ function close(path) {
 
   // Return if client is not defined
   if (ports[path] === undefined) {
-    const error = "port is not defined, open the port first then send"
-    ports[path] = {error: error}
-    log(`error ${error}`)
-
+    const error = "client is not defined, open the connection first"
+    
     // Emit event
-    const portCopy = copyPortObj(ports[path])
-    emitter.emit('port', path, portCopy)
-
+    emitter.emit('close', path, {error: error})
+    
     // Return
+    log(`close ${path} ${error}`)
     return error
   }
 
   // Return if the client is already closed
   if (ports[path]?.isOpen === false) {
     const error = "client already closed"
-    log(`error ${error}`)
 
     // Emit event
-    const portCopy = copyPortObj(ports[path])
-    emitter.emit('port', path, portCopy)
-  
+    emitter.emit('close', path, {error: error})
+    
     // Return
+    log(`close ${path} ${error}`)
     return error
   }
 
@@ -286,11 +299,7 @@ function close(path) {
   })
 
   // Return
-  // Emit event
-  const portCopy = copyPortObj(ports[path])
-  // portCopy.isOpen = false
-  log(`return ${JSON.stringify(portCopy)}`)
-  return portCopy
+  return "OK"
 }
 
 async function getAvailablePorts() {
@@ -334,36 +343,44 @@ async function getAvailablePorts() {
 }
 function getPorts() {
   log(`getPorts()`)
-  // Remove portObj from returned object
+
+  // Remove clientObj from returned object
   let portsReturn = {}
-  Object.entries(ports).forEach(port => {
-    const [name, object] = port
-    let portCopy = JSON.parse(JSON.stringify(ports[name]))
-    portCopy.portObj = "for server use only"
-    portsReturn[name] = portCopy
+  Object.keys(ports).forEach(path => {
+    const portCopy = copyPortObj(ports[path])
+    portsReturn[path] = portCopy
   })
+
   // Return ports
+  log(`return ${JSON.stringify(portsReturn)}`)
   return portsReturn
 }
 function getPort(path) {
+  log(`getPort(${path})`)
+
   // Stop if port not defined / open
   if (ports[path] === undefined) {
-    log(`getPort(${path}) doesn't exist`)
-    return { "error": "port hasn't been open before" }
+    const error = "client is not defined, open the connection first"
+    
+    // Emit event
+    // emitter.emit('error', path, {error: error})
+    
+    // Return
+    log(`getClient ${path} ${error}`)
+    return error
   }
-  // Remove portObj from returned object
-  let portCopy = JSON.parse(JSON.stringify(ports[path]))
-  portCopy.portObj = "for server use only"
-  // Return port
-  log(`getPort(${path})`)
+
+  // Return client
+  const portCopy = copyPortObj(ports[path])
+  log(`return ${JSON.stringify(portCopy)}`)
   return portCopy
 }
 
 // Export
+exports.emitter = emitter
 exports.open = open
 exports.send = send
 exports.close = close
-
 exports.getAvailablePorts = getAvailablePorts
 exports.getPorts = getPorts
 exports.getPort = getPort

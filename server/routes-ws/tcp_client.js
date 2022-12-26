@@ -4,7 +4,7 @@ const ws_server = require('../modules/ws_server')
 const tcpClient = require('../modules/tcp_client')
 
 // Client Events
-ws_server.emitter.on("/tcp/client/v1", (ws, req) => {
+ws_server.emitter.on("/tcp/client/v1", async (ws, req) => {
   if (req.event === "open") {
     ws_server.subscribe(ws, `/tcp/client/v1/${req.body.ip}:${req.body.port}`)
     tcpClient.open(
@@ -49,26 +49,21 @@ ws_server.emitter.on("/tcp/client/v1", (ws, req) => {
 // Module events
 tcpClient.emitter.on("open", (address, body) => {
   ws_server.event(`/tcp/client/v1/${address}`, "open", body)
-  body.address = address
-  ws_server.event(`/tcp/client/v1`, "open", body)
+  ws_server.event(`/tcp/client/v1`, "open", {...body, address: address})
 })
 tcpClient.emitter.on("send", (address, body) => {
   ws_server.event(`/tcp/client/v1/${address}`, "send", body)
-  body.address = address
-  ws_server.event(`/tcp/client/v1`, "send", body)
+  ws_server.event(`/tcp/client/v1`, "send", {...body, address: address})
 })
 tcpClient.emitter.on("receive", (address, body) => {
   ws_server.event(`/tcp/client/v1/${address}`, "receive", body)
-  body.address = address
-  ws_server.event(`/tcp/client/v1`, "receive", body)
+  ws_server.event(`/tcp/client/v1`, "receive", {...body, address: address})
 })
 tcpClient.emitter.on("close", (address, body) => {
   ws_server.event(`/tcp/client/v1/${address}`, "close", body)
-  body.address = address
-  ws_server.event(`/tcp/client/v1`, "close", body)
+  ws_server.event(`/tcp/client/v1`, "close", {...body, address: address})
 })
 tcpClient.emitter.on("error", (address, body) => {
   ws_server.event(`/tcp/client/v1/${address}`, "error", body)
-  body.address = address
-  ws_server.event(`/tcp/client/v1`, "error", body)
+  ws_server.event(`/tcp/client/v1`, "error", {...body, address: address})
 })

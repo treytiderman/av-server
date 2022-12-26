@@ -27,7 +27,7 @@ const TCP_CLIENT_MODEL = {
 }
 
 // Helper Functions
-const logInConsole = true
+const logInConsole = false
 function log(text) {
   text = addEscapeCharsToAscii(text)
   const logger = require('./log')
@@ -39,11 +39,13 @@ function addEscapeCharsToAscii(text) {
   return text
 }
 function removeEscapeCharsFromAscii(text) {
+  if (typeof text !== "string") return text
   text = text.replace(/\\r/g, CR.ascii)
   text = text.replace(/\\n/g, LF.ascii)
   return text
 }
 function removeEscapeCharsFromHex(text) {
+  if (typeof text !== "string") return text
   text = text.replace(/\\x/g, "")
   text = text.replace(/0x/g, "")
   text = text.replace(/ /g, "")
@@ -100,7 +102,6 @@ function open(ip, port = 23, delimiter = "\r\n") {
       port: port,
       address: address,
       expectedDelimiter: delimiter,
-      history: [],
       error: null,
     })
   })
@@ -109,14 +110,23 @@ function open(ip, port = 23, delimiter = "\r\n") {
   tcpClients[address].clientObj.on('error', (error) => {
     tcpClients[address].error = error
     
+    // Connection refused
+    if (error.code === "ECONNREFUSED") {
+      tcpClients[address].error = "connection refused"
+    }
+    
     // Emit event
     log(`error ${address} ${error}`)
-    emitter.emit('error', address, {error: error})
+    emitter.emit('error', address, {error: tcpClients[address].error})
   })
 
   // Close event
   tcpClients[address].clientObj.on('close', () => {
     tcpClients[address].isOpen = false
+
+    if (tcpClients[address].error) {
+      
+    }
     
     // Emit event
     log(`close ${address}`)
@@ -126,8 +136,7 @@ function open(ip, port = 23, delimiter = "\r\n") {
       port: port,
       address: address,
       expectedDelimiter: delimiter,
-      history: [],
-      error: null,
+      error: tcpClients[address].error,
     })
   })
 
@@ -287,11 +296,9 @@ function getClients() {
   log(`getClients()`)
 
   // Remove clientObj from returned object
-  // let tcpClientsCopy = {}
   let tcpClientsCopy = []
   Object.keys(tcpClients).forEach(address => {
     const tcpClientCopy = copyClientObj(tcpClients[address])
-    // tcpClientsCopy[address] = tcpClientCopy
     tcpClientsCopy.push(tcpClientCopy)
   })
 

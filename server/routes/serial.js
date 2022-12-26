@@ -26,14 +26,14 @@ const routes = {
     },
     "body (optional)": {
       "baudRate": 9600,
-      "delimiter": "\r\n",
+      "expectedDelimiter": "\r\n",
     },
     "response (exaample)": {
       "path": "/dev/tty.usbserial-FTCK2VXE",
       "error": null,
       "isOpen": true,
       "baudRate": 9600,
-      "delimiter": "\r\n",
+      "expectedDelimiter": "\r\n",
       "portObj": "for server use only",
       "data": [],
       "dataRaw": [],
@@ -41,11 +41,11 @@ const routes = {
   },
   "/send": {
     "method": "POST",
-    "description": "Send a hex or ascii message out the serial port",
+    "description": "Send a hex or ascii data out the serial port",
     "body (example)": {
       "path": "/dev/tty.usbserial-FTCK2VXE",
-      "message": "mc 01 02\r",
-      "messageType": "ascii || hex"
+      "data": "mc 01 02\r",
+      "encoding": "ascii || hex"
     },
     "body (optional)": {
       "cr": false,
@@ -84,7 +84,7 @@ const routes = {
       "error": null,
       "isOpen": false,
       "baudRate": 9600,
-      "delimiter": "\r\n",
+      "expectedDelimiter": "\r\n",
       "portObj": "for server use only",
       "data": [],
       "dataRaw": []
@@ -99,7 +99,7 @@ const routes = {
         "error": null,
         "isOpen": true,
         "baudRate": 9600,
-        "delimiter": "\r\n",
+        "expectedDelimiter": "\r\n",
         "portObj": "for server use only",
         "data": [
           {
@@ -195,7 +195,7 @@ const routes = {
       "error": null,
       "isOpen": true,
       "baudRate": 9600,
-      "delimiter": "\r\n",
+      "expectedDelimiter": "\r\n",
       "portObj": "for server use only",
       "data": [
         {
@@ -282,7 +282,7 @@ const routes = {
 }
 
 // Module
-const serialport = require("../modules/serialport")
+const serialport = require("../modules/serial")
 
 // Routes
 router.get('/', (req, res) => {
@@ -297,7 +297,7 @@ router.post('/open', (req, res) => {
   const output = serialport.open(
     body.path,
     body.baudRate,
-    body.delimiter,
+    body.expectedDelimiter,
   )
   res.json(output)
 })
@@ -305,8 +305,8 @@ router.post('/send', (req, res) => {
   const body = req.body
   const output = serialport.send(
     body.path,
-    body.message,
-    body.messageType,
+    body.data,
+    body.encoding,
     body.cr,
     body.lf,
   )
