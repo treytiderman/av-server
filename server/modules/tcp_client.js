@@ -94,7 +94,15 @@ function open(ip, port = 23, delimiter = "\r\n") {
     
     // Emit event
     log(`open ${address}`)
-    emitter.emit('open', address, {isOpen: true})
+    emitter.emit('open', address, {
+      isOpen: true,
+      ip: ip,
+      port: port,
+      address: address,
+      expectedDelimiter: delimiter,
+      history: [],
+      error: null,
+    })
   })
 
   // Error event
@@ -112,7 +120,15 @@ function open(ip, port = 23, delimiter = "\r\n") {
     
     // Emit event
     log(`close ${address}`)
-    emitter.emit('close', address, {isOpen: false})
+    emitter.emit('close', address, {
+      isOpen: false,
+      ip: ip,
+      port: port,
+      address: address,
+      expectedDelimiter: delimiter,
+      history: [],
+      error: null,
+    })
   })
 
   // Listen for new data

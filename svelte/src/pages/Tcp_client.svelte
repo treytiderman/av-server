@@ -26,6 +26,7 @@
 
   // Data
   $: data = {
+    clearHistory: true,
     clientSelected: NEW_CONNECTION,
     clients: [
       {
@@ -240,8 +241,23 @@
       "cr": false,
       "lf": false
     }
-    ws.send.event("/tcp/client/v1", "send", body)
-    console.log("Send", body)
+    if (data.clientSelected.isOpen) {
+      ws.send.event("/tcp/client/v1", "send", body)
+      console.log("Send", body)
+    }
+    else {
+      console.log("Send FAILED, client not open", body)
+    }
+  }
+  function clearHistory() {
+    data.clearHistory = true
+    const client = data.clients.find(findClient => findClient.address === data.clientSelected.address)
+    client.history = []
+    updateLines()
+  }
+  function getClients() {
+    data.clearHistory = false
+    ws.send.event("/tcp/client/v1", "getClients")
   }
 
   ws.send.subscribe("/tcp/client/v1")
@@ -263,26 +279,28 @@
         if (data.clients[1].error === "not a real connection") {
           data.clients = [ NEW_CONNECTION ]
           body.forEach(client => {
-            // client.history = [] // Clear History
+            if (data.clearHistory) client.history = []
             data.clients = [...data.clients, client]
           })
         }
 
         // Received updated TCP Clients
         else {
-          data.clients.forEach(client => {
-            const newData = body.find(newClient => client.address === newClient.address)
-            console.log("newData", newData);
-            if (newData !== undefined) {              
-              client.isOpen = newData.isOpen
-              client.ip = newData.ip
-              client.port = newData.port
-              client.error = newData.error
-              client.history = newData.history // Replace with all History
-              client.expectedDelimiter = newData.expectedDelimiter
+          body.forEach(newClient => {
+            const client = data.clients.find(findClient => newClient.address === findClient.address)
+            if (client === undefined) {
+              if (data.clearHistory) client.history = []
+              data.clients = [...data.clients, newClient]
+            }
+            else {
+              client.isOpen = newClient.isOpen
+              client.ip = newClient.ip
+              client.port = newClient.port
+              client.error = newClient.error
+              client.expectedDelimiter = newClient.expectedDelimiter
+              if (!data.clearHistory) client.history = newClient.history
             }
           })
-          data.clients = data.clients
           updateSettings()
           updateLines()
         }
@@ -291,41 +309,76 @@
 
       // Received "open" event
       else if (event === "open") {
-        if (body.isOpen === true) {
+        if (body.isOpen === true && body.error === null) {
+
+          // Show UI Feedback
           data.feedback = {
             message: `Client ${address} opened`,
             color: `green`,
           }
-          ws.send.event("/tcp/client/v1", "getClients")
-          if (body.address === data.opened) {
-            console.log("I opened this client", body)
-            changeClient(body.address)
+
+          // Update client with body data
+          const client = data.clients.find(findClient => findClient.address === body.address)
+          if (client === undefined) {
+            if (data.clearHistory) body.history = []
+            data.clients = [...data.clients, body]
           }
+          else {
+            client.isOpen = body.isOpen
+            client.ip = body.ip
+            client.port = body.port
+            client.error = body.error
+            client.expectedDelimiter = body.expectedDelimiter
+            if (!data.clearHistory) client.history = body.history
+          }
+
+          // This web page tried to open this client and should switch to it
+          if (body.address === data.opened) changeClient(body.address)
         }
       }
 
       // Received "close" event
       else if (event === "close") {
-        if (body.isOpen === false) {
+        if (body.isOpen === false && body.error === null) {
+
+          // Show UI Feedback
           data.feedback = {
             message: `Client ${address} closed`,
             color: `red`,
           }
-          ws.send.event("/tcp/client/v1", "getClients")
-          if (body.address === data.settings.client) {
-            changeClient("New Connection")
+
+          // Update client with body data
+          const client = data.clients.find(findClient => findClient.address === body.address)
+          if (client === undefined) {
+            if (data.clearHistory) body.history = []
+            data.clients = [...data.clients, body]
           }
+          else {
+            client.isOpen = body.isOpen
+            client.ip = body.ip
+            client.port = body.port
+            client.error = body.error
+            client.expectedDelimiter = body.expectedDelimiter
+            if (!data.clearHistory) client.history = body.history
+          }
+          changeClient(data.clientSelected.address)
         }
       }
 
       // Received "send" event
       else if (event === "send") {
-        ws.send.event("/tcp/client/v1", "getClients")
+        const client = data.clients.find(findClient => findClient.address === body.address)
+        if (client === undefined) ws.send.event("/tcp/client/v1", "getClients")
+        else client.history = [...client.history, body]
+        updateLines()
       }
 
       // Received "receive" event
       else if (event === "receive") {
-        ws.send.event("/tcp/client/v1", "getClients")
+        const client = data.clients.find(findClient => findClient.address === body.address)
+        if (client === undefined) ws.send.event("/tcp/client/v1", "getClients")
+        else client.history = [...client.history, body]
+        updateLines()
       }
 
     }
@@ -336,6 +389,7 @@
   let doneLoading = false
   onMount(async () => {
 
+    // Get all TCP clients
     ws.send.event("/tcp/client/v1", "getClients")
 
     // Startup complete
@@ -399,6 +453,17 @@
         </button>
       </div>
     </div>
+    <div>
+      History<br>
+      <div class="flex even">
+        <button on:click={getClients}>
+          Pull
+        </button>
+        <button on:click={clearHistory}>
+          Clear
+        </button>
+      </div>
+    </div>
     {#if data.settings.isOpen}
       <button class="red" on:click={connectionToggle}>Close</button>
     {:else}
@@ -423,7 +488,12 @@
       {#each data.sends as send}        
         <div class="flex nowrap">
           <input type="text" placeholder={send.placeholder} bind:value={send.value}>
-          <button class="green" on:click={() => sendMessage(send.value)}>Send</button>
+          <button class="green" 
+            on:click={() => sendMessage(send.value)}
+            disabled={!data.settings.isOpen}
+          >
+            Send
+          </button>
         </div>
       {/each}
     </div>
