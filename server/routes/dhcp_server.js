@@ -39,7 +39,7 @@ router.get('/serverOptions', (req, res) => {
   res.json(dhcp.options)
 })
 router.get('/start', (req, res) => {
-  const output = dhcp.start(dhcp.state.options)
+  const output = dhcp.start()
   res.status(200).json(output)
 })
 router.get('/stop', (req, res) => {

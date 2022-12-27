@@ -1,7 +1,9 @@
 // Require
 const dhcpd = require('dhcp');
+const events = require('events')
 
 // Variables
+const emitter = new events.EventEmitter()
 let server;
 let serverState = {
   running: false,
@@ -168,13 +170,20 @@ function start(options = serverState.options) {
   server.on('message', (data) => {
     // console.log("message:");
     // console.log(data);
+    // Emit event
+    emitter.emit('message', serverState.data)
   });
   server.on('bound', (state) => {
     serverState.clients = parseState(state);
+    // Emit event
+    emitter.emit('clients', serverState.clients)
   });
   server.on("error", (err, data) => {
     // console.log("error:");
     // console.log(err, data);
+    
+    // Emit event
+    emitter.emit('error', err)
   });
   server.on("listening", (sock) => {
     serverState.running = true;
@@ -189,10 +198,16 @@ function start(options = serverState.options) {
     console.log('- dns:', options.dns);
     console.log('- leasePeriod:', options.leaseTime);
 
+    // Emit event
+    emitter.emit('listening', serverState.running)
+
   });
   server.on("close", () => {
     serverState.running = false;
     console.log("DHCP Server Stopped");
+
+    // Emit event
+    emitter.emit('close', serverState.running)
   });
   server.listen(67, options.server);
   return true;
@@ -206,6 +221,7 @@ function stop() {
 }
 
 // Export
+exports.emitter = emitter
 exports.state = serverState;
 exports.start = start;
 exports.stop = stop;
