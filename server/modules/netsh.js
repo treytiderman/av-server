@@ -73,6 +73,7 @@ class NIC {
       else if (line.startsWith('DNS servers configured through DHCP:')) {
         let split = line.split(": ");
         this.dns[0] = split[1].trim();
+        this.dnsIsDhcp = true;
         for (let j = 1; j < lines.length - i; j++) {
           const line2 = lines[j+i].trim();
           if (line2.startsWith('Register with which suffix:')) break;
@@ -82,6 +83,7 @@ class NIC {
       else if (line.startsWith('Statically Configured DNS Servers:')) {
         let split = line.split(": ");
         this.dns[0] = split[1].trim();
+        this.dnsIsDhcp = false;
         for (let j = 1; j < lines.length - i; j++) {
           const line2 = lines[j+i].trim();
           if (line2.startsWith('Register with which suffix:')) break;
@@ -212,23 +214,29 @@ async function getNics() {
 }
 // DHCP
 async function setDhcpIp(nic) {
-  if (validNic(nic)) {
+  if (nicsGlobal.find(nicFind => nicFind.name === nic).ipIsDhcp) {
+    return 'already DHCP'
+  }
+  else if (validNic(nic)) {
     let cmd = `netsh interface ipv4 set address name="${nic}" source=dhcp`
     return await runCmd(cmd);
   }
   return 'failed'
 }
 async function setDhcpDns(nic) {
-  if (validNic(nic)) {
+  if (nicsGlobal.find(nicFind => nicFind.name === nic).dnsIsDhcp) {
+    return 'already DHCP'
+  }
+  else if (validNic(nic)) {
     let cmd = `netsh interface ipv4 set dns name="${nic}" source=dhcp`
     return await runCmd(cmd);
   }
   return 'failed'
 }
 async function setDhcp(nic) {
-  let output = [];
-  output[0] = await setDhcpIp(nic);
-  output[1] = await setDhcpDns(nic);
+  let output = {};
+  output["ip"] = await setDhcpIp(nic);
+  output["dns"] = await setDhcpDns(nic);
   return output;
 }
 // Static
@@ -266,9 +274,9 @@ async function setStaticDns(nic, dns, dns2 = null) {
   return output;
 }
 async function setStatic(nic, ip, mask, gateway = null, dns = null, dns2 = null) {
-  let output = [];
-  output[0] = await setStaticIp(nic, ip, mask, gateway);
-  output[1] = await setStaticDns(nic, dns, dns2);
+  let output = {};
+  output["ip"] = await setStaticIp(nic, ip, mask, gateway);
+  output["dns"] = await setStaticDns(nic, dns, dns2);
   return output
 }
 // Metric

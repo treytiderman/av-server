@@ -199,7 +199,7 @@ function start(options = serverState.options) {
     console.log('- leasePeriod:', options.leaseTime);
 
     // Emit event
-    emitter.emit('listening', serverState.running)
+    emitter.emit('start', serverState.running)
 
   });
   server.on("close", () => {

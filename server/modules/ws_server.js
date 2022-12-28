@@ -147,7 +147,7 @@ function get(ws, name) {
   const tx = {
     "name": name,
     "event": "get",
-    "body": store[name] || null
+    "body": store[name] ?? null
   }
   send(ws, tx)
 }
@@ -158,7 +158,7 @@ function publish(name, body) {
       const tx = {
         "name": name,
         "event": "publish",
-        "body": body || null
+        "body": body ?? null
       }
       send(ws, tx)
     }
@@ -170,7 +170,7 @@ function event(name, event, body) {
       const tx = {
         "name": name,
         "event": event,
-        "body": body || null
+        "body": body ?? null
       }
       send(ws, tx)
     }
