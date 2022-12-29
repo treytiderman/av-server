@@ -298,7 +298,8 @@
               client.port = newClient.port
               client.error = newClient.error
               client.expectedDelimiter = newClient.expectedDelimiter
-              if (!data.clearHistory) client.history = newClient.history
+              client.history = []
+              if (!data.clearHistory) client.history = newClient.history ?? []
             }
           })
           updateSettings()
@@ -331,7 +332,8 @@
             client.port = body.port
             client.error = body.error
             client.expectedDelimiter = body.expectedDelimiter
-            if (!data.clearHistory) client.history = body.history
+            client.history = []
+            if (!data.clearHistory) client.history = body.history ?? []
           }
 
           // This web page tried to open this client and should switch to it
@@ -363,7 +365,8 @@
             client.port = body.port
             client.error = body.error
             client.expectedDelimiter = body.expectedDelimiter
-            if (!data.clearHistory) client.history = body.history
+            client.history = []
+            if (!data.clearHistory) client.history = body.history ?? []
           }
           changeClient(data.clientSelected.address)
         }

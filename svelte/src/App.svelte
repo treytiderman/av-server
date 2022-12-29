@@ -40,10 +40,10 @@
       icon: "house",
       path: "/#/",
     },
-    {
-      name: "Tools",
-      show: true,
-      subItems: [
+    // {
+    //   name: "Tools",
+    //   show: true,
+    //   subItems: [
         {
           name: "Network",
           icon: "ethernet",
@@ -69,8 +69,8 @@
           icon: "video",
           path: "/#/rtsp2ws",
         },
-      ],
-    },
+    //   ],
+    // },
   ]
 
   // Global

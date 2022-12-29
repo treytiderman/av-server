@@ -1,36 +1,55 @@
 <!-- Javascript -->
 <script>
-  import { get, post } from "../js/helper.js"
+  import { settings } from "../js/settings.js"
+  import { ws } from "../js/ws.js"
 
   // Components
   import Icon from '../components/Icon.svelte'
   import Terminal from '../components/Terminal.svelte'
+  
+  // Constants
+  const NO_LINES = {
+    wasReceived: true,
+    timestampISO: '0000-00-00T00:00:00.000Z',
+    data: 'No data yet...',
+  }
+  const HEX_SPACER = $settings.hex_spacer || " "
   
   // Data
   let data = {
     baudRates: [9600, 14400, 19200, 38400, 57600, 115200],
     serialports: [
       {
-        path: "COM3",
+        path: "COM5",
+        isOpen: false,
+        baudRate: 9600,
+        expectedDelimiter: "\r\n",
+        history: [],
+        historyRaw: [],
+        error: "not a real connection"
       },
       {
-        path: "COM4",
+        path: "COM6",
+        isOpen: false,
+        baudRate: 9600,
+        expectedDelimiter: "\r\n",
+        history: [],
+        historyRaw: [],
+        error: "not a real connection"
       },
     ],
     serialportSelected: {
-      path: "COM3",
+      path: "COM5",
       isOpen: false,
       baudRate: 9600,
-      delimiter: "\r\n",
-      tx: [],
-      txFail: [],
-      rx: [],
-      rxRaw: [],
-      error: null,
+      expectedDelimiter: "\r\n",
+      history: [],
+      historyRaw: [],
+      error: "not a real connection",
       portObj: "for server use only"
     },
     settings: {
-      devicePath: "COM3",
+      devicePath: "COM5",
       baudRate: 9600,
       expectedDelimiter: "\\r\\n",
       encodingMode: "ascii",
@@ -40,13 +59,13 @@
         expectedDelimiter: "\\r\\n",
       },
     },
-    lines: [
-      {
-        wasReceived: true,
-        timestampISO: '2022-10-16T21:05:38.425Z',
-        data: 'No data yet...',
-      },
-    ],
+    clearHistory: true,
+    feedback: {
+      message: "",
+      error: "",
+      color: "dim"
+    },
+    lines: [NO_LINES],
     sends: [
       {
         value: "ka 01 01\\r",
@@ -64,103 +83,298 @@
   }
 
   // Functions
-  function interfaceChange(event) {
-    const selectValue = event.target.value
-    data.nicSelected = data.nics.find(nic => nic.name === selectValue)
-    console.log("Interface selected changed to", selectValue, data.nicSelected)
+  function changeDevice(path) {
+    data.settings.devicePath = path
+    updateSettings()
+    updateLines()
   }
-  async function openConnection(path, baudRate, delimiter) {
+  function changeEncoding(mode) {
+    data.settings.encodingMode = mode
+    updateLines()
+  }
+  function connectionOpen(path, baudRate, delimiter) {
     const body = {
       "path": path,
       "baudRate": baudRate,
       "delimiter": delimiter
     }
-    // const openResponse = await post("/api/serial/v1/open", body)
+    ws.send.event("/serial/v1", "open", body)
     console.log("Open Connection", body)
   }
-  async function closeConnection(path) {
-    const body = { "path": path }
-    // const openResponse = await post("/api/serial/v1/close", body)
-    console.log("Close Connection", body)
+  function updateSettings() {
+    data.serialportSelected = data.serialports.find(o => o.path === data.settings.devicePath)
+    data.settings.isOpen = data.serialportSelected.isOpen
+    data.settings.baudRate = data.serialportSelected.baudRate
+    data.settings.expectedDelimiter = data.serialportSelected.expectedDelimiter
   }
-  async function toggleConnectionClick() {
-    if (data.serialportSelected.isOpen) closeConnection(data.serialportSelected.path)
-    else openConnection(data.settings.devicePath, data.settings.baudRate, data.settings.expectedDelimiter)
-  }
-  async function sendClick(text) {
-    const body = {
-      "path": data.settings.devicePath,
-      "message": text,
-      "messageType": data.settings.encodingMode,
-      "cr": false,
-      "lf": false
-    }
-    // const sendResponse = await post("/api/serial/v1/send", body)
-    console.log("Send", body)
-  }
-  function updateLineData(port, encodingMode) {
-    if (port?.data) {
-      let linesFromServer = []
+  function updateLines() {
+    if (data.serialportSelected.history.length > 0) {
       // Add sends to the array
-      if (encodingMode === "hex") {        
-        port.data.forEach(data => {
-          if (data.error !== "") data.hex += " <- " + data.error
+      let linesFromServer = []
+
+      // HEX
+      if (data.settings.encodingMode === "hex") {        
+        data.serialportSelected.history.forEach(data => {
+
+          // Build HEX string with a spacer
+          let hexString = HEX_SPACER !== " " ? HEX_SPACER : ""
+          if (data.hex !== "") {
+            const hexArray = data.hex.match(/.{1,2}/g)
+            hexString += hexArray.join(HEX_SPACER)
+          }
+          else hexString = ""
+
+          // Add error
+          if (data.error !== null) data.hex += " <- " + data.error
+          
+          // Push to array
           linesFromServer.push({
             wasReceived: data.wasReceived,
             timestampISO: data.timestampISO,
-            data: data.hex,
+            data: hexString,
           })
+
         })
       }
+
+      // ASCII
       else {
-        port.data.forEach(data => {
-          if (data.error !== "") data.ascii += " <- " + data.error
+        data.serialportSelected.history.forEach(data => {
+
+          // Add error
+          if (data.error !== null) data.ascii += " <- " + data.error
+
+          // Push to array
           linesFromServer.push({
             wasReceived: data.wasReceived,
             timestampISO: data.timestampISO,
             data: data.ascii,
           })
+
         })
       }
       // Set lines equal to the info from the server
-      lines = linesFromServer
+      data.lines = linesFromServer
+    }
+    else {
+      data.lines = [NO_LINES]
     }
   }
+  function connectionClose(path) {
+    const body = { "path": path }
+    ws.send.event("/serial/v1", "close", body)
+    console.log("Close Connection", body)
+  }
+  function connectionToggle() {
+    if (data.serialportSelected.isOpen) connectionClose(data.serialportSelected.path)
+    else connectionOpen(data.settings.devicePath, data.settings.baudRate, data.settings.expectedDelimiter)
+  }
+  function sendClick(text) {
+    const body = {
+      "path": data.settings.devicePath,
+      "data": text,
+      "encoding": data.settings.encodingMode,
+      "cr": false,
+      "lf": false
+    }
+    if (data.serialportSelected.isOpen) {
+      ws.send.event("/serial/v1", "send", body)
+      console.log("Send", body)
+    }
+    else {
+      console.log("Send FAILED, client not open", body)
+    }
+  }
+  function clearHistory() {
+    data.clearHistory = true
+    const i = data.serialports.findIndex(o => o.path === data.serialportSelected.path)
+    if (i !== -1) {
+      data.serialports[i].history = []
+      data.serialports[i].historyRaw = []
+      data.serialports = data.serialports
+    }
+    updateSettings()
+    updateLines()
+  }
+  function getClients() {
+    data.clearHistory = false
+    ws.send.event("/serial/v1", "ports")
+  }
 
-  // Terminal lines
-  let lines
-  $: updateLineData(data.settings.devicePath, data.settings.encodingMode)
+  // Receive server updates
+  ws.receive.json(obj => {
+    if (obj.name === '/serial/v1') {
+      const event = obj.event
+      const body = obj.body
+      console.log("EVENT", ">", obj.event, obj.body)
+
+      // Received all ports
+      if (event === "available") {
+
+        // First time receiving available ports. Replace placeholder data
+        if (data.serialports[0].error === "not a real connection") {
+          data.serialports = []
+          body.forEach(port => {
+            data.serialports.push({
+              path: port.path,
+              isOpen: false,
+              baudRate: 9600,
+              expectedDelimiter: "\r\n",
+              history: [],
+              historyRaw: [],
+              error: null
+            })
+          })
+          data.settings.devicePath = data.serialports[0].path
+          ws.send.event("/serial/v1", "ports")
+          updateSettings()
+          updateLines()
+        }
+        else {
+
+          // New device plugged in
+          body.forEach(port => {
+            const i = data.serialports.findIndex(o => o.path === port.path)
+            if (i === -1) {
+              data.serialports.push({
+                path: port.path,
+                isOpen: false,
+                baudRate: 9600,
+                expectedDelimiter: "\r\n",
+                history: [],
+                historyRaw: [],
+                error: null
+              })
+              data.serialports = data.serialports
+            }
+          })
+
+          // Device removed
+          data.serialports.forEach(port => {
+            const i = body.findIndex(o => o.path === port.path)
+            if (i === -1) {
+              data.serialports.splice(i, 1)
+            }
+            data.serialports = data.serialports
+          })
+
+          updateSettings()
+        }
+      }
+
+      // Received "ports" event
+      else if (event === "ports") {
+        Object.keys(body).forEach(path => {
+          const i = data.serialports.findIndex(o => o.path === path)
+
+          // New data for an available port
+          if (i > -1) {
+            data.serialports[i].path = body[path].path
+            data.serialports[i].isOpen = body[path].isOpen
+            data.serialports[i].baudRate = body[path].baudRate
+            data.serialports[i].expectedDelimiter = body[path].expectedDelimiter
+            data.serialports[i].error = body[path].error
+            if (!data.clearHistory) {
+              data.serialports[i].history = body[path].history
+              data.serialports[i].historyRaw = body[path].historyRaw
+            }
+          }
+  
+          updateSettings()
+          updateLines()
+        })
+      }
+
+      // Received "open" event
+      else if (event === "open") {
+  
+        // Show UI Feedback
+        data.feedback = {
+          message: `Port ${body.path} opened`,
+          error: body.error,
+          color: `green`,
+        }
+
+        // Update port to show open
+        if (body.isOpen === true && body.error === null) {
+          const i = data.serialports.findIndex(o => o.path === body.path)
+          if (i > -1) {
+            data.serialports[i].isOpen = body.isOpen
+            data.serialports[i].baudRate = body.baudRate
+            data.serialports[i].error = body.error
+            data.serialports[i].expectedDelimiter = body.expectedDelimiter
+          }
+        }
+
+        updateSettings()
+      }
+
+      // Received "close" event
+      else if (event === "close") {
+
+        // Show UI Feedback
+        data.feedback = {
+          message: `Port ${body.path} closed`,
+          error: body.error,
+          color: `red`,
+        }
+
+        // Update port to show closed
+        if (body.isOpen === false && body.error === null) {
+          const i = data.serialports.findIndex(o => o.path === body.path)
+          if (i > -1) {
+            data.serialports[i].isOpen = body.isOpen
+            data.serialports[i].baudRate = body.baudRate
+            data.serialports[i].error = body.error
+            data.serialports[i].expectedDelimiter = body.expectedDelimiter
+          }
+        }
+
+        updateSettings()
+      }
+
+      // Received "error" event
+      else if (event === "error") {
+
+        // Show UI Feedback
+        data.feedback = {
+          message: `Client ${address} error`,
+          error: body.error,
+          color: `red`,
+        }
+
+      }
+
+      // Received "send" event
+      else if (event === "send") {
+        const i = data.serialports.findIndex(o => o.path === body.path)
+          if (i > -1) {
+            data.serialports[i].history = [...data.serialports[i].history, body]
+          }
+        updateLines()
+      }
+
+      // Received "receive" event
+      else if (event === "receive") {
+        const i = data.serialports.findIndex(o => o.path === body.path)
+          if (i > -1) {
+            data.serialports[i].history = [...data.serialports[i].history, body]
+          }
+        updateLines()
+      }
+
+    }
+  })
 
   // Component Startup
-  import { onMount } from 'svelte';
+  import { onMount } from 'svelte'
   let doneLoading = false
   onMount(async () => {
 
-    // Is Online
-    // const time = await get("/api/time")
-    // console.log(time)
-
-    // Available ports
-    // const availablePortsResponse = await get("/api/serial/v1/availablePorts", "http://192.168.1.9:4620")
-    // const availablePortsResponse = await get("/api/serial/v1/availablePorts")
-    // Remove ports that don't have a serial number
-    // availablePortsResponse.forEach(port => {
-    //   if (port.serialNumber !== undefined) availablePorts = [...availablePorts, port];
-    // })
-    // Set the device select to the first available port
-    // if (availablePorts.length > 0) devicePath = availablePorts[0].path
-
-    // Device info
-    // if (availablePorts.length > 0) {
-    //   const body = { "path": devicePath }
-    //   port = await post("/api/serial/v1/port", body, "http://192.168.1.9:4620")
-    //   port = await post("/api/serial/v1/port", body)
-    //   setInterval(async () => {
-    //     const body = { "path": devicePath }
-    //     port = await post("/api/serial/v1/port", body, "http://192.168.1.9:4620")
-    //     port = await post("/api/serial/v1/port", body)
-    //   }, 1 * 1000)
-    // }
+    // Get all ports
+    ws.send.event("/serial/v1", "available")
+    // setInterval(() => ws.send.event("/serial/v1", "available"), 2 * 1000);
+    
 
     // Startup complete
     doneLoading = true
@@ -168,8 +382,9 @@
   })
 
   // Debug
-  // $: console.log("port", port)
-  // $: console.log("lines", lines)
+  // $: console.log("serialports", data.serialports)
+  // $: console.log("serialportSelected", data.serialportSelected)
+  // $: console.log("lines", data.lines)
 
 </script>
 
@@ -181,8 +396,7 @@
     <h2>Connection Settings</h2>
     <label>
       Device<br>
-      <select on:input={interfaceChange} 
-        disabled={data.serialportSelected.isOpen}>
+      <select on:input={event => changeDevice(event.target.value)}>
         {#each data.serialports as port}
           <option>{port.path}</option>
         {/each}
@@ -207,25 +421,38 @@
       Encoding Mode<br>
       <div class="flex even">
         <button class={data.settings.encodingMode === "ascii" ? "" : "dim"}
-          on:click={() => data.settings.encodingMode = "ascii"}
-          disabled={data.serialportSelected.isOpen}>
+          on:click={() => changeEncoding("ascii")}>
           ASCII
         </button>
         <button class={data.settings.encodingMode === "hex" ? "" : "dim"}
-          on:click={() => data.settings.encodingMode = "hex"}
-          disabled={data.serialportSelected.isOpen}>
+          on:click={() => changeEncoding("hex")}>
           HEX
         </button>
       </div>
     </div>
-    {#if data.serialportSelected.isOpen}
-      <button class="red" on:click={toggleConnectionClick}>Close</button>
+    <div>
+      History<br>
+      <div class="flex even">
+        <button on:click={getClients}>
+          Pull
+        </button>
+        <button on:click={clearHistory}>
+          Clear
+        </button>
+      </div>
+    </div>
+    {#if data.settings.isOpen}
+      <button class="red" on:click={connectionToggle}>Close</button>
     {:else}
-      <button class="green" on:click={toggleConnectionClick}>Open</button>
+      <button class="green" on:click={connectionToggle}>Open</button>
     {/if}
     <div>
       <span class="dim">Carriage Return [CR] = \r or \x0D</span> <br>
       <span class="dim">Line Feed [LF] = \n or \x0A</span>
+    </div>
+    <div>
+      <span class={data.feedback.color}>{data.feedback.message}</span> <br>
+      <span class={data.feedback.color}>{data.feedback.error || ""}</span>
     </div>
   </aside>
 
@@ -239,7 +466,11 @@
       {#each data.sends as send}        
         <div class="flex nowrap">
           <input type="text" placeholder={send.placeholder} bind:value={send.value}>
-          <button class="green" on:click={sendClick(send.value)}>Send</button>
+          <button class="green"
+            on:click={sendClick(send.value)}
+            disabled={!data.settings.isOpen}
+          >
+            Send</button>
         </div>
       {/each}
     </div>
