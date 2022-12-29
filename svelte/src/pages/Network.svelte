@@ -1,6 +1,7 @@
 <!-- Javascript -->
 <script>
   import { sortArrayByObjKey } from "../js/helper.js"
+  import { ws } from "../js/ws.js"
 
   // Components
   import Icon from '../components/Icon.svelte'
@@ -249,10 +250,38 @@
     data.setIp.show = true
   }
   function presetActionSet() {
-    console.log("Set selected preset as network settings", data.presetSelected)
+    if (data.presetSelected.name === "DHCP") {
+      console.log(`Set ${data.nicSelected.name} to DHCP`)
+      const body = { "nic": data.nicSelected.name }
+      ws.send.event("/network/v1", "dhcp", body)
+    }
+    else {
+      console.log(`Set ${data.nicSelected.name} to`, data.presetSelected)
+      const body = {
+        "nic": data.nicSelected.name,
+        "ip": data.presetSelected.ip,
+        "mask": data.presetSelected.mask,
+        "gateway": data.presetSelected.gateway,
+        "dns": data.presetSelected.dns
+      }
+      ws.send.event("/network/v1", "static", body)
+    }
   }
   function presetActionAdd() {
-    console.log("Add selected preset to network settings", data.presetSelected)
+    if (data.presetSelected.name === "DHCP") {
+      console.log(`CAN NOT add DHCP to ${data.nicSelected.name}`)
+    }
+    else {
+      console.log(`Add ${data.nicSelected.name} to`, data.presetSelected)
+      const body = {
+        "nic": data.nicSelected.name,
+        "ip": data.presetSelected.ip,
+        "mask": data.presetSelected.mask,
+        "gateway": data.presetSelected.gateway,
+        "dns": data.presetSelected.dns
+      }
+      ws.send.event("/network/v1", "static/add", body)
+    }
   }
   function presetActionRemove() {
     data.presets = data.presets.filter(preset => preset.name !== data.presetSelected.name)
@@ -273,7 +302,15 @@
   function setIp_set(event) {
     const preset = {...event.detail, name: Date.now()}
     data.setIp.show = false
-    console.log("SetIP popup set these settings", preset)
+    console.log(`SetIP popup set ${data.nicSelected.name} to`, preset)
+    const body = {
+      "nic": data.nicSelected.name,
+      "ip": preset.ip,
+      "mask": preset.mask,
+      "gateway": preset.gateway,
+      "dns": preset.dns
+    }
+    ws.send.event("/network/v1", "static", body)
   }
   function presetChange(preset) {
     data.presetSelected = preset
@@ -314,10 +351,41 @@
     console.log("Presets saved to local storage", data.presets)
   }
 
+  // Receive server updates
+  ws.send.subscribe("/network/v1")
+  ws.receive.json(obj => {
+    if (obj.name === '/network/v1') {
+      const event = obj.event
+      const body = obj.body
+      console.log("EVENT", ">", obj.event, obj.body)
+
+      // Received all nics
+      if (event === "nics") {
+        data.nics = body
+
+        // First time receiving data
+        if (data.nicSelected.name === "Fake NIC") {
+          data.nicSelected = data.nics[0]
+        }
+
+        // Every other time
+        else {
+          data.nicSelected = data.nics.find(f => f.name === data.nicSelected.name)
+        }
+
+      }
+
+    }
+  })
+
   // Component Startup
   import { onMount } from 'svelte';
   let doneLoading = false
   onMount(async () => {
+
+    // Get all TCP clients
+    ws.send.event("/network/v1", "nics")
+    setInterval(() => ws.send.event("/network/v1", "nics"), 1 * 1000);
 
     // Get the presets the client has saved in local storage
     getPresetsFromLocalStorage()
@@ -331,6 +399,11 @@
     doneLoading = true
 
   })
+
+  // Debug
+  // $: console.log("nics", data.nics)
+  // $: console.log("nicSelected", data.nicSelected)
+  // $: console.log("lines", data.lines)
 
 </script>
 
@@ -356,14 +429,14 @@
 
     <!-- NIC Info -->
     <div class="nicInfo">
-      <h3>{data.nicSelected.ip}</h3>
+      <h3>{data.nicSelected.ip ?? "Setting..."}</h3>
       <div>
         <div>Mask:</div>
         <div>{data.nicSelected.mask}</div>
       </div>
       <div>
         <div>Gate:</div>
-        <div>{data.nicSelected.gateway}</div>
+        <div>{data.nicSelected.gateway ?? "None"}</div>
       </div>
       <br>
       {#if data.nicSelected.ipsAdded.length > 0}

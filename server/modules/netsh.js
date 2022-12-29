@@ -254,6 +254,13 @@ async function setStaticIp(nic, ip, mask, gateway = null) {
 }
 async function addStaticIp(nic, ip, mask) {
   if (validNic(nic) && validIp(ip) && validMask(mask)) {
+    const current = nicsGlobal.find(nicFind => nicFind.name === nic)
+    if (current.ip === ip) {
+      return 'already set to IP'
+    }
+    else if (current.ipsAdded.find(ipAdd => ipAdd.ip === ip)) {
+      return 'already added to IP'
+    }
     let cmd = `netsh interface ipv4 add address name="${nic}" ${ip} ${mask}`
     return await runCmd(cmd);
   }
