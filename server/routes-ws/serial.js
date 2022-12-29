@@ -61,6 +61,10 @@ serial.emitter.on("receive", (path, body) => {
   ws_server.event(`/serial/v1/${path}`, "receive", body)
   ws_server.event(`/serial/v1`, "receive", {...body, path: path})
 })
+serial.emitter.on("receiveRaw", (path, body) => {
+  ws_server.event(`/serial/v1/${path}`, "receiveRaw", body)
+  ws_server.event(`/serial/v1`, "receiveRaw", {...body, path: path})
+})
 serial.emitter.on("close", (path, body) => {
   ws_server.event(`/serial/v1/${path}`, "close", body)
   ws_server.event(`/serial/v1`, "close", {...body, path: path})

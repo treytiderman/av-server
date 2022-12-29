@@ -24,8 +24,8 @@ const PORT_MODEL = {
   baudRate: "baudRate",
   delimiter: "delimiter",
   portObj: "new SerialPort({ path: path, baudRate: baudRate })",
-  data: [],
-  dataRaw: [],
+  history: [],
+  historyRaw: [],
 }
 
 // Helper Functions
@@ -163,7 +163,7 @@ function open(path, baudRate = 9600, delimiter = "\r\n") {
 
     // Emit event
     log(`received ${path} ${JSON.stringify(data)}`)
-    emitter.emit('receive', path, rxObj)
+    emitter.emit('receiveRaw', path, rxObj)
   })
 
   // Listen for new data that ends with the delimiter

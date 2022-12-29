@@ -96,7 +96,7 @@
     const body = {
       "path": path,
       "baudRate": baudRate,
-      "delimiter": delimiter
+      "expectedDelimiter": delimiter
     }
     ws.send.event("/serial/v1", "open", body)
     console.log("Open Connection", body)
