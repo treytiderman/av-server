@@ -21,6 +21,8 @@
   const iconSize = 1.25
   const indentSubItem = 1
 
+  console.log(window.location.pathname)
+
 </script>
 
 <!-- HTML -->
@@ -49,7 +51,7 @@
 
 <!-- Else add the navItem -->
 {:else if navItem?.name}
-  <a on:click href={navItem.path} 
+  <a on:click href={window.location.pathname.substring(0, window.location.pathname.length - 1) + navItem.path} 
     class:active={"./#" + $location === navItem.path}
     style={`padding-left: calc(var(--gap)*${indent});`}>
     <Icon name="{navItem.icon}" size={iconSize} />
