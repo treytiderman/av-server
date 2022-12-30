@@ -10,7 +10,7 @@
   // Constants
   const NO_LINES = {
     wasReceived: true,
-    timestampISO: '0000-00-00T00:00:00.000Z',
+    timestampISO: '1970-01-01T00:00:00.000Z',
     data: 'No data yet...',
   }
   const HEX_SPACER = $settings.hex_spacer || " "
@@ -396,7 +396,7 @@
     <h2>Connection Settings</h2>
     <label>
       Device<br>
-      <select on:input={event => changeDevice(event.target.value)}>
+      <select on:input={event => changeDevice(event.target.value)} class="mono">
         {#each data.serialports as port}
           <option>{port.path}</option>
         {/each}
@@ -404,7 +404,7 @@
     </label>
     <label>
       Baud Rate<br>
-      <select bind:value={data.settings.baudRate} 
+      <select bind:value={data.settings.baudRate} class="mono"
         disabled={data.serialportSelected.isOpen}>
         {#each data.baudRates as baudRate}
           <option>{baudRate}</option>
@@ -413,7 +413,7 @@
     </label>
     <label>
       Expected Delimiter<br>
-      <input type="text" bind:value={data.settings.expectedDelimiter}
+      <input type="text" class="mono" bind:value={data.settings.expectedDelimiter}
         placeholder={data.settings.placeholder.expectedDelimiter}
         disabled={data.serialportSelected.isOpen}>
     </label>
@@ -465,7 +465,7 @@
     <div class="grid">
       {#each data.sends as send}        
         <div class="flex nowrap">
-          <input type="text" placeholder={send.placeholder} bind:value={send.value}>
+          <input type="text" class="mono" placeholder={send.placeholder} bind:value={send.value}>
           <button class="green"
             on:click={sendClick(send.value)}
             disabled={!data.settings.isOpen}

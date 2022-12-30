@@ -113,6 +113,16 @@ export function dateObjToTime(date) {
   return time
 }
 
+// Date Object to Time (4:37:23 PM)
+export function dateObjToTimeSec(date) {
+  let time = new Intl.DateTimeFormat('default', {
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+  }).format(date)
+  return time
+}
+
 // Date Object to Date (11/13/2022)
 export function dateObjToDate(date) {
   let time = new Intl.DateTimeFormat().format(date)
@@ -288,6 +298,30 @@ export function validLeasePeriod(time, returnErrorMessage = false) {
   // Is not 32bit unsigned range
   if (time < 0 || time > 2 ** 32 - 2) {
     if (returnErrorMessage) return "Is not a 32bit unsigned integer"
+    return false
+  }
+
+  // Passed all tests
+  return true
+}
+export function validPort(port, returnErrorMessage = false) {
+  // port is a unsigned 16bit int
+
+  // Is null or undefined
+  if (port === null || port === undefined) {
+    if (returnErrorMessage) return "Is null or undefined"
+    return false
+  }
+
+  // Is not a number
+  if (typeof port != "number") {
+    if (returnErrorMessage) return "Is not a number"
+    return false
+  }
+
+  // Is not 16bit unsigned range
+  if (port < 0 || port > 2 ** 16 - 2) {
+    if (returnErrorMessage) return "Is not a 16bit unsigned integer"
     return false
   }
 

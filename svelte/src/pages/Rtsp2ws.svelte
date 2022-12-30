@@ -1,5 +1,6 @@
 <!-- Javascript -->
 <script>
+  import { get, post } from "../js/helper";
 
   // Components
   import Icon from '../components/Icon.svelte'
@@ -36,6 +37,16 @@
       if (data.playerObj.source.established) data.watch.connected = true
     }, 1000);
   }
+  function startStream() {
+    post("/api/rtsp2ws/v1/start", {
+      rtspUrl: data.settings.rtspUrl,
+      wsPort: data.settings.wsPort,
+      frameRate: data.settings.frameRate
+    })
+  }
+  function stopStream() {
+    get("/api/rtsp2ws/v1/stop")
+  }
 
   // Component Startup
   import { onDestroy, onMount } from 'svelte';
@@ -71,13 +82,13 @@
       <input type="text" bind:value={data.watch.wsUrl}
         placeholder={data.watch.placeholder.wsUrl}>
     </label>
-    <button class="green" on:click={connectWsUrl(data.watch.wsUrl)}>
+    <button class="green" on:click={() => connectWsUrl(data.watch.wsUrl)}>
       Connect
     </button>
   </div>
   <canvas bind:this={data.playerCanvas} class:border-red={!data.playerObj?.source?.established}></canvas>
 
-  <h2>Settings</h2>
+  <!-- <h2>Settings</h2>
   <label>
     rtspUrl<br>
     <input type="text" bind:value={data.settings.rtspUrl}
@@ -94,13 +105,13 @@
       placeholder={data.settings.placeholder.frameRate}>
   </label>
   <div class="flex even">
-    <button class="red">
+    <button class="red" on:click={stopStream}>
       Stop
     </button>
-    <button class="green">
+    <button class="green" on:click={startStream}>
       Start
     </button>
-  </div>
+  </div> -->
 
 </article>
 

@@ -16,7 +16,7 @@ function isJSON(text) {
   return true
 }
 function setDebug(bool) { debug = bool }
-function start(options = {}) {
+function start(options = {}) {  
 
   // Options
   const ip = options.ip || document.location.hostname
@@ -61,7 +61,7 @@ function start(options = {}) {
 }
 function send(obj) {
   if (websocket.readyState === 1) websocket.send(JSON.stringify(obj))
-  else console.log("didn't send")
+  else console.log("WebSocket: didn't send", obj)
 }
 function sendGet(name) {
   send({ "name": name, "event": "get" })
@@ -85,7 +85,7 @@ function sendUnsubscribeAll() {
   send({ "name": "*", "event": "unsubscribe" })
 }
 function receive(callback) {
-  websocket.addEventListener('message', (event) => {
+  if (websocket.readyState === 1) websocket.addEventListener('message', (event) => {
     callback(event.data)
   })
 }
@@ -115,7 +115,7 @@ function createStore() {
   // Create Store
 	const { subscribe, set, update } = writable({
     "status": "",
-    "time": "2022-12-23T21:32:03.004Z"
+    "time": "2022-04-20T21:20:00.000Z"
   })
 
   // Return WebSocket functions with a svelte store
@@ -126,7 +126,14 @@ function createStore() {
 
     // Main Functions
     setDebug,
-    connect: (options) => {
+    connect: (options, offline = false) => {
+      if (offline) {
+        update(store => {
+          store.status = "offline"
+          return store
+        })
+        return
+      }
 
       // Connect to Websocket
       start(options)

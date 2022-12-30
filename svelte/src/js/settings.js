@@ -30,9 +30,10 @@ export async function getThemes() {
 
 // Export Stores
 export const settings = writable({
+  "offline": true,
   "theme": "dark",
   "themes": ["dark", "light"],
-  "font_size": 16,
+  "font_size": 14,
   "hex_spacer": " "
 })
 

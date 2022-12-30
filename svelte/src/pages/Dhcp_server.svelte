@@ -1,6 +1,7 @@
 <!-- Javascript -->
 <script>
   import { validIPv4, validMask, validLeasePeriod } from "../js/helper.js"
+  import { ws } from "../js/ws.js"
 
   // Import Components
   import Icon from '../components/Icon.svelte'
@@ -54,26 +55,80 @@
     console.log("Clients View Mode Changed to", data.clientsViewMode)
   }
   function startDhcpServer() {
-    data.running = true
-    console.log("DHCP Server Started")
+    const options = {
+      ip: data.value.ip,
+      mask: data.value.mask,
+      gateway: data.value.gateway,
+      dns1: data.value.dns[0],
+      dns2: data.value.dns[1],
+      rangeStart: data.value.rangeStart,
+      rangeEnd: data.value.rangeEnd,
+      leasePeriod: Number(data.value.leasePeriod_sec),
+    }
+    ws.send.event("/dhcp/server/v1", "options", options)
+    console.log("DHCP Server options sent", options)
+    setTimeout(() => {
+      ws.send.event("/dhcp/server/v1", "start")
+      console.log("DHCP Server Started")
+    }, 100);
   }
   function stopDhcpServer() {
-    data.running = false
+    ws.send.event("/dhcp/server/v1", "stop")
+    ws.send.event("/dhcp/server/v1", "clients")
     console.log("DHCP Server Stopped")
   }
+  function stringISOtoDateTime(string, leasePeriod) {
+    const time = new Date(string)
+    const expireTime = new Date(time.getTime() + leasePeriod * 1000)
+    return expireTime.toLocaleString()
+  }
+
+  ws.receive.json(obj => {
+    if (obj.name === '/dhcp/server/v1') {
+      const event = obj.event
+      const body = obj.body
+      console.log("EVENT", ">", obj.event, obj.body)
+  
+      // Received all clients
+      if (event === "clients") {
+        data.clients = []
+        body.forEach(client => {
+          const newClient = {
+            ip: client.address,
+            mac: client.mac.replace(/-/g, ":"),
+            expires: stringISOtoDateTime(client.bindTime, client.leasePeriod),
+          }
+          data.clients = [...data.clients, newClient]
+        })
+      }
+
+      else if (event === "listening") {
+        data.running = body
+      }
+
+      else if (event === "running") {
+        data.running = body
+      }
+
+      else if (event === "close") {
+        data.running = body
+      }
+
+    }
+  })
 
   // Component Startup
   import { onMount } from 'svelte'
-  let doneLoading = false
   onMount(async () => {
+
+    // Get DHCP clients
+    ws.send.event("/dhcp/server/v1", "clients")
+    ws.send.event("/dhcp/server/v1", "running")
 
     // If the width of the screen is greater than 1200 show the presets in table form
     if (document.documentElement.offsetWidth > 1200) {
       data.clientsViewMode = "table"
     }
-
-    // Startup complete
-    doneLoading = true
 
   })
 
@@ -110,7 +165,7 @@
     <div class="grid">
       <div class="flex even break-md">
         <label>
-          Computer's static IP <br>
+          Server's static IP <br>
           <input type="text" class="fill mono"
             class:error={!validIPv4(data.value.ip) && data.value.ip !== ""}
             on:keyup={event => { if (event.key === "p") data.value.ip = data.placeholder.ip }}
@@ -233,7 +288,7 @@
     <div class="flex mono {data.clientsViewMode}">
       {#if data.clientsViewMode === "table"}        
         <div>
-          <span>IP</span>
+          <span>IP Address</span>
           <span>Mac Address</span>
           <span>Expires</span>
         </div>

@@ -1,5 +1,6 @@
 <!-- Javascript -->
 <script>
+  import { validIPv4, validPort } from "../js/helper.js"
   import { settings } from "../js/settings.js"
   import { ws } from "../js/ws.js"
 
@@ -19,7 +20,7 @@
   }
   const NO_LINES = {
     wasReceived: true,
-    timestampISO: '0000-00-00T00:00:00.000Z',
+    timestampISO: '1970-01-01T00:00:00.000Z',
     data: 'No data yet...',
   }
   const HEX_SPACER = $settings.hex_spacer || " "
@@ -49,7 +50,7 @@
       },
       {
         isOpen: true,
-        ip: "192.168.246",
+        ip: "192.168.1.246",
         port: 23,
         address: "192.168.1.246:23",
         expectedDelimiter: "\\r",
@@ -432,7 +433,7 @@
     <h2>Settings</h2>
     <label>
       Clients <br>
-      <select on:input={event => changeClient(event.target.value)} bind:value={data.settings.client}>
+      <select on:input={event => changeClient(event.target.value)} class="mono" bind:value={data.settings.client}>
         <!-- <option>New Connection</option> -->
         {#each data.clients as client}
           <!-- {#if client.isOpen} -->
@@ -442,20 +443,36 @@
       </select>
     </label>
     <label>
-      IP Address<br>
-      <input type="text" bind:value={data.settings.ip}
-        placeholder={data.settings.placeholder.ip}
+      IP Address <br>
+      <input type="text" class="fill mono"
+        class:error={!validIPv4(data.settings.ip) && data.settings.ip !== ""}
+        on:keyup={event => { if (event.key === "p") data.settings.ip = data.settings.placeholder.ip }}
+        bind:value={data.settings.ip} placeholder={data.settings.placeholder.ip}
         disabled={data.settings.isOpen}>
+      {#if !validIPv4(data.settings.ip) && data.settings.ip !== ""}
+        <div class="flex error-message">
+          <Icon name="circle-exclamation"/>
+          <small>{validIPv4(data.settings.ip, true)}</small>
+        </div>
+      {/if}
     </label>
     <label>
-      Port<br>
-      <input type="text" bind:value={data.settings.port}
-        placeholder={data.settings.placeholder.port}
+      Port <br>
+      <input type="number" class="fill mono"
+        class:error={!validPort(data.settings.port) && data.settings.port !== ""}
+        on:keyup={event => { if (event.key === "p") data.settings.port = data.settings.placeholder.port }}
+        bind:value={data.settings.port} placeholder={data.settings.placeholder.port}
         disabled={data.settings.isOpen}>
+      {#if !validPort(data.settings.port) && data.settings.port !== ""}
+        <div class="flex error-message">
+          <Icon name="circle-exclamation"/>
+          <small>{validPort(data.settings.port, true)}</small>
+        </div>
+      {/if}
     </label>
     <label>
       Expected Delimiter<br>
-      <input type="text" bind:value={data.settings.expectedDelimiter}
+      <input type="text" class="fill mono" bind:value={data.settings.expectedDelimiter}
         placeholder={data.settings.placeholder.expectedDelimiter}
         disabled={data.settings.isOpen}>
     </label>
@@ -486,7 +503,12 @@
     {#if data.settings.isOpen}
       <button class="red" on:click={connectionToggle}>Close</button>
     {:else}
-      <button class="green" on:click={connectionToggle}>Open</button>
+      <button class="green"
+        on:click={connectionToggle}
+        disabled={!(validIPv4(data.settings.ip) && validPort(data.settings.port))}
+      >
+        Open
+      </button>
     {/if}
     <div class="dim">
       <span>Carriage Return [CR] = \r or \x0D</span> <br>
@@ -507,7 +529,7 @@
     <div class="grid">
       {#each data.sends as send}        
         <div class="flex nowrap">
-          <input type="text" placeholder={send.placeholder} bind:value={send.value}>
+          <input type="text" class="mono" placeholder={send.placeholder} bind:value={send.value}>
           <button class="green" 
             on:click={() => sendMessage(send.value)}
             disabled={!data.settings.isOpen}

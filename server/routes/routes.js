@@ -38,6 +38,11 @@ serial.path = '/api/serial/v1'
 api.routesAll[serial.path] = serial.routes
 router.use(serial.path, serial.router)
 
+// Router /api/rtsp2ws - RTSP to Websocket
+const rtsp2ws = require('./rtsp2ws')
+rtsp2ws.path = '/api/rtsp2ws/v1'
+router.use(rtsp2ws.path, rtsp2ws.router)
+
 // Routes /login
 const auth = require('../middleware/auth')
 auth.path = '/api/login/v1'

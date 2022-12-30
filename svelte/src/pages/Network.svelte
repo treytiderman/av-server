@@ -379,13 +379,13 @@
   })
 
   // Component Startup
-  import { onMount } from 'svelte';
-  let doneLoading = false
+  import { onMount, onDestroy } from 'svelte';
+  let interval
   onMount(async () => {
 
     // Get all TCP clients
     ws.send.event("/network/v1", "nics")
-    setInterval(() => ws.send.event("/network/v1", "nics"), 1 * 1000);
+    interval = setInterval(() => ws.send.event("/network/v1", "nics"), 1 * 1000);
 
     // Get the presets the client has saved in local storage
     getPresetsFromLocalStorage()
@@ -395,9 +395,9 @@
       data.presetViewMode = "table"
     }
 
-    // Startup complete
-    doneLoading = true
-
+  })
+  onDestroy(async () => {
+    clearInterval(interval)
   })
 
   // Debug

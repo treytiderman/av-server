@@ -21,7 +21,7 @@
   // Router
   import Router, { location, querystring } from 'svelte-spa-router'
   const routes = {
-    "/": Home,
+    "/": Network,
     "/dhcp/server": Dhcp_server,
     "/network": Network,
     "/rtsp2ws": Rtsp2ws,
@@ -35,11 +35,11 @@
   let navShow = false
   let navItem
   let navItems = [
-    {
-      name: "Home",
-      icon: "house",
-      path: "/#/",
-    },
+    // {
+    //   name: "Home",
+    //   icon: "house",
+    //   path: "/#/",
+    // },
     // {
     //   name: "Tools",
     //   show: true,
@@ -47,7 +47,7 @@
         {
           name: "Network",
           icon: "ethernet",
-          path: "/#/Network",
+          path: "/#/network",
         },
         {
           name: "DHCP Server",
@@ -94,7 +94,7 @@
 
     // Start WebSocket Connection
     ws.setDebug(true)
-    ws.connect({port: 4620})
+    ws.connect({port: 4620}, $settings.offline)
 
   })
 
@@ -106,7 +106,7 @@
 </script>
 
 <!-- HTML -->
-{#if $ws.status === "open"}
+{#if $ws.status === "open" || $ws.status === "offline"}
   <Header title={$location}
     on:nav={() => navShow = !navShow}/>
   <div class="navMain">

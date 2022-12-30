@@ -52,8 +52,8 @@ ws_server.emitter.on("/dhcp/server/v1", async (ws, req) => {
 dhcp_server.emitter.on("clients", (body) => {
   ws_server.event(`/dhcp/server/v1`, "clients", body)
 })
-dhcp_server.emitter.on("start", (body) => {
-  ws_server.event(`/dhcp/server/v1`, "start", body)
+dhcp_server.emitter.on("listening", (body) => {
+  ws_server.event(`/dhcp/server/v1`, "listening", body)
 })
 dhcp_server.emitter.on("close", (body) => {
   ws_server.event(`/dhcp/server/v1`, "close", body)

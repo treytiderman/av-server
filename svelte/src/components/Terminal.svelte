@@ -1,5 +1,6 @@
 <!-- Javascript -->
 <script>
+  import { dateObjToDate, dateObjToTime, dateObjToTimeSec } from "../js/helper";
 
   // Components
   import Icon from './Icon.svelte'
@@ -41,19 +42,19 @@
   
   // Time Column
   $: timeColFormat = terminalElementWidth > 600 ? "time" : "timeShort"
-  $: timeColWidth = terminalElementWidth > 600 ? "6.75rem" : "4rem"
+  $: timeColWidth = terminalElementWidth > 600 ? "6.25rem" : "5rem"
   function timePress() {
     if (timeColFormat === "datetime") {
       timeColFormat = "time"
-      timeColWidth = "6.75rem"
+      timeColWidth = "6.25rem"
     }
     else if (timeColFormat === "time") {
       timeColFormat = "timeShort"
-      timeColWidth = "4rem"
+      timeColWidth = "5rem"
     }
     else {
       timeColFormat = "datetime"
-      timeColWidth = "12rem"
+      timeColWidth = "11.5rem"
     }
   }
 
@@ -138,12 +139,12 @@
         <!-- Col2 -->
         <div class="terminal-col2">
           {#if timeColFormat === "datetime"}
-            <span>{line.timestampISO.split('T')[0]}</span>
-            <span>{line.timestampISO.split('T')[1].split('Z')[0]}</span>
+            <span>{dateObjToDate(new Date(line.timestampISO))}</span>
+            <span>{dateObjToTimeSec(new Date(line.timestampISO))}</span>
           {:else if timeColFormat === "time"}
-            <span>{line.timestampISO.split('T')[1].split('Z')[0]}</span>
+            <span>{dateObjToTimeSec(new Date(line.timestampISO))}</span>
           {:else}
-            <span>{line.timestampISO.split('T')[1].slice(3).split('.')[0]}</span>
+            <span>{dateObjToTime(new Date(line.timestampISO))}</span>
           {/if}
         </div>
 
@@ -162,6 +163,13 @@
 <style>
   section {
     padding: 0;
+    max-height: 100vh;
+  }
+  @media (max-width: 60rem) {
+    section {
+      padding: 0;
+      max-height: 40vh;
+    }
   }
   .terminal {
     background-color: var(--color-bg);
