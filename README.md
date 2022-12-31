@@ -97,12 +97,18 @@ Dependencies
 ```
 
 ### TCP Client v1
+
 - [ ] Open tcp connections to any device on the network
 - Connection Views
   - [x] Log + 3 Simple send commands
   - [ ] Terminal Tool / Telnet / SSH style
   - [ ] Visca tool
   - [ ] Device specific builder?
+
+Dependencies
+```
+NONE
+```
 
 ### Restream to Web v0
 
@@ -123,7 +129,7 @@ Dependencies
 ### Road map Ideas
 - HTTP Server
 - TCP Server
-- UDP Server
+- UDP Client / Server
 - Websocket Client / Server
 - IR TX / RX
 - QR code generator
