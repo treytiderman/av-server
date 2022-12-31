@@ -1,9 +1,19 @@
 # Websocket API
 
-### Connect
+## Connect
 
 Open a WebSocket connection to ws://HOST:PORT
 - Example: ws://192.168.1.9:4620
+
+## Tools
+
+- [dhcp_server](./ws_dhcp_server.md)
+- [network](./ws_network.md)
+- [serialport](./ws_serialport.md)
+- [structure](./ws_structure.md)
+- [tcp_client](./ws_tcp_client.md)
+
+## Examples
 
 ### Example 1
 
