@@ -1,6 +1,6 @@
 # AV-Tools v0.3
 
-[Download](https://github.com/TreyTiderman/AV-Tools/releases/tag/v0.2) or check out the [Demo UI](https://trey.app/av-tools)
+[Download](https://github.com/TreyTiderman/AV-Tools/releases/tag/v0.3) or check out the [Demo UI](https://trey.app/av-tools)
 
 ### Goals
 - Simple tools for testing AV control systems
