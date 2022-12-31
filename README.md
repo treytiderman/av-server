@@ -68,6 +68,7 @@ NONE
 
 Notes
 - Make sure port 53 traffic isn't blocked by your firewall or virus protection software
+- Mac OS set "Server's static IP" to 0.0.0.0. Doesn't work with 192.168.1.42 for some reason
 
 Dependencies
 ```
