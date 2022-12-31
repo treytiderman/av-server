@@ -165,6 +165,18 @@ npm run dev
 5. Go to http://SERVER_IP:4620
     - Example: http://192.168.1.1:4620
 
+#### Kill the process
+
+```
+sudo netstat -lpn |grep :'<SERVER_PORT>'
+kill -9 <NODE_PROCESS>
+```
+
+```
+sudo netstat -lpn |grep :'6969'
+kill -9 1029825
+```
+
 ### Client | Web UI with Svelte
 
 1. Run the following commands in the `./client` folder
@@ -187,7 +199,41 @@ npm run build
 npm run preview
 ```
 
-## Build | Electron App (for the OS you are on)
+### Docker
+
+1. Run the following commands in the `./` folder
+2. Build the image
+    - Folder to build: "PATH"
+    - Tag: "-t NAME_OF_TAG"
+```
+sudo docker build . -t AV-Tools
+```
+3. Remove the current running container if it exists
+    - Image Name: "NAME"
+```
+sudo docker rm AV-Tools
+```
+4. Then to run the image
+    - Detach: "-d" (run in background)
+    - Port: "-p SERVER_PORT:CONTAINER_PORT"
+    - Volume: "-v SERVER_DIRECTORY:CONTAINER_DIRECTORY"
+    - Image Name: "NAME"
+```
+sudo docker run -d -p 4620:4620 -v $(pwd)/public:/app/public --restart unless-stopped --name AV-Tools AV-Tools
+```
+5. Stop / Start / Restart when needed
+    - Image Name: "NAME"
+```
+sudo docker stop AV-Tools
+```
+```
+sudo docker start AV-Tools
+```
+```
+sudo docker restart AV-Tools
+```
+
+### Electron App (for the OS you are on)
 
 1. Run the following commands in the `./server` folder
 2. Build the electron installer with

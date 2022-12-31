@@ -27,7 +27,7 @@ function getNICs() {
 }
 
 // Start web server
-const port = 4620
+const port = process.env.port || 4620
 server.listen(port, () => {
   console.log(`\nAV-Tools server is up and running on ${os.type()}.`)
   console.log(`The user interface is available at:`)
