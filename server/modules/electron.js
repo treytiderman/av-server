@@ -11,6 +11,7 @@ const createWindow = () => {
     width: 1200,
     height: 800,
     autoHideMenuBar: true, // Press alt to see menu
+    icon: './icons/icon.png',
   });
 
   // Load the webpage
