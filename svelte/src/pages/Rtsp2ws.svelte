@@ -54,7 +54,13 @@
   onMount(async () => {
 
     // Try to connect to the stream
-    data.playerObj = new JSMpeg.Player(`ws://${window.location.hostname}:9999`, {canvas: data.playerCanvas})
+    const ip = document.location.hostname
+    const port = 9999
+    const path = ''
+    const protocol = document.location.protocol === 'http:' ? 'ws' : 'wss'
+    const host = protocol === 'wss' ? `${ip}` : `${ip}:${port}`
+    const url = `${protocol}://${host}/${path}`
+    data.playerObj = new JSMpeg.Player(url, {canvas: data.playerCanvas})
     setTimeout(() => {
       if (data.playerObj.source.established) data.watch.connected = true
     }, 1000);
