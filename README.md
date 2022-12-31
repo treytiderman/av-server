@@ -15,7 +15,7 @@
 
 ## Tools
 
-I refer to the computer that this application is running on at "the server"
+I refer to the computer that this application is running on "the server"
 
 ### Server v0.3
 - [x] HTTP Server
