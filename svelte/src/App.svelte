@@ -103,7 +103,7 @@
   // $: console.log(routes)
   // $: console.log($global)
   // $: console.log($settings)
-  $: console.log($ws)
+  // $: console.log($ws)
   
 </script>
 
