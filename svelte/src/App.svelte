@@ -95,6 +95,7 @@
     // Start WebSocket Connection
     ws.setDebug(true)
     ws.connect({port: 4620}, $settings.offline)
+    setTimeout(() => ws.send.subscribe("time"), 100);
 
   })
 
@@ -102,6 +103,7 @@
   // $: console.log(routes)
   // $: console.log($global)
   // $: console.log($settings)
+  $: console.log($ws)
   
 </script>
 

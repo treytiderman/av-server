@@ -22,6 +22,9 @@ function start() {
   // Public folder, everything in this folder is available to anyone
   app.use(express.static("../public"))
 
+  // Mac OS + Electron
+  // app.use(express.static(require('path').resolve(__dirname + "/../../../../../../public"))) 
+
   // API Routes
   const routes = require('../routes/routes')
   app.use(routes.router)
