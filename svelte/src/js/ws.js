@@ -144,6 +144,17 @@ function createStore() {
           store["status"] = "open"
           return store
         })
+
+        // Save published and get values to the Svelte store
+        receiveJSON(obj => {
+          if (obj.event === "publish" || obj.event === "get") {
+            update(store => {
+              store[obj.name] = obj.body
+              return store
+            })
+          }
+        })
+
       })
       websocket.addEventListener('error', event => {
         update(store => {
@@ -156,16 +167,6 @@ function createStore() {
           store["status"] = "close"
           return store
         })
-      })
-      
-      // Save published and get values to the Svelte store
-      receiveJSON(obj => {
-        if (obj.event === "publish" || obj.event === "get") {
-          update(store => {
-            store[obj.name] = obj.body
-            return store
-          })
-        }
       })
 
     },
