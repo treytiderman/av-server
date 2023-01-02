@@ -31,18 +31,6 @@ function middlware_log(req, res, next) {
   log(req)
   next()
 }
-function middlware_auth(req, res, next) {
-  // // Looks like "Bearer TOKEN"
-  // const authHeader = req.headers['authorization'];
-  // // If authHeader true
-  // const token = authHeader && authHeader.split(' ')[1];
-  // if (token == null) { return res.redirect('/api/v1/login') }
-  // // Verify the jwt
-  // jwt.verify(token, hashKey, (err, wasDecoded) => {
-  //   if (err) { return res.redirect('/api/v1/login') }
-  //   next();
-  // });
-}
 function start() {
   const app = express()
   app.set('json spaces', 2)
@@ -63,12 +51,12 @@ function start() {
 
   // Middleware
   // - Log requests (exclude public routes)
-  // - Check localhost (req.localhost)
+  // - Check if localhost (req.localhost)
   app.use(middlware_log)
   // - Check auth / permissions (req.auth)
   // app.use(middlware_auth)
 
-  // API Routes
+  // API
   app.use(require('./routes').router)
 
   return app

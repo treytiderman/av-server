@@ -4,6 +4,7 @@ const router = express.Router()
 
 // General
 router.use('/', require('./pages').router)
+router.use('/', require('./user').router)
 router.use('/api', require('./api').router)
 
 // Tools

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    * { color-scheme: dark; line-height: 1.5; font-family: monospace;}
+    body { max-width: 700px; margin: auto; padding: 1rem; font-size: 1rem;}
+  </style>
+</head>
+<body>
+
+  <!-- Main -->
+  <main>
+    
+    <h4>Login</h4>
+    <div>
+      <label for="password">Password</label> <br>
+      <input type="password" name="password">
+      <button type="submit">Submit</button>
+      <p></p>
+    </div>
+    
+  </main>
+  
+  <!-- JavaScript -->
+  <script>
+
+    // Elements
+    let attemts = 0;
+    const password = document.querySelector('input');
+    const submit = document.querySelector('button');
+    const result = document.querySelector('p');
+
+    // Login | POST password for token
+    async function login() {
+
+      // Fetch options
+      const origin = document.location.origin;
+      const url = `${origin}/api/v1/login`;
+      const options = {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({'password': password.value})
+      };
+
+      // Fetch
+      const response = await fetch(url, options);
+      if (!response.ok) { console.log("I'm not ok"); return }
+
+      // Password failed
+      if (response.redirected) { 
+        attemts++;
+        result.innerHTML = `wrong password ${attemts}`;
+        localStorage.clear();
+        return
+      }
+
+      // Password accepted
+      const token = await response.json();
+      localStorage.setItem('token', token);
+      result.innerHTML = 'correct password, token added to local storage';
+      history.back();
+      return
+
+    }
+
+    // Submit clicked
+    submit.addEventListener('click', login);
+
+    // Submit if Enter is pressed
+    password.addEventListener("keyup", (event) => {
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        submit.click();
+      }
+    });
+
+  </script>
+
+</body>
+</html>
