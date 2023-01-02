@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Index</title>
+  <style>
+    * { color-scheme: dark; line-height: 1.5; font-family: monospace; }
+    body { padding: 1rem; font-size: 1rem; background-color: black; color: #CCC; }
+    a { color: hsl(200, 99%, 65%); text-decoration: none; }
+    a:visited { color: hsl(200, 55%, 48%); }
+  </style>
+</head>
+<body>
+  <h1>API</h1>
+  <p>
+    <a href="/files">/files</a>
+    Browse Files
+  </p>
+
+  <h2>Try</h2>
+  <p>
+    <code>GET</code>
+    <a href="/api/time">/api/time</a>
+    <span>Returns time in ISO format</span>
+  </p>
+  <p>
+    <code>GET</code>
+    <a href="/api/files">/api/files</a>
+    <span>Returns a JSON of all public files</span>
+  </p>
+  <p>
+    <code>GET</code>
+    <a href="/api/try/headers">/api/try/headers</a>
+    <span>Returns the headers you sent</span>
+  </p>
+  <p>
+    <code>GET</code>
+    <a href="/api/try/query?key=value">/api/try/query</a>
+    <span>Returns the querystring you sent</span>
+  </p>
+  <p>
+    <code>GET</code>
+    <a href="/api/try/json">/api/try/json</a>
+    <span>Returns a simple JSON</span>
+  </p>
+  <p>
+    <code>POST</code>
+    <a href="/api/try/post/json">/api/try/post/json</a>
+    <span>Returns the JSON sent in the body of the POST</span>
+  </p>
+
+</body>
+</html>

@@ -1,40 +1,25 @@
-// Web (HTTP) server
-const http = require('./modules/http')
-const app = http.start()
-app.use(http.middlware)
+// HTTP Server
+// const http = require('./modules/http_server')
+const http = require('./_http/_http_server')
+const http_server = http.start()
 
-// WebSocket server
-const ws_server = require('./modules/ws_server')
-const server = ws_server.start(app)
+// WebSocket Server
+const ws = require('./modules/ws_server')
+const server = ws.start(http_server)
 
-// Get IP addresses
-const os = require("os")
-function getNICs() {
-  const nets = os.networkInterfaces()
-  const results = {}
-  for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-      // 'IPv4' is in Node <= 17, for 18 it's a number 4 or 6
-      const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
-      if (net.family === familyV4Value && !net.internal) {
-        if (!results[name]) results[name] = []
-        results[name].push(net.address)
-      }
-    }
-  }
-  return results
-}
+// Get System Info
+const system = require("./modules/system")
+const systemInfo = system.getSystemInfo()
 
-// Start web server
+// Start Server
 const port = process.env.port || 4620
 server.listen(port, () => {
-  console.log(`\nAV-Tools server is up and running on ${os.type()}.`)
+  console.log(`\nAV-Tools server is up and running on ${systemInfo.os}`)
   console.log(`The user interface is available at:`)
-  console.log(`http://localhost:${port}`)
-  const NICs = getNICs()
-  Object.values(NICs).forEach(key => {
-    console.log(`http://${key[0]}:${port}`)
-  })
+  console.log(`- http://${systemInfo.hostname}:${port}`)
+  console.log(`- http://localhost:${port}`)
+  systemInfo.nics.forEach(nic => {
+    console.log(`- http://${nic.ip}:${port}`)
+  });
   console.log("")
 })

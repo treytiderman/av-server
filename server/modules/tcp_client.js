@@ -30,7 +30,7 @@ const TCP_CLIENT_MODEL = {
 const logInConsole = false
 function log(text) {
   text = addEscapeCharsToAscii(text)
-  const logger = require('./log')
+  const logger = require('./logger')
   logger.log(text, "../public/logs/", 'tcp client', logInConsole)
 }
 function addEscapeCharsToAscii(text) {

@@ -32,7 +32,7 @@ const PORT_MODEL = {
 const logInConsole = true
 function log(text) {
   text = addEscapeCharsToAscii(text)
-  const logger = require('./log')
+  const logger = require('./logger')
   logger.log(text, "../public/logs/", 'serial', logInConsole)
 }
 function addEscapeCharsToAscii(text) {
