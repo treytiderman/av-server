@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('fs').promises
 
 // Helper Functions
 function log(...params) { if (false) console.log("file_system.js |", ...params) }
@@ -9,7 +9,7 @@ async function getStatsRaw(path) {
   
   // Write
   try {
-    const statsRaw = await fs.promises.stat(path)
+    const statsRaw = await fs.stat(path)
     log(`getStatsRaw(${path})`)
     return statsRaw
   }
@@ -35,7 +35,7 @@ async function getStats(path) {
   
   // Write
   try {
-    const statsRaw = await fs.promises.stat(path)
+    const statsRaw = await fs.stat(path)
     log(`getStats(${path})`)
 
     if (statsRaw.isDirectory() && path.slice(-1) !== "/") path += "/"
@@ -61,10 +61,10 @@ async function getStats(path) {
     }
 
     if (stats.isFolder) {
-      const files = await fs.promises.readdir(path)
+      const files = await fs.readdir(path)
       for (const file of files) {
         const path2 = `${path}${file}`
-        const fileStats = await fs.promises.stat(path2)
+        const fileStats = await fs.stat(path2)
         const path_folder2 = path2.slice(0, path2.lastIndexOf('/')) + "/"
         const path_up2 = path_folder2.slice(0, path_folder2.slice(0, -1).lastIndexOf('/')) + "/"
         const file_name2 = path2.slice(path2.lastIndexOf('/') + 1)
@@ -122,7 +122,7 @@ async function getStatsRecursive(path) {
   
   // Write
   try {
-    const statsRaw = await fs.promises.stat(path)
+    const statsRaw = await fs.stat(path)
     log(`getStats(${path})`)
 
     if (statsRaw.isDirectory() && path.slice(-1) !== "/") path += "/"
@@ -148,7 +148,7 @@ async function getStatsRecursive(path) {
     }
 
     if (stats.isFolder) {
-      const files = await fs.promises.readdir(path)
+      const files = await fs.readdir(path)
       // console.log(files)
       for (const file of files) {
         const fileStats = await getStatsRecursive(`${path}${file}`)
@@ -189,7 +189,7 @@ async function readText(path) {
 
   // Write
   try {
-    const file = await fs.promises.readFile(path, 'utf-8')
+    const file = await fs.readFile(path, 'utf-8')
     log(`readText(${path})`)
     return file
   }
@@ -215,7 +215,7 @@ async function readJSON(path) {
 
   // Write
   try {
-    const file = await fs.promises.readFile(path)
+    const file = await fs.readFile(path)
     log(`readJSON(${path})`)
 
     try { return JSON.parse(file) }
@@ -243,7 +243,7 @@ async function writeText(path, text) {
 
   // Write
   try {
-    await fs.promises.writeFile(path, text)
+    await fs.writeFile(path, text)
     log(`writeText(${path}, ...)`)
   }
   
@@ -270,7 +270,7 @@ async function appendText(path, text) {
 
   // Write
   try {
-    await fs.promises.appendFile(path, text)
+    await fs.appendFile(path, text)
     log(`appendText(${path}, ...)`)
   }
   
@@ -298,7 +298,7 @@ async function writeJSON(path, obj) {
   // Write
   try {
     const json = JSON.stringify(obj, null, 2)
-    await fs.promises.writeFile(path, json)
+    await fs.writeFile(path, json)
     log(`writeJSON(${path}, ...)`)
   }
   
@@ -325,7 +325,7 @@ async function makeDir(path) {
   
   // Make Directory
   try {
-    await fs.promises.mkdir(path, { recursive: true })
+    await fs.mkdir(path, { recursive: true })
     log(`makeDir(${path})`)
   }
   
@@ -340,7 +340,7 @@ async function deleteFile(path) {
   
   // Make Directory
   try {
-    await fs.promises.rm(path)
+    await fs.rm(path)
     log(`deleteFile(${path})`)
   }
   
@@ -360,7 +360,7 @@ async function deleteFolder(path) {
   
   // Make Directory
   try {
-    await fs.promises.rmdir(path, { recursive: true })
+    await fs.rmdir(path, { recursive: true })
     log(`deleteFolder(${path})`)
   }
   
@@ -380,7 +380,7 @@ async function rename(oldPath, newPath) {
   
   // Make Directory
   try {
-    await fs.promises.rename(oldPath, newPath)
+    await fs.rename(oldPath, newPath)
     log(`rename(${oldPath}, ${newPath})`)
   }
   
@@ -406,7 +406,7 @@ async function exists(path) {
   
   // Make Directory
   try {
-    const stat = await fs.promises.stat(path)
+    const stat = await fs.stat(path)
     log(`exists(${path})`)
     return true
   }
