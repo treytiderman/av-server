@@ -1,27 +1,17 @@
 const fs = require('fs')
 
+// Helper Functions
+function log(...params) { if (false) console.log("file_system.js |", ...params) }
+function err(...params) { if (true) console.error("ERROR | file_system.js |", ...params) }
+
 // Functions
-function readText(path, file, cb) {
-  fs.readFile(path+file, 'utf-8', (error, data) => {
-
-    // Error
-    if (error) {
-      console.log("Read File Error", path+file)
-      // console.log(error)
-      return
-    }
-    
-    // Success
-    // console.log("Read Text File", path+file)
-    cb(data)
-  })
-}
-async function writeText(path, file, text) {
-
+async function getStatsRaw(path) {
+  
   // Write
   try {
-    await fs.promises.writeFile(path+file, text)
-    console.log("Write File Error", path+file)
+    const statsRaw = await fs.promises.stat(path)
+    log(`getStatsRaw(${path})`)
+    return statsRaw
   }
   
   // Error
@@ -29,26 +19,153 @@ async function writeText(path, file, text) {
 
     // Path didn't exist, Create it then write the file
     if (error?.code === "ENOENT") {
-      console.log("Write File Error", "path doesn't exist", path+file)
-      makeDir(path).then(() => {
-        writeText(path, file, text)
-        return
-      })
+      err(`getStatsRaw(${path}) ERROR path doesn't exist`)
+      return
     }
 
     // Other Error
-    console.log("Write File Error", path)
-    console.log(error)
+    err(`getStatsRaw(${path}) ERROR`)
+    err(error)
     return
+
   }
 
 }
-async function appendText(path, file, text) {
-
+async function getStats(path) {
+  
   // Write
   try {
-    await fs.promises.appendFile(path+file, text)
-    console.log("Append Text to File", path+file)
+    const statsRaw = await fs.promises.stat(path)
+    log(`getStats(${path})`)
+
+    if (statsRaw.isDirectory() && path.slice(-1) !== "/") path += "/"
+    const path_folder = path.slice(0, path.lastIndexOf('/')) + "/"
+    const path_up = path_folder.slice(0, path_folder.slice(0, -1).lastIndexOf('/')) + "/"
+    const file_name = path.slice(path.lastIndexOf('/') + 1)
+    const folder_name = path_folder.slice(path_folder.slice(0, -1).lastIndexOf('/') + 1).slice(0, -1)
+    const stats = {
+      path: path,
+      path_folder: path_folder,
+      path_up: path_up,
+      file_name: file_name,
+      folder_name: folder_name,
+      isFile: statsRaw.isFile(),
+      isFolder: statsRaw.isDirectory(),
+      size_bytes: statsRaw.size,
+      created_iso: statsRaw.birthtime,
+      accessed_iso: statsRaw.atime,
+      modified_iso: statsRaw.mtime,
+      changed_status_iso: statsRaw.ctime,
+      contains_files: [],
+      contains_folders: []
+    }
+
+    if (stats.isFolder) {
+      const files = await fs.promises.readdir(path)
+      for (const file of files) {
+        const path2 = `${path}${file}`
+        const fileStats = await fs.promises.stat(path2)
+        const path_folder2 = path2.slice(0, path2.lastIndexOf('/')) + "/"
+        const path_up2 = path_folder2.slice(0, path_folder2.slice(0, -1).lastIndexOf('/')) + "/"
+        const file_name2 = path2.slice(path2.lastIndexOf('/') + 1)
+        const folder_name2 = path_folder2.slice(path_folder2.slice(0, -1).lastIndexOf('/') + 1).slice(0, -1)
+        const stats2 = {
+          path: path2,
+          path_folder: path_folder2,
+          path_up: path_up2,
+          file_name: file_name2,
+          folder_name: folder_name2,
+          isFile: fileStats.isFile(),
+          isFolder: fileStats.isDirectory(),
+          size_bytes: fileStats.size,
+          created_iso: fileStats.birthtime,
+          accessed_iso: fileStats.atime,
+          modified_iso: fileStats.mtime,
+          changed_status_iso: fileStats.ctime,
+          contains_files: [],
+          contains_folders: []
+        }
+  
+        // Folder
+        if (stats2.isFolder) {
+          stats.contains_folders.push(stats2)
+        }
+  
+        // File
+        else {
+          stats.contains_files.push(stats2)
+        }
+      }
+    }
+
+    return stats
+  }
+
+  // Error
+  catch (error) {
+
+    // Path didn't exist, Create it then write the file
+    if (error?.code === "ENOENT") {
+      err(`getStats(${path}) ERROR path doesn't exist`)
+      return
+    }
+
+    // Other Error
+    err(`getStats(${path}) ERROR`)
+    err(error)
+    return
+
+  }
+
+}
+async function getStatsRecursive(path) {
+  
+  // Write
+  try {
+    const statsRaw = await fs.promises.stat(path)
+    log(`getStats(${path})`)
+
+    if (statsRaw.isDirectory() && path.slice(-1) !== "/") path += "/"
+    const path_folder = path.slice(0, path.lastIndexOf('/')) + "/"
+    const path_up = path_folder.slice(0, path_folder.slice(0, -1).lastIndexOf('/')) + "/"
+    const file_name = path.slice(path.lastIndexOf('/') + 1)
+    const folder_name = path_folder.slice(path_folder.slice(0, -1).lastIndexOf('/') + 1).slice(0, -1)
+    const stats = {
+      path: path,
+      path_folder: path_folder,
+      path_up: path_up,
+      file_name: file_name,
+      folder_name: folder_name,
+      isFile: statsRaw.isFile(),
+      isFolder: statsRaw.isDirectory(),
+      size_bytes: statsRaw.size,
+      created_iso: statsRaw.birthtime,
+      accessed_iso: statsRaw.atime,
+      modified_iso: statsRaw.mtime,
+      changed_status_iso: statsRaw.ctime,
+      contains_files: [],
+      contains_folders: []
+    }
+
+    if (stats.isFolder) {
+      const files = await fs.promises.readdir(path)
+      // console.log(files)
+      for (const file of files) {
+        const fileStats = await getStatsRecursive(`${path}${file}`)
+
+        // Folder
+        if (fileStats.isFolder) {
+          stats.contains_folders.push(fileStats)
+        }
+
+        // File
+        else {
+          stats.contains_files.push(fileStats)
+        }
+      }
+    }
+
+    return stats
   }
   
   // Error
@@ -56,43 +173,133 @@ async function appendText(path, file, text) {
 
     // Path didn't exist, Create it then write the file
     if (error?.code === "ENOENT") {
-      console.log("Append Text Error", "path doesn't exist", path+file)
-      makeDir(path).then(() => {
-        appendText(path, file, text)
-        return
-      })
+      err(`getStats(${path}) ERROR path doesn't exist`)
+      return
     }
 
     // Other Error
-    console.log("Append Text Error", path)
-    console.log(error)
+    err(`getStats(${path}) ERROR`)
+    err(error)
     return
+
   }
 
 }
-function readJSON(path, file, cb) {
-  fs.readFile(path+file, (error, data) => {
+async function readText(path) {
 
-    // Error
-    if (error) {
-      console.log("Read File Error", path+file)
-      // console.log(error)
+  // Write
+  try {
+    const file = await fs.promises.readFile(path, 'utf-8')
+    log(`readText(${path})`)
+    return file
+  }
+  
+  // Error
+  catch (error) {
+
+    // Path didn't exist, Create it then write the file
+    if (error?.code === "ENOENT") {
+      err(`readText(${path}) ERROR path doesn't exist`)
       return
     }
-    
-    // Success
-    // console.log("Read JSON File", path+file)
-    let json = JSON.parse(data)
-    cb(json)
-  })
+
+    // Other Error
+    err(`readText(${path}) ERROR`)
+    err(error)
+    return
+
+  }
+
 }
-async function writeJSON(path, file, obj) {
+async function readJSON(path) {
+
+  // Write
+  try {
+    const file = await fs.promises.readFile(path)
+    log(`readJSON(${path})`)
+
+    try { return JSON.parse(file) }
+    catch (error) { return err(`readJSON(${path}) ERROR not JSON`) }
+  }
+  
+  // Error
+  catch (error) {
+
+    // Path didn't exist, Create it then write the file
+    if (error?.code === "ENOENT") {
+      err(`readJSON(${path}) ERROR path doesn't exist`)
+      return
+    }
+
+    // Other Error
+    err(`readJSON(${path}) ERROR`)
+    err(error)
+    return
+
+  }
+
+}
+async function writeText(path, text) {
+
+  // Write
+  try {
+    await fs.promises.writeFile(path, text)
+    log(`writeText(${path}, ...)`)
+  }
+  
+  // Error
+  catch (error) {
+
+    // Path didn't exist, Create it then write the file
+    if (error?.code === "ENOENT") {
+      log(`writeText(${path}, ...) ERROR path doesn't exist. Creating path...`)
+      await makeDir(path.slice(0, path.lastIndexOf('/')) + "/")
+      await writeText(path, text)
+      return
+    }
+
+    // Other Error
+    err(`writeText(${path}, ...) ERROR`)
+    err(error)
+    return
+
+  }
+
+}
+async function appendText(path, text) {
+
+  // Write
+  try {
+    await fs.promises.appendFile(path, text)
+    log(`appendText(${path}, ...)`)
+  }
+  
+  // Error
+  catch (error) {
+
+    // Path didn't exist, Create it then write the file
+    if (error?.code === "ENOENT") {
+      log(`appendText(${path}, ...) ERROR path doesn't exist. Creating path...`)
+      await makeDir(path.slice(0, path.lastIndexOf('/')) + "/")
+      await appendText(path, text)
+      return
+    }
+
+    // Other Error
+    err(`appendText(${path}, ...) ERROR`)
+    err(error)
+    return
+
+  }
+
+}
+async function writeJSON(path, obj) {
   
   // Write
   try {
     const json = JSON.stringify(obj, null, 2)
-    await fs.promises.writeFile(path+file, json)
-    console.log("Wrote JSON File", path+file)
+    await fs.promises.writeFile(path, json)
+    log(`writeJSON(${path}, ...)`)
   }
   
   // Error
@@ -100,40 +307,146 @@ async function writeJSON(path, file, obj) {
 
     // Path didn't exist, Create it then write the file
     if (error?.code === "ENOENT") {
-      console.log("Write File Error", "path doesn't exist", path+file)
-      makeDir(path).then(() => {
-        writeJSON(path, file, obj)
-        return
-      })
+      log(`writeJSON(${path}, ...) ERROR path doesn't exist. Creating path...`)
+      await makeDir(path.slice(0, path.lastIndexOf('/')) + "/")
+      await writeJSON(path, obj)
+      return
     }
 
     // Other Error
-    console.log("Make Directory Error", path)
-    console.log(error)
+    err(`writeJSON(${path}, ...) ERROR`)
+    err(error)
     return
+
   }
 
 }
 async function makeDir(path) {
   
-  // Make
+  // Make Directory
   try {
     await fs.promises.mkdir(path, { recursive: true })
-    console.log("Make Directory", path)
+    log(`makeDir(${path})`)
   }
   
   // Error
   catch (error) {
-    console.log("Make Directory Error", path)
-    console.log(error)
-    return
+    err(`makeDir(${path}) ERROR`)
+    err(error)
+  }
+
+}
+async function deleteFile(path) {
+  
+  // Make Directory
+  try {
+    await fs.promises.rm(path)
+    log(`deleteFile(${path})`)
+  }
+  
+  // Error
+  catch (error) {
+    if (error?.code === "ENOENT") {
+      log(`deleteFile(${path}) ERROR path doesn't exist`)
+    }
+    else {
+      err(`deleteFile(${path}) ERROR`)
+      err(error)
+    }
+  }
+
+}
+async function deleteFolder(path) {
+  
+  // Make Directory
+  try {
+    await fs.promises.rmdir(path, { recursive: true })
+    log(`deleteFolder(${path})`)
+  }
+  
+  // Error
+  catch (error) {
+    if (error?.code === "ENOENT") {
+      log(`deleteFolder(${path}) ERROR path doesn't exist`)
+    }
+    else {
+      err(`deleteFolder(${path}) ERROR`)
+      err(error)
+    }
+  }
+
+}
+async function rename(oldPath, newPath) {
+  
+  // Make Directory
+  try {
+    await fs.promises.rename(oldPath, newPath)
+    log(`rename(${oldPath}, ${newPath})`)
+  }
+  
+  // Error
+  catch (error) {
+    if (error?.code === "ENOENT") {
+      err(`rename(${oldPath}, ${newPath}) ERROR path doesn't exist`)
+      if (await exists(oldPath)) {
+        console.log("exists(oldPath)", await exists(oldPath));
+        await makeDir(newPath.slice(0, newPath.lastIndexOf('/')) + "/")
+        await rename(oldPath, newPath)
+      }
+      err(error)
+    }
+    else {
+      err(`rename(${oldPath}, ${newPath}) ERROR`)
+      err(error)
+    }
+  }
+
+}
+async function exists(path) {
+  
+  // Make Directory
+  try {
+    const stat = await fs.promises.stat(path)
+    log(`exists(${path})`)
+    return true
+  }
+  
+  // Error
+  catch (error) {
+    log(`exists(${path}) ERROR`)
+    log(error)
+    return false
   }
 
 }
 
+// Export
+exports.getStatsRaw = getStatsRaw
+exports.getStats = getStats
+exports.getStatsRecursive = getStatsRecursive
+exports.readText = readText
+exports.readJSON = readJSON
+exports.writeText = writeText
+exports.appendText = appendText
+exports.writeJSON = writeJSON
+exports.makeDir = makeDir
+exports.deleteFile = deleteFile
+exports.deleteFolder = deleteFolder
+exports.rename = rename
+exports.exists = exists
+
 // ----------------------------------------------------------------
 
-// writeJSON("../public/test/", "test.json", { 
+// getStats("../public/logs/example.log")
+//   .then(stats => console.log(stats))
+
+// getStats("../public/docs")
+//   .then(stats => writeJSON("../public/DELETE_ME/test.json", stats))
+
+// getStatsRecursive("../public/docs")
+//   .then(stats => writeJSON("../public/DELETE_ME/test.json", stats))
+
+// writeJSON("../public/DELETE_ME/test.json", { 
 //   name: 'Mike',
 //   age: 24, 
 //   gender: 'Male',
@@ -141,19 +454,18 @@ async function makeDir(path) {
 //   car: 'Honda' 
 // })
 
-// readJSON("../public/test/", "test.json", json => {
-//   console.log("json", json)
+// readJSON("../public/DELETE_ME/test.json")
+//   .then(json => console.log(json))
+
+// appendText("../public/DELETE_ME/go/ddd/example.log", "test other \n")
+
+// readText("../public/logs/example.log").then(async text => {
+//   log(text)
+//   await writeText("../public/DELETE_ME/example.log", text)
+//   await appendText("../public/DELETE_ME/example.log", "test others \n")
 // })
 
-// appendText("../public/test/go/ddd/", "example.log", "test other \n")
-
-// readText("../public/logs/", "example.log", async text => {
-//   console.log(text)
-//   await writeText("../public/test/", "example.log", text)
-//   await appendText("../public/test/", "example.log", "test other \n")
-// })
-  
-// writeJSON("../public/test/1/2/", "test.json", { 
+// writeJSON("../public/DELETE_ME/1/2/test.json", { 
 //   name: 'John',
 //   age: 29, 
 //   gender: 'Male',
@@ -161,6 +473,15 @@ async function makeDir(path) {
 //   car: 'Honda' 
 // })
 
-// makeDir("../public/test/super/path")
+// makeDir("../public/DELETE_ME/super/path/")
+// makeDir("../public/DELETE_ME/super/path2")
 
+// exists("../public/DELETE_ME/1/2/test.json")
+//   .then(bool => console.log(bool))
 
+// rename("../public/DELETE_ME/1/2/test.json", "../public/DELETE_ME/1/test.json")
+// rename("../public/DELETE_ME/1/2/test.json", "../public/DELETE_ME/1/3/test.json")
+
+// deleteFile("../public/DELETE_ME/example.log")
+
+// deleteFolder("../public/DELETE_ME/")
