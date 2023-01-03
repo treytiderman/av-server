@@ -21,8 +21,8 @@ I refer to the computer that this application is running on "the server"
 - [x] HTTP Server
   - Any files put in the `./public` directory will be served
 - [ ] Auth / User accounts / Permissions
-- [x] HTTP API v0 | [Docs](./public/docs/api/http.md)
-- [x] WebSocket API v0 | [Docs](./public/docs/api/ws.md)
+- [x] HTTP API v0 | [Docs](./public/docs/api_http/http.md)
+- [x] WebSocket API v0 | [Docs](./public/docs/api_websocket/ws.md)
 - [ ] TCP API
 - [ ] UDP API
 - [ ] Multicast API?

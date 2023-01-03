@@ -1,4 +1,7 @@
-// Require Routes
+// General
+require('./store')
+
+// Tools
 require('./tcp_client')
 require('./serial')
 require('./network')

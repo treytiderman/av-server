@@ -8,12 +8,13 @@ const store = {
   time: new Date(Date.now()).toISOString(),
   uptime: 0,
   test: 'success',
+  system: '',
 }
 
 // Helper Functions
 const logInConsole = false
 function log(text) {
-  const logger = require('./logger')
+  const logger = require('../modules/logger')
   logger.log(text, "../public/logs/", 'ws server', logInConsole)
 }
 function isJSON(text) {
@@ -43,7 +44,7 @@ function start(app) {
   }, 30 * 1000)
 
   // API Routes
-  require('../routes-ws/routes')
+  require('./routes')
 
   // Return
   return server
@@ -180,14 +181,6 @@ function subscribe(ws, name) {
   if (ws.subs.indexOf(name) === -1) ws.subs.push(name)
 }
 
-// Global uptime
-let globalCount = 0
-setInterval(() => {
-  globalCount++
-  publish("uptime", globalCount)
-  publish("time", new Date(Date.now()).toISOString())
-}, 1000)
-
 // Export
 exports.emitter = emitter
 exports.start = start
@@ -199,13 +192,18 @@ exports.subscribe = subscribe
 
 /* Examples
 
-// express - Web server
-const http = require('./modules/http')
-const app = http.start()
-app.use(http.middlware)
+// HTTP Server
+const http = require('./_http/_http_server')
+const http_server = http.start()
 
-// ws - WebSockets
-const ws = require('./modules/ws')
-const server = ws.start(app)
+// WebSocket Server
+const ws = require('./_websocket/_ws_server')
+const server = ws.start(http_server)
+
+// Start web server
+const port = 3000
+server.listen(port, () => {
+  console.log(`\nServer available at: http://localhost:${port}`)
+})
 
 */

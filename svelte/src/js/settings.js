@@ -5,7 +5,7 @@ export async function getThemes() {
 
   // Get all themes in /public/themes
   const themesResponse = await get("/api/files", `${document.location.protocol}//${document.location.hostname}:4620`)
-  const themesFolder = themesResponse.folders.find(folder => folder.name === "/themes")
+  const themesFolder = themesResponse.folders.find(folder => folder.path === "/themes/")
   const head = document.getElementsByTagName('head')[0]
 
   // Import each theme

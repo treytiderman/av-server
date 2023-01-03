@@ -1,4 +1,4 @@
-const ws_server = require('../modules/ws_server')
+const ws_server = require('./_ws_server')
 
 // If Windows
 const os = require("os")

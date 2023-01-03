@@ -1,4 +1,4 @@
-const ws_server = require('../modules/ws_server')
+const ws_server = require('./_ws_server')
 
 // Module
 const tcpClient = require('../modules/tcp_client')

@@ -1,10 +1,9 @@
 // HTTP Server
-// const http = require('./modules/http_server')
 const http = require('./_http/_http_server')
 const http_server = http.start()
 
 // WebSocket Server
-const ws = require('./modules/ws_server')
+const ws = require('./_websocket/_ws_server')
 const server = ws.start(http_server)
 
 // Get System Info
@@ -20,6 +19,6 @@ server.listen(port, () => {
   console.log(`- http://localhost:${port}`)
   systemInfo.nics.forEach(nic => {
     console.log(`- http://${nic.ip}:${port}`)
-  });
+  })
   console.log("")
 })

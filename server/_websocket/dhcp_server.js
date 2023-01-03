@@ -1,4 +1,4 @@
-const ws_server = require('../modules/ws_server')
+const ws_server = require('./_ws_server')
 
 // Module
 const dhcp_server = require('../modules/dhcp_server')

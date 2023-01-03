@@ -67,12 +67,12 @@ exports.start = start
 
 /* Examples
 
-// HTTP server
-const http = require('./modules/http')
+// HTTP Server
+const http = require('./_http/_http_server')
 const http_server = http.start()
 
-// WebSocket server
-const ws = require('./modules/ws_server')
+// WebSocket Server
+const ws = require('./_websocket/_ws_server')
 const server = ws.start(http_server)
 
 // Start web server
