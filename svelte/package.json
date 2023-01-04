@@ -1,7 +1,7 @@
 {
-  "name": "ui-testing",
+  "name": "av-tools-ui",
   "version": "0.1.0",
-  "description": "ui-testing",
+  "description": "av-tools-ui",
   "author": "trey",
   "license": "MIT",
   "type": "module",

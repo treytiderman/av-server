@@ -12,6 +12,7 @@
 
   // Pages
   import Home from "./pages/Home.svelte";
+  import Login from "./pages/Login.svelte";
   import Dhcp_server from "./pages/Dhcp_server.svelte";
   import Network from "./pages/Network.svelte";
   import Rtsp2ws from "./pages/Rtsp2ws.svelte";
@@ -21,7 +22,7 @@
   // Router
   import Router, { location, querystring } from 'svelte-spa-router'
   const routes = {
-    "/": Network,
+    "/": Login,
     "/dhcp/server": Dhcp_server,
     "/network": Network,
     "/rtsp2ws": Rtsp2ws,
