@@ -20,15 +20,18 @@ async function getJSON(path, options = {}) {
   log(`get(${url})`)
 
   // Fetch options
+  const token = localStorage.getItem('token')
   const fetch_options = {
-    method: 'GET',
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
   }
 
   // Fetch
   try {
     const response = await fetch(url, fetch_options)
     log(`get(${url})`, response)
-    if (!response.ok) return "not ok"
 
     // Parse JSON
     try {
@@ -54,12 +57,14 @@ async function postJSON(path, body, options = {}) {
   log(`postJSON(${url}, ...)`, body)
 
   // Fetch options
+  const token = localStorage.getItem('token')
   const fetch_options = {
+    method: "POST",
     headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
     },
-    method: 'POST',
     body: JSON.stringify(body)
   }
 
@@ -67,7 +72,6 @@ async function postJSON(path, body, options = {}) {
   try {
     const response = await fetch(url, fetch_options)
     log(`postJSON(${url}, ...)`, response)
-    if (!response.ok) return "not ok"
 
     // Parse JSON
     try {
@@ -87,15 +91,61 @@ async function postJSON(path, body, options = {}) {
 
 // Login
 async function login(username, password, options = {}) {
-  return await postJSON("/login", {
+
+  // Send username and password to login endpoint
+  const token = await postJSON("/login", {
     username: username,
     password: password
   }, options)
+
+  // Password incorrect
+  if (token === "password incorrect") return token
+
+  // User doesn't exist
+  else if (token === "username doesn't exists") return token
+
+  // Save Token to localStorage
+  else {
+    log("token saved")
+    localStorage.setItem("token", token)
+  }
+
+}
+
+// Logout
+async function logout() {
+  localStorage.removeItem("token")
+}
+
+// Role
+async function role(options = {}) {
+
+  // Send username and password to login endpoint
+  const role = await getJSON("/user/role", options)
+  log("role", role)
+
+  if (role === "bad token") return role
+  else if (role === "username doesn't exists") return role
+  return role
+
+  // // Password incorrect
+  // if (role === "password incorrect") return role
+
+  // // User doesn't exist
+  // else if (role === "username doesn't exists") return role
+
+  // // Save role to localStorage
+  // else {
+  //   log("role saved")
+  //   localStorage.setItem("role", role)
+  // }
+
 }
 
 // Exports
 export const http = {
   login: login,
+  role: role,
   buildURL: buildURL,
   get: {
     json: getJSON,

@@ -6,6 +6,7 @@ const router = express.Router()
 router.use('/', require('./pages').router)
 router.use('/', require('./user').router)
 router.use('/api', require('./api').router)
+router.use('/api', require('./files').router)
 
 // Tools
 router.use('/api/network/v1', require('./network').router)

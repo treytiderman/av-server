@@ -21,8 +21,6 @@
   const iconSize = 1.25
   const indentSubItem = 1
 
-  console.log(window.location.pathname)
-
 </script>
 
 <!-- HTML -->
