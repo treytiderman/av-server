@@ -43,7 +43,9 @@ function mw_auth(role) {
 
     // Grab Token from authorization header "Authorization: Bearer <TOKEN>"
     const authHeader = req.headers['authorization']
+    console.log(authHeader)
     const token = authHeader && authHeader.split(' ')[1]
+    console.log(token)
 
     // No Token
     if (token === undefined) {
@@ -101,7 +103,7 @@ getUsersFile().then(async file => {
 // Login Page
 router.get('/login', async (req, res) => {
   const file = await fs.readFile('./_http/login.html','utf8')
-  res.json(file)
+  res.send(file)
 })
 
 // Login to receive Token
@@ -132,6 +134,12 @@ router.post('/login', async (req, res) => {
   // Else
   else { res.status(404).json("username doesn't exists") }
 
+})
+
+// Get User
+router.get('/user', mw_auth(ROLES.ANY), async (req, res) => {
+  const { password, ...body } = req.user
+  res.json(body)
 })
 
 // Create User

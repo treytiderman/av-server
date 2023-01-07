@@ -23,7 +23,7 @@
   // Router
   import Router, { location, querystring } from 'svelte-spa-router'
   const routes = {
-    "/": Files,
+    "/": Login,
     "/dhcp/server": Dhcp_server,
     "/network": Network,
     "/rtsp2ws": Rtsp2ws,

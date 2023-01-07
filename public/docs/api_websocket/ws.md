@@ -20,6 +20,7 @@ Open a WebSocket connection to ws://HOST:PORT
 Empty Send
 
 ```json
+
 ```
 
 Response
@@ -133,6 +134,7 @@ Send
 Stop receiving "uptime" events
 
 ```json
+
 ```
 
 ### Example 7
@@ -149,6 +151,7 @@ Send
 Stop receiving all events
 
 ```json
+
 ```
 
 ### Example 8

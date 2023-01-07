@@ -4,6 +4,7 @@ const router = express.Router()
 
 // Module
 const fs = require('fs').promises
+const { mw_auth, ROLES } = require('./user')
 
 // Functions
 async function getClientFiles(folder) {
@@ -63,6 +64,9 @@ router.get('/try/json', async (req, res) => {
 })
 router.get('/try/download', async (req, res) => {
   res.status(200).download('../public/logs/example.log')
+})
+router.get('/try/token', mw_auth(ROLES.ANY), async (req, res) => {
+  res.status(200).send("auth level " + req.user.role)
 })
 router.get('/try/:path', async (req, res) => {
   res.status(200).send(req.params.path)

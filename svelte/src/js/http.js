@@ -1,4 +1,3 @@
-
 // Helper Functions
 function log(...params) { if (true) console.log("http.js |", ...params) }
 function err(...params) { if (true) console.error("http.js |", ...params) }
@@ -20,7 +19,7 @@ async function getJSON(path, options = {}) {
   log(`get(${url})`)
 
   // Fetch options
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('token') ?? ""
   const fetch_options = {
     method: "GET",
     headers: {
@@ -57,7 +56,7 @@ async function postJSON(path, body, options = {}) {
   log(`postJSON(${url}, ...)`, body)
 
   // Fetch options
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('token') ?? ""
   const fetch_options = {
     method: "POST",
     headers: {
@@ -118,34 +117,16 @@ async function logout() {
 }
 
 // Role
-async function role(options = {}) {
-
-  // Send username and password to login endpoint
-  const role = await getJSON("/user/role", options)
-  log("role", role)
-
-  if (role === "bad token") return role
-  else if (role === "username doesn't exists") return role
-  return role
-
-  // // Password incorrect
-  // if (role === "password incorrect") return role
-
-  // // User doesn't exist
-  // else if (role === "username doesn't exists") return role
-
-  // // Save role to localStorage
-  // else {
-  //   log("role saved")
-  //   localStorage.setItem("role", role)
-  // }
-
+async function user(options = {}) {
+  const user = await getJSON("/user", options)
+  log("user", user)
+  return user
 }
 
 // Exports
 export const http = {
   login: login,
-  role: role,
+  user: user,
   buildURL: buildURL,
   get: {
     json: getJSON,

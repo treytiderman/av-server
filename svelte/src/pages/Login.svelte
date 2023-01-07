@@ -18,7 +18,7 @@
   }
 
   async function checkRole() {
-    const response = await http.role({ port: "4620" })
+    const response = await http.user({ port: "4620" })
     role = response ?? ""
   }
 
