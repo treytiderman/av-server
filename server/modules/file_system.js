@@ -42,12 +42,12 @@ async function getStats(path) {
     const path_folder = path.slice(0, path.lastIndexOf('/')) + "/"
     const path_up = path_folder.slice(0, path_folder.slice(0, -1).lastIndexOf('/')) + "/"
     const file_name = path.slice(path.lastIndexOf('/') + 1)
-    const folder_name = path_folder.slice(path_folder.slice(0, -1).lastIndexOf('/') + 1).slice(0, -1)
+    const folder_name = "/" + path_folder.slice(path_folder.slice(0, -1).lastIndexOf('/') + 1).slice(0, -1)
     const stats = {
       path: path,
       path_folder: path_folder,
       path_up: path_up,
-      file_name: file_name,
+      file_name: statsRaw.isDirectory() ? "/" + file_name : file_name,
       folder_name: folder_name,
       isFile: statsRaw.isFile(),
       isFolder: statsRaw.isDirectory(),
@@ -68,12 +68,12 @@ async function getStats(path) {
         const path_folder2 = path2.slice(0, path2.lastIndexOf('/')) + "/"
         const path_up2 = path_folder2.slice(0, path_folder2.slice(0, -1).lastIndexOf('/')) + "/"
         const file_name2 = path2.slice(path2.lastIndexOf('/') + 1)
-        const folder_name2 = path_folder2.slice(path_folder2.slice(0, -1).lastIndexOf('/') + 1).slice(0, -1)
+        const folder_name2 = "/" + path_folder2.slice(path_folder2.slice(0, -1).lastIndexOf('/') + 1).slice(0, -1)
         const stats2 = {
           path: path2,
           path_folder: path_folder2,
           path_up: path_up2,
-          file_name: file_name2,
+          file_name: fileStats.isDirectory() ? "/" + file_name2 : file_name2,
           folder_name: folder_name2,
           isFile: fileStats.isFile(),
           isFolder: fileStats.isDirectory(),
@@ -129,12 +129,12 @@ async function getStatsRecursive(path) {
     const path_folder = path.slice(0, path.lastIndexOf('/')) + "/"
     const path_up = path_folder.slice(0, path_folder.slice(0, -1).lastIndexOf('/')) + "/"
     const file_name = path.slice(path.lastIndexOf('/') + 1)
-    const folder_name = path_folder.slice(path_folder.slice(0, -1).lastIndexOf('/') + 1).slice(0, -1)
+    const folder_name = "/" + path_folder.slice(path_folder.slice(0, -1).lastIndexOf('/') + 1).slice(0, -1)
     const stats = {
       path: path,
       path_folder: path_folder,
       path_up: path_up,
-      file_name: file_name,
+      file_name: statsRaw.isDirectory() ? "/" + file_name : file_name,
       folder_name: folder_name,
       isFile: statsRaw.isFile(),
       isFolder: statsRaw.isDirectory(),

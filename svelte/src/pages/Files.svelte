@@ -24,14 +24,21 @@
   }
   
   // Functions
-  import { onMount } from 'svelte';
-  onMount(async () => {
-
-    // Get Files
-    const response = await http.get.json("/api/files/v1", {port: 4620})
+  async function folderPress(path) {
+    path = path.replace("..", "")
+    path = path.replace("/public", "")
+    const response = await http.post.json("/api/files/v1", {path: path}, {port: 4620})
     console.log("files", response)
 
     files = response
+  }
+
+  // Startup
+  import { onMount } from "svelte";
+  onMount(async () => {
+
+    // Get Files
+    folderPress("/")
 
   })
 
@@ -40,28 +47,26 @@
 
 <!-- HTML -->
 <article>
-  <h2>{files.path}</h2>
-  <hr>
   <div class="header line">
     <span>Name</span>
     <span>Size</span>
-    <span>Actions</span>
   </div>
-  <div class="line">
-    <span>{files.path_up}</span>
+  <button class="line" on:click={() => folderPress(files.path_up)}>
+    <span>{files.path}</span>
     <span></span>
-    <span></span>
-  </div>
-  {#each [...files.contains_files, ...files.contains_folders] as file}
-    <div class="line">
-      <span>{file.file_name}</span>
-      <span>{(file.size_bytes / 1024).toFixed(2)} KB</span>
-      <span>
-        <button class="clear" style="padding: calc(var(--pad)/2);">
-          <Icon name="plus" color="var(--color-text-dim)"/>
-        </button>
-      </span>
-    </div>
+  </button>
+  {#each [...files.contains_folders, ...files.contains_files] as file}
+    {#if file.isFile}
+      <a class="line" href={file.path.replace("../public", "")}>
+        <span>{file.file_name}</span>
+        <span>{(file.size_bytes / 1024).toFixed(2)} KB</span>
+      </a>
+    {:else if file.isFolder}
+      <button class="line" on:click={() => folderPress(file.path)}>
+        <span>{file.file_name}</span>
+        <span></span>
+      </button>
+    {/if}
   {/each}
 </article>
 
@@ -69,6 +74,10 @@
 <style>
   article {
     padding: var(--gap);
+  }
+  a {
+    text-decoration: none;
+    color: var(--color-text-bright);
   }
   .header {
     border-bottom: var(--border);
@@ -78,21 +87,20 @@
     display: flex;
     gap: var(--gap);
     align-items: center;
+    padding: 0;
+    text-align: left;
+    background-color: transparent;
+    border-radius: var(--radius);
+    width: 100%;
     /* border: 1px solid blue; */
   }
   .line > *:nth-child(1) {
     padding-left: var(--pad);
-    min-width: 12rem;
   }
   .line > *:nth-child(2) {
-    min-width: 6rem;
-    /* border: 1px solid red; */
-  }
-  .line > *:nth-child(3) {
+    /* min-width: 6rem; */
     margin-left: auto;
     padding-right: var(--pad);
-    /* color: var(--color-text-dim); */
-    /* min-width: 6rem; */
     /* border: 1px solid red; */
   }
 </style>
