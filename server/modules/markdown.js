@@ -8,13 +8,11 @@ function markdown2html(markdown) {
   const html = converter.makeHtml(markdown)
   return html
 }
-async function markdown2htmlPage(markdown, title = "markdown", light = false) {
+async function markdown2htmlPage(markdown, css, title = "markdown") {
   const body = converter.makeHtml(markdown)
-  const css = await readText(`../server/_http/markdown.css`)
-
   const html = 
 `<!DOCTYPE html>
-<html lang="en" class="${light ? "light" : "dark"}">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

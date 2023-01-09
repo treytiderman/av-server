@@ -440,13 +440,7 @@
       }
 
     })
-    username.addEventListener("keyup", (event) => {
-      if (event.keyCode === 13) { // Pressed Enter
-        event.preventDefault()
-        submit.click()
-      }
-    })
-    password.addEventListener("keyup", (event) => {
+    document.addEventListener("keyup", (event) => {
       if (event.keyCode === 13) { // Pressed Enter
         event.preventDefault()
         submit.click()
@@ -499,7 +493,7 @@
     async function login(username, password, options = {}) {
 
       // Send username and password to login endpoint
-      const token = await postJSON("/login", {
+      const token = await postJSON("/api/login/v1", {
         username: username,
         password: password
       }, options)

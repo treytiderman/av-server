@@ -17,7 +17,5 @@ router.post('/files/v1', async (req, res) => {
   res.json(files)
 })
 
-
-
 // Export
 exports.router = router

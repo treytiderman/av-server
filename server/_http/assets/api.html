@@ -9,7 +9,7 @@
     body { padding: 1rem; font-size: 14px; background-color: black; color: #CCC; }
     h1 { margin-top: 0; }
     a { color: hsl(200, 99%, 65%); text-decoration: none; cursor: pointer; }
-    a:visited { color: hsl(200, 55%, 48%); }
+    /* a:visited { color: hsl(200, 55%, 48%); } */
   </style>
   <script>
 
@@ -107,7 +107,7 @@
     async function login(username, password, options = {}) {
 
       // Send username and password to login endpoint
-      const token = await postJSON("/login", {
+      const token = await postJSON("/api/login/v1", {
         username: username,
         password: password
       }, options)
@@ -137,7 +137,7 @@
   <h1>API</h1>
   <p>
     <a href="/web/ui">AV-Tools</a>
-    <span>User infterface for AV-Tools</span>
+    <span>Main User infterface</span>
   </p>
   <p>
     <a href="/files">files</a>
@@ -145,11 +145,11 @@
   </p>
   <p>
     <a href="/login">login</a>
-    Login, most of the API requires a Token
+    Login, get an API token, "token" in localStorage
   </p>
   <p>
     <a id="logout">logout</a>
-    <span>Logout</span>
+    <span>Logout, delete "token" in localStorage</span>
     <script>
       const logoutEl = document.getElementById("logout")
       logoutEl.addEventListener("click", () => logout())
@@ -157,13 +157,13 @@
   </p>
   <p>
     <a id="tryUser">user</a>
-    <span>check role of the logged in user</span> <br>
+    <span>Get the user info associated with your token</span> <br>
     <pre id="tryUserResponse"></pre>
     <script>
       const tryUser = document.getElementById("tryUser")
       const tryUserResponse = document.getElementById("tryUserResponse")
       tryUser.addEventListener("click", async () => {
-        const response = await getJSON("/user")
+        const response = await getJSON("/api/user/v1")
         tryUserResponse.innerText = JSON.stringify(response, null, 2)
         tryUserResponse.style.color = "hsl(60, 99%, 65%)"
       })

@@ -120,7 +120,7 @@ pre > code {
   
   border-left: var(--border);
   padding: var(--gap);
-  width: fit-content;
+  /* width: fit-content; */
 }
 
 /* Blockquote + Cite */

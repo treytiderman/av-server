@@ -1,9 +1,35 @@
 // Module
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
+const file_system = require('../modules/file_system')
 
 // Variables
-const jwtKey = "sweetpotato"
+// const jwtKey = crypto.randomBytes(32).toString('base64')
+const jwtKey = "DELETE_ME_8UrIDqNu3GhKV8DUqYM2W7SYZ1RmBniygRvIb6gGRZ48"
+const ROLES = {
+  ADMIN: 99,
+  USER: 50,
+  ANY: 1,
+}
+const state = {
+  users: [
+    {
+      username: 'admin',
+      role: ROLES.ADMIN,
+      password: hashPassword("1qaz!QAZ")
+    },
+    {
+      username: 'user',
+      role: ROLES.USER,
+      password: hashPassword("password")
+    },
+    {
+      username: 'guest',
+      role: ROLES.ANY,
+      password: hashPassword("password")
+    }
+  ]
+}
 
 // Functions
 function hashPassword(password) {
@@ -25,12 +51,28 @@ function generateJWT(json) {
 function verifyJWT(token, cb) {
   jwt.verify(token, jwtKey, (error, json) => cb(error, json) )
 }
+async function getUsersFile() {
+  return await file_system.readJSON("../public/configs/users.json")
+}
+async function saveUsersFile(users) {
+  return await file_system.writeJSON("../public/configs/users.json", users)
+}
+
+// Script startup
+getUsersFile().then(async file => {
+  if (file) state.users = file // File has data
+  else await saveUsersFile(state.users) // Make file
+})
 
 // Export
+exports.ROLES = ROLES
+exports.state = state
 exports.hashPassword = hashPassword
 exports.isHashedPassword = isHashedPassword
 exports.generateJWT = generateJWT
 exports.verifyJWT = verifyJWT
+exports.getUsersFile = getUsersFile
+exports.saveUsersFile = saveUsersFile
 
 // Testing
 
@@ -50,4 +92,3 @@ exports.verifyJWT = verifyJWT
 //   if (error) console.log("wrong token")
 //   else console.log("correct token", json)
 // })
-

@@ -1,116 +1,24 @@
 // Create Express router
+const { response } = require('express')
 const express = require('express')
 const router = express.Router()
 
 // Module
 const fs = require('fs').promises
 const auth = require('../modules/auth')
-const file_system = require('../modules/file_system')
-
-// Variables
-const ROLES = {
-  ADMIN: 99,
-  USER: 50,
-  ANY: 0,
-}
-let users = [
-  {
-    username: 'admin',
-    role: ROLES.ADMIN,
-    password: auth.hashPassword("1qaz!QAZ")
-  },
-  {
-    username: 'user',
-    role: ROLES.USER,
-    password: auth.hashPassword("password")
-  },
-  {
-    username: 'guest',
-    role: ROLES.ANY,
-    password: auth.hashPassword("password")
-  }
-]
-
-// Functions
-async function getUsersFile() {
-  return await file_system.readJSON("../public/configs/users.json")
-}
-async function saveUsersFile() {
-  return await file_system.writeJSON("../public/configs/users.json", users)
-}
-function mw_auth(role) {
-  return (req, res, next) => {
-
-    // Grab Token from authorization header "Authorization: Bearer <TOKEN>"
-    const authHeader = req.headers['authorization']
-    console.log(authHeader)
-    const token = authHeader && authHeader.split(' ')[1]
-    console.log(token)
-
-    // No Token
-    if (token === undefined) {
-      return res.status(401).json("no token, login first")
-      // return res.redirect('/login')
-    }
-
-    // Verify Token
-    auth.verifyJWT(token, (error, jwtJson) => {
-
-      // Bad Token
-      if (error) {
-        return res.status(401).json("bad token, login first")
-        // return res.redirect('/login')
-      }
-
-      // Good token
-      else {
-
-        // Get user and add to request <- TODO couldn't the jwt username be changed?
-        const user = users.find(user => user.username === jwtJson.username)
-        if (user) req.user = user
-
-        // User doesn't exist
-        else return res.status(401).json("jwt username doesn't exist")
-
-        // jwt username is the same as the request body username
-        req.isSelf = req.user.username === req.body.username
-
-        // User role level is greater than or equal to the role required
-        if (req.user.role >= role) next()
-
-        // User role not high enough
-        else return res.status(401).json("user role not high enough")
-
-      }
-
-    })
-
-  }
-}
-function mw_isSelf(req, res, next) {
-  // jwt username is the same as the request body username OR
-  // the user is an ROLES.ADMIN
-  if (req.isSelf || req.user.role === ROLES.ADMIN) next()
-  else return res.status(400).json("jwt username is the same as the request body username")
-}
-
-// Script startup
-getUsersFile().then(async file => {
-  if (file) users = file // File has data
-  else await saveUsersFile() // Make file
-})
+const mw = require('./middleware')
 
 // Login Page
 router.get('/login', async (req, res) => {
-  const file = await fs.readFile('./_http/login.html','utf8')
+  const file = await fs.readFile('./_http/assets/login.html','utf8')
   res.send(file)
 })
 
 // Login to receive Token
-router.post('/login', async (req, res) => {
+router.post('/api/login/v1', async (req, res) => {
 
   // Get User
-  const user = users.find(user => user.username === req.body.username)
+  const user = auth.state.users.find(user => user.username === req.body.username)
 
   // Username exists
   if (user) {
@@ -124,26 +32,27 @@ router.post('/login', async (req, res) => {
     }
 
     // Password incorrect
-    else { 
-      res.status(403).json("password incorrect")
-      // res.redirect('/login')
-    }
+    else res.status(403).json("password incorrect")
 
   }
 
   // Else
-  else { res.status(404).json("username doesn't exists") }
+  else res.status(404).json("username doesn't exists")
 
 })
 
 // Get User
-router.get('/user', mw_auth(ROLES.ANY), async (req, res) => {
-  const { password, ...body } = req.user
+router.get('/api/user/v1', mw.gate({role_min: auth.ROLES.ANY}), async (req, res) => {
+  console.log(req.user)
+  const body = {
+    username: req.user.username,
+    role: req.user.role,
+  }
   res.json(body)
 })
 
 // Create User
-router.post('/user', mw_auth(ROLES.USER), async (req, res) => {
+router.post('/api/user/v1', mw.gate({role_min: auth.ROLES.USER}), async (req, res) => {
 
   // Passwords don't match
   if (req.body.password !== req.body.confirm_password) {
@@ -151,44 +60,46 @@ router.post('/user', mw_auth(ROLES.USER), async (req, res) => {
   }
 
   // Username exists
-  else if (users.some(user => user.username === req.body.username)) {
+  else if (auth.state.users.some(user => user.username === req.body.username)) {
     res.status(400).json("username exists")
   }
 
   // User's role is less than the requested role
   else if (req.user.role < req.body.role) {
-    res.status(403).json("user's role is less than the requested role")
+    res.status(403).json("not autherized, user's role is less than the requested role")
   }
+
+  // TODO validate username and password (length, special chars, etc...)
 
   // Add user
   else if (req.body.username && req.body.password && req.body.confirm_password) {
-    users.push({
+    auth.state.users.push({
       username: req.body.username,
       role: req.body.role ?? 0,
       password: auth.hashPassword(req.body.password)
     })
-    await saveUsersFile()
+    await auth.saveUsersFile(auth.state.users)
     res.json("user created")
   }
 
   // Else
-  else { res.status(400).json("failed") }
+  else res.status(400).json("failed")
 
 })
 
 // Delete User
-router.delete('/user', mw_auth(ROLES.USER), mw_isSelf, async (req, res) => {
+router.delete('/api/user/v1', mw.gate({role_min: auth.ROLES.USER, self: true}), async (req, res) => {
 
   // Get User
-  const user = users.find(user => user.username === req.body.username)
+  const user = auth.state.users.find(user => user.username === req.body.username)
 
   // Username exists
   if (user) {
     
     // Delete user
     if (auth.isHashedPassword(req.body.password, user.password.hash, user.password.salt)) {
-      users = users.filter(user => user.username !== req.body.username)
-      await saveUsersFile()
+      auth.state.users = auth.state.users.filter(user => user.username !== req.body.username)
+      await auth.saveUsersFile(auth.state.users)
       res.json("user deleted")
     }
 
@@ -202,11 +113,11 @@ router.delete('/user', mw_auth(ROLES.USER), mw_isSelf, async (req, res) => {
 
 })
 
-// Update User Password
-router.put('/user', mw_auth(ROLES.USER), mw_isSelf, async (req, res) => {
+// Update User
+router.put('/api/user/v1', mw.gate({role_min: auth.ROLES.USER, self: true}), async (req, res) => {
 
   // Get User
-  const user = users.find(user => user.username === req.body.username)
+  const user = auth.state.users.find(user => user.username === req.body.username)
 
   // Username exists
   if (user) {
@@ -218,15 +129,21 @@ router.put('/user', mw_auth(ROLES.USER), mw_isSelf, async (req, res) => {
 
     // User's role is less than the requested role
     else if (req.user.role < req.body.role) {
-      res.status(403).json("user's role is less than the requested role")
+      res.status(403).json("not autherized, user's role is less than the requested role")
     }
+
+    // TODO validate username and password (length, special chars, etc...)
 
     // Correct | Update user password
     else if (auth.isHashedPassword(req.body.old_password, user.password.hash, user.password.salt)) {
       if (req.body.new_password) user.password = auth.hashPassword(req.body.new_password)
       if (req.body.role) user.role = req.body.role
-      await saveUsersFile()
-      res.json(user)
+      await auth.saveUsersFile(auth.state.users)
+      const response = {
+        username: user.username,
+        role: user.role
+      }
+      res.json(response)
     }
 
     // Password incorrect
@@ -239,18 +156,22 @@ router.put('/user', mw_auth(ROLES.USER), mw_isSelf, async (req, res) => {
 
 })
 
-// User roles
-router.get('/user/roles', async (req, res) => {
-  res.json(ROLES)
+// All Users
+router.get('/api/users/v1', mw.gate({role_min: auth.ROLES.ADMIN}), async (req, res) => {
+  const response = []
+  auth.state.users.forEach(user => {
+    response.push({
+      username: user.username,
+      role: user.role,
+    })
+  })
+  res.json(response)
 })
 
-// User's role
-router.get('/user/role', mw_auth(ROLES.ANY), async (req, res) => {
-  res.json(req.user.role)
+// User roles
+router.get('/api/user/roles/v1', async (req, res) => {
+  res.json(auth.ROLES)
 })
 
 // Export
 exports.router = router
-exports.ROLES = ROLES
-exports.mw_auth = mw_auth
-exports.mw_isSelf = mw_isSelf
