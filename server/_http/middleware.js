@@ -61,7 +61,7 @@ function checkRequest(req, res, next) {
         /* Get user and add to request
         Q: Couldn't the jwt username be changed?
         A: Yes, but they would also need the secret to do that */
-        const user = auth.state.users.find(user => user.username === jwtJson.username)
+        const user = auth.users.find(user => user.username === jwtJson.username)
         if (user) req.user = user
   
         // jwt username is the same as the request body username

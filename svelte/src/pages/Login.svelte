@@ -1,9 +1,7 @@
 <!-- Javascript -->
 <script>
-  import { http } from "../js/http";
-
-  // Components
-  import Icon from '../components/Icon.svelte'
+  import { ws } from "../js/ws";
+  import { settings } from '../js/settings'
 
   // Variables
   let username = "user"
@@ -13,46 +11,79 @@
   
   // Functions
   async function submitLogin() {
-    const response = await http.login(username, password, { port: "4620" })
-    error = response ?? ""
+    ws.send.event("/user/v1", "login", {
+      username: username,
+      password: password,
+    })
   }
 
-  async function checkRole() {
-    const response = await http.user({ port: "4620" })
-    role = response ?? ""
-  }
+  // Component Startup
+  import { onMount } from 'svelte'
+  onMount(async () => {
+
+    // Start WebSocket Connection
+    ws.setDebug(true)
+    ws.connect({port: 4620}, $settings.offline)
+    setTimeout(() => {
+      // ws.send.subscribe("time")
+      ws.receive.event("/user/v1", "login", body => {
+        console.log("login", body)
+        if (body !== "username or password incorrect") {          
+          $ws.status = "logged in"
+          $ws.user = body
+          error = body
+        }
+      })
+      ws.receive.event("/user/v1", "logout", body => {
+        console.log("logout", body)
+        if (body === true) {          
+          $ws.status = "open"
+        }
+      })
+    }, 100)
+
+  })
 
 </script>
 
 <!-- HTML -->
-<article class="grid">
-  <h2>Login</h2>
-  {#if error}
-    <p class="red">{error}</p>
-  {/if}
-  <label>
-    Username <br>
-    <input type="text" class="fill" placeholder="username"
-      bind:value={username}
-    >
-  </label>
-  <label>
-    Password <br>
-    <input type="password" class="fill" placeholder="password"
-      bind:value={password}
-    >
-  </label>
-  <button on:click={submitLogin}>Submit</button>
-  <hr>
-  <button on:click={checkRole}>checkRole</button>
-  <p class="yellow">{role}</p>
+<article>
+  <main class="grid">
+    <br>
+    <h1>Login</h1>
+    {#if error}
+      <p class="red">{error}</p>
+    {/if}
+    <label>
+      Username <br>
+      <input type="text" class="fill" placeholder="username"
+        bind:value={username}
+      >
+    </label>
+    <label>
+      Password <br>
+      <input type="password" class="fill" placeholder="password"
+        bind:value={password}
+      >
+    </label>
+    <button on:click={submitLogin}>Submit</button>
+  </main>
 </article>
 
 <!-- CSS -->
 <style>
   article {
+    background-color: black;
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+  main {
     padding: var(--gap);
-    max-width: 400px;
+    max-width: 350px;
     margin: auto;
   }
 </style>

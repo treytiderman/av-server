@@ -11,19 +11,18 @@
   import { ws } from './js/ws'
 
   // Pages
-  import Home from "./pages/Home.svelte";
-  import Login from "./pages/Login.svelte";
-  import Files from "./pages/Files.svelte";
-  import Dhcp_server from "./pages/Dhcp_server.svelte";
-  import Network from "./pages/Network.svelte";
-  import Rtsp2ws from "./pages/Rtsp2ws.svelte";
-  import Serial from "./pages/Serial.svelte";
-  import Tcp_client from "./pages/Tcp_client.svelte";
+  import Home from "./pages/Home.svelte"
+  import Login from "./pages/Login.svelte"
+  import Dhcp_server from "./pages/Dhcp_server.svelte"
+  import Network from "./pages/Network.svelte"
+  import Rtsp2ws from "./pages/Rtsp2ws.svelte"
+  import Serial from "./pages/Serial.svelte"
+  import Tcp_client from "./pages/Tcp_client.svelte"
 
   // Router
   import Router, { location, querystring } from 'svelte-spa-router'
   const routes = {
-    "/": Login,
+    "/": Home,
     "/dhcp/server": Dhcp_server,
     "/network": Network,
     "/rtsp2ws": Rtsp2ws,
@@ -90,27 +89,42 @@
   $: document.documentElement.classList = $settings.theme
   $: document.documentElement.style.fontSize = $settings.font_size + "px"
 
-  // Component Startup
-  import { onMount } from 'svelte';
-  onMount(async () => {
+  // // Component Startup
+  // import { onMount } from 'svelte'
+  // onMount(async () => {
 
-    // Start WebSocket Connection
-    ws.setDebug(true)
-    ws.connect({port: 4620}, $settings.offline)
-    setTimeout(() => ws.send.subscribe("time"), 100);
+  //   // Start WebSocket Connection
+  //   ws.setDebug(true)
+  //   ws.connect({port: 4620}, $settings.offline)
+  //   setTimeout(() => {
+  //     ws.send.subscribe("time")
+  //     // Listen for login success
+  //     ws.receive.event("/user/v1", (event, body) => {
+  //       console.log(event, body)
+  //       if (event === "login" && body !== "username or password incorrect") {          
+  //         $ws.status = "logged in"
+  //         $ws.user = body
+  //       }
+  //       else if (event === "logout" && body === true) {          
+  //         $ws.status = "open"
+  //       }
+  //     })
+  //   }, 100)
 
-  })
+  // })
 
   // Debug
   // $: console.log(routes)
   // $: console.log($global)
   // $: console.log($settings)
-  // $: console.log($ws)
+  $: console.log($ws)
   
 </script>
 
 <!-- HTML -->
-{#if $ws.status === "open" || $ws.status === "offline"}
+<!-- {#if $ws.status === "open" || $ws.status === "offline"} -->
+<Login/>
+{#if $ws.status === "logged in" || $ws.status === "offline"}
   <Header title={$location}
     on:nav={() => navShow = !navShow}/>
   <div class="navMain">

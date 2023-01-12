@@ -11,25 +11,23 @@ const ROLES = {
   USER: 50,
   ANY: 1,
 }
-const state = {
-  users: [
-    {
-      username: 'admin',
-      role: ROLES.ADMIN,
-      password: hashPassword("1qaz!QAZ")
-    },
-    {
-      username: 'user',
-      role: ROLES.USER,
-      password: hashPassword("password")
-    },
-    {
-      username: 'guest',
-      role: ROLES.ANY,
-      password: hashPassword("password")
-    }
-  ]
-}
+const users = [
+  {
+    username: 'admin',
+    role: ROLES.ADMIN,
+    password: hashPassword("1qaz!QAZ")
+  },
+  {
+    username: 'user',
+    role: ROLES.USER,
+    password: hashPassword("password")
+  },
+  {
+    username: 'guest',
+    role: ROLES.ANY,
+    password: hashPassword("password")
+  }
+]
 
 // Functions
 function hashPassword(password) {
@@ -60,13 +58,21 @@ async function saveUsersFile(users) {
 
 // Script startup
 getUsersFile().then(async file => {
-  if (file) state.users = file // File has data
-  else await saveUsersFile(state.users) // Make file
+
+  // File has data
+  if (file) {
+    users.length = 0
+    users.push(...file)
+  }
+
+  // Make file
+  else await saveUsersFile(users)
+
 })
 
 // Export
 exports.ROLES = ROLES
-exports.state = state
+exports.users = users
 exports.hashPassword = hashPassword
 exports.isHashedPassword = isHashedPassword
 exports.generateJWT = generateJWT

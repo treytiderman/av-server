@@ -37,33 +37,33 @@ ws_server.emitter.on("/tcp/client/v1", async (ws, req) => {
       req.body.ip,
       req.body.port
     )
-    ws_server.event(`/tcp/client/v1/${req.body.ip}:${req.body.port}`, "getClient", client)
+    ws_server.eventAll(`/tcp/client/v1/${req.body.ip}:${req.body.port}`, "getClient", client)
   }
   else if (req.event === "getClients") {
     ws_server.subscribe(ws, `/tcp/client/v1`)
     const clients = tcpClient.getClients()
-    ws_server.event(`/tcp/client/v1`, "getClients", clients)
+    ws_server.eventAll(`/tcp/client/v1`, "getClients", clients)
   }
 })
 
 // Module events
 tcpClient.emitter.on("open", (address, body) => {
-  ws_server.event(`/tcp/client/v1/${address}`, "open", body)
-  ws_server.event(`/tcp/client/v1`, "open", {...body, address: address})
+  ws_server.eventAll(`/tcp/client/v1/${address}`, "open", body)
+  ws_server.eventAll(`/tcp/client/v1`, "open", {...body, address: address})
 })
 tcpClient.emitter.on("send", (address, body) => {
-  ws_server.event(`/tcp/client/v1/${address}`, "send", body)
-  ws_server.event(`/tcp/client/v1`, "send", {...body, address: address})
+  ws_server.eventAll(`/tcp/client/v1/${address}`, "send", body)
+  ws_server.eventAll(`/tcp/client/v1`, "send", {...body, address: address})
 })
 tcpClient.emitter.on("receive", (address, body) => {
-  ws_server.event(`/tcp/client/v1/${address}`, "receive", body)
-  ws_server.event(`/tcp/client/v1`, "receive", {...body, address: address})
+  ws_server.eventAll(`/tcp/client/v1/${address}`, "receive", body)
+  ws_server.eventAll(`/tcp/client/v1`, "receive", {...body, address: address})
 })
 tcpClient.emitter.on("close", (address, body) => {
-  ws_server.event(`/tcp/client/v1/${address}`, "close", body)
-  ws_server.event(`/tcp/client/v1`, "close", {...body, address: address})
+  ws_server.eventAll(`/tcp/client/v1/${address}`, "close", body)
+  ws_server.eventAll(`/tcp/client/v1`, "close", {...body, address: address})
 })
 tcpClient.emitter.on("error", (address, body) => {
-  ws_server.event(`/tcp/client/v1/${address}`, "error", body)
-  ws_server.event(`/tcp/client/v1`, "error", {...body, address: address})
+  ws_server.eventAll(`/tcp/client/v1/${address}`, "error", body)
+  ws_server.eventAll(`/tcp/client/v1`, "error", {...body, address: address})
 })

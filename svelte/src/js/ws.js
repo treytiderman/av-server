@@ -101,10 +101,10 @@ function receivePublish(callback) {
     }
   })
 }
-function receiveEvent(name, callback) {
+function receiveEvent(name, event, callback) {
   receiveJSON(obj => {
-    if (obj.name === name) {
-      callback(obj.event, obj.body)
+    if (obj.name === name && obj.event === event) {
+      callback(obj.body)
     }
   })
 }
@@ -115,13 +115,18 @@ function createStore() {
   // Create Store
 	const { subscribe, set, update } = writable({
     "status": "",
-    "time": "2022-04-20T21:20:00.000Z"
+    "time": "2022-04-20T21:20:00.000Z",
+    "user": {
+      "username": null,
+      "role": null,
+    }
   })
 
   // Return WebSocket functions with a svelte store
   return {
 
     // Svelte Functions
+		set,
 		subscribe,
 
     // Main Functions

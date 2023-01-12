@@ -1,5 +1,6 @@
 // General
 require('./store')
+require('./user')
 
 // Tools
 require('./tcp_client')

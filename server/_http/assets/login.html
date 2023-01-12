@@ -428,20 +428,23 @@
     
       // Login
       const response = await login(username.value, password.value)
-
-      // Show response
-      info.innerText = `(${attempt}) ${response}`
-      info.style.color = "var(--color-bg-red)"
-
+      
       // If successful
       if (response.startsWith("success")) {
-        info.style.color = "var(--color-bg-green)"
         history.back()
+        // window.location.replace("/")
+      }
+
+      // Show response
+      else {
+        info.innerText = `(${attempt}) ${response}`
+        info.style.color = "var(--color-bg-red)"
       }
 
     })
     document.addEventListener("keyup", (event) => {
-      if (event.keyCode === 13) { // Pressed Enter
+      const enterKeyCode = 13
+      if (event.keyCode === enterKeyCode) {
         event.preventDefault()
         submit.click()
       }

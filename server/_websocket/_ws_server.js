@@ -165,7 +165,17 @@ function publish(name, body) {
     }
   })
 }
-function event(name, event, body) {
+function event(ws, name, event, body) {
+  if (ws.subs.includes(name)) {
+    const tx = {
+      "name": name,
+      "event": event,
+      "body": body ?? null
+    }
+    send(ws, tx)
+  }
+}
+function eventAll(name, event, body) {
   wsServer.clients.forEach(ws => {
     if (ws.subs.includes(name)) {
       const tx = {
@@ -187,6 +197,7 @@ exports.start = start
 exports.send = send
 exports.get = get
 exports.event = event
+exports.eventAll = eventAll
 exports.publish = publish
 exports.subscribe = subscribe
 

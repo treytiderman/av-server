@@ -18,7 +18,7 @@ router.get('/login', async (req, res) => {
 router.post('/api/login/v1', async (req, res) => {
 
   // Get User
-  const user = auth.state.users.find(user => user.username === req.body.username)
+  const user = auth.users.find(user => user.username === req.body.username)
 
   // Username exists
   if (user) {
@@ -43,7 +43,6 @@ router.post('/api/login/v1', async (req, res) => {
 
 // Get User
 router.get('/api/user/v1', mw.gate({role_min: auth.ROLES.ANY}), async (req, res) => {
-  console.log(req.user)
   const body = {
     username: req.user.username,
     role: req.user.role,
@@ -60,7 +59,7 @@ router.post('/api/user/v1', mw.gate({role_min: auth.ROLES.USER}), async (req, re
   }
 
   // Username exists
-  else if (auth.state.users.some(user => user.username === req.body.username)) {
+  else if (auth.users.some(user => user.username === req.body.username)) {
     res.status(400).json("username exists")
   }
 
@@ -73,12 +72,12 @@ router.post('/api/user/v1', mw.gate({role_min: auth.ROLES.USER}), async (req, re
 
   // Add user
   else if (req.body.username && req.body.password && req.body.confirm_password) {
-    auth.state.users.push({
+    auth.users.push({
       username: req.body.username,
       role: req.body.role ?? 0,
       password: auth.hashPassword(req.body.password)
     })
-    await auth.saveUsersFile(auth.state.users)
+    await auth.saveUsersFile(auth.users)
     res.json("user created")
   }
 
@@ -91,15 +90,16 @@ router.post('/api/user/v1', mw.gate({role_min: auth.ROLES.USER}), async (req, re
 router.delete('/api/user/v1', mw.gate({role_min: auth.ROLES.USER, self: true}), async (req, res) => {
 
   // Get User
-  const user = auth.state.users.find(user => user.username === req.body.username)
+  const user = auth.users.find(user => user.username === req.body.username)
 
   // Username exists
   if (user) {
     
     // Delete user
     if (auth.isHashedPassword(req.body.password, user.password.hash, user.password.salt)) {
-      auth.state.users = auth.state.users.filter(user => user.username !== req.body.username)
-      await auth.saveUsersFile(auth.state.users)
+      auth.users.length = 0
+      auth.users.push(...auth.users.filter(user => user.username !== req.body.username))
+      await auth.saveUsersFile(auth.users)
       res.json("user deleted")
     }
 
@@ -117,7 +117,7 @@ router.delete('/api/user/v1', mw.gate({role_min: auth.ROLES.USER, self: true}), 
 router.put('/api/user/v1', mw.gate({role_min: auth.ROLES.USER, self: true}), async (req, res) => {
 
   // Get User
-  const user = auth.state.users.find(user => user.username === req.body.username)
+  const user = auth.users.find(user => user.username === req.body.username)
 
   // Username exists
   if (user) {
@@ -138,7 +138,7 @@ router.put('/api/user/v1', mw.gate({role_min: auth.ROLES.USER, self: true}), asy
     else if (auth.isHashedPassword(req.body.old_password, user.password.hash, user.password.salt)) {
       if (req.body.new_password) user.password = auth.hashPassword(req.body.new_password)
       if (req.body.role) user.role = req.body.role
-      await auth.saveUsersFile(auth.state.users)
+      await auth.saveUsersFile(auth.users)
       const response = {
         username: user.username,
         role: user.role
@@ -159,7 +159,7 @@ router.put('/api/user/v1', mw.gate({role_min: auth.ROLES.USER, self: true}), asy
 // All Users
 router.get('/api/users/v1', mw.gate({role_min: auth.ROLES.ADMIN}), async (req, res) => {
   const response = []
-  auth.state.users.forEach(user => {
+  auth.users.forEach(user => {
     response.push({
       username: user.username,
       role: user.role,

@@ -1,5 +1,6 @@
 <!-- Javascript -->
 <script>
+  import { ws } from '../js/ws'
 
   // Components
   import Icon from '../components/Icon.svelte'
@@ -7,10 +8,12 @@
 </script>
 
 <!-- HTML -->
-<article>
-  <button>1</button>
-  <button>2</button>
-  <button>3</button>
+<article class="grid">
+  <h2>Welcome {$ws.user.username}</h2>
+  <br>
+  <div>
+    <button on:click={() => ws.send.event("/user/v1", "logout")}>Logout</button>
+  </div>
 </article>
 
 <!-- CSS -->
