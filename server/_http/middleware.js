@@ -55,13 +55,15 @@ function checkRequest(req, res, next) {
       // Bad Token
       if (error) req.token = "bad token"
   
-      // Good token
+      // Verified Token
       else {
   
         /* Get user and add to request
         Q: Couldn't the jwt username be changed?
         A: Yes, but they would also need the secret to do that */
         const user = auth.users.find(user => user.username === jwtJson.username)
+
+        // Good Token
         if (user) req.user = user
   
         // jwt username is the same as the request body username

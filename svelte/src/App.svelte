@@ -1,5 +1,6 @@
 <!-- Javascript -->
 <script>
+  import { fade } from 'svelte/transition'
 
   // Global store
   import { global, parseQuerystring, getScreenSize } from "./js/global"
@@ -36,11 +37,11 @@
   let navShow = false
   let navItem
   let navItems = [
-    // {
-    //   name: "Home",
-    //   icon: "house",
-    //   path: "/#/",
-    // },
+    {
+      name: "Home",
+      icon: "house",
+      path: "/#/",
+    },
     // {
     //   name: "Tools",
     //   show: true,
@@ -89,42 +90,43 @@
   $: document.documentElement.classList = $settings.theme
   $: document.documentElement.style.fontSize = $settings.font_size + "px"
 
-  // // Component Startup
-  // import { onMount } from 'svelte'
-  // onMount(async () => {
+  // Component Startup
+  import { onMount } from 'svelte'
+  onMount(async () => {
 
-  //   // Start WebSocket Connection
-  //   ws.setDebug(true)
-  //   ws.connect({port: 4620}, $settings.offline)
-  //   setTimeout(() => {
-  //     ws.send.subscribe("time")
-  //     // Listen for login success
-  //     ws.receive.event("/user/v1", (event, body) => {
-  //       console.log(event, body)
-  //       if (event === "login" && body !== "username or password incorrect") {          
-  //         $ws.status = "logged in"
-  //         $ws.user = body
-  //       }
-  //       else if (event === "logout" && body === true) {          
-  //         $ws.status = "open"
-  //       }
-  //     })
-  //   }, 100)
+    // Start WebSocket Connection
+    ws.setDebug(true)
+    ws.setOffline($settings.offline)
+    ws.connect({port: 4620})
+    ws.connected(() => {
+      ws.send.get("system")
+    })
 
-  // })
+  })
 
   // Debug
   // $: console.log(routes)
-  // $: console.log($global)
+  $: console.log("$global", $global)
   // $: console.log($settings)
-  $: console.log($ws)
+  $: console.log("$ws", $ws)
   
 </script>
 
-<!-- HTML -->
-<!-- {#if $ws.status === "open" || $ws.status === "offline"} -->
+<!-- Login Page -->
 <Login/>
-{#if $ws.status === "logged in" || $ws.status === "offline"}
+
+<!-- Server Offline -->
+{#if $ws.status === "offline"}
+  <main class="grid" style="padding: var(--gap)">
+    <h2>Lost connection to server {$global.url.ip}:{$global.url.port} on {localStorage.getItem("server_offline")}</h2>
+    <section>
+      <button on:click={() => window.location.reload(true)}>Reload?</button>
+    </section>
+  </main>
+{/if}
+
+<!-- Main -->
+{#if $ws.status !== "offline" && $ws.auth === true}
   <Header title={$location}
     on:nav={() => navShow = !navShow}/>
   <div class="navMain">
@@ -137,16 +139,8 @@
       <Router {routes}/>
     </main>
   </div>
-
-<!-- Server Offline -->
-{:else}
-  <main class="grid" style="padding: var(--gap)">
-    <h2>Lost connection to server {$global.url.ip}:{$global.url.port} on {localStorage.getItem("server_offline")}</h2>
-    <section>
-      <button on:click={() => window.location.reload(true)}>Reload?</button>
-    </section>
-  </main>
 {/if}
+
 
 <!-- CSS -->
 <style>

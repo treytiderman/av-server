@@ -14,9 +14,11 @@
   export let title = "Title"
   const iconSize = 1.5
 
-  // Time
-  ws.send.get("time")
-  ws.send.subscribe("time")
+  // WebSocket Connected
+  ws.connected(() => {
+    console.log("get time")
+    ws.send.get("time")
+  })
   $: time = dateObjToTime( new Date($ws.time) )
 
 </script>

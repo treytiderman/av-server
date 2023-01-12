@@ -1,5 +1,7 @@
 <!-- Javascript -->
 <script>
+  import { fade } from 'svelte/transition'
+  import { settings } from '../js/settings'
 
   // Event Dispatcher
   import { createEventDispatcher } from 'svelte';
@@ -58,6 +60,7 @@
 <!-- HTML -->
 {#if show}
   <dialog
+    transition:fade="{{duration: $settings.animation_ms}}"
     on:mousedown={() => {if (event.target.localName === 'dialog') dispatch("close")}}
     on:mouseup={mouseup}
     on:mouseleave={mouseup}

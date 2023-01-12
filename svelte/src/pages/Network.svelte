@@ -429,7 +429,7 @@
 
     <!-- NIC Info -->
     <div class="nicInfo">
-      <h3>{data.nicSelected.ip ?? "Setting..."}</h3>
+      <h3>{data.nicSelected.ip ?? "..."}</h3>
       <div>
         <div>Mask:</div>
         <div>{data.nicSelected.mask}</div>

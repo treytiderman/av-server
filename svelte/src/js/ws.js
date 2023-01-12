@@ -1,21 +1,19 @@
 import { writable } from 'svelte/store'
 
-// Debug
-let debug = false
-function log(text) {
-  if (debug) console.log(text)
-}
-
 // Global variables
+let debug = false
+let offline = false
 let websocket = { readyState: 3 }
 
 // Functions
+function log(...params) { if (debug) console.log("ws.js |", ...params) }
 function isJSON(text) {
   try { JSON.parse(text) }
   catch (error) { return false }
   return true
 }
 function setDebug(bool) { debug = bool }
+function setOffline(bool) { offline = bool }
 function start(options = {}) {  
 
   // Options
@@ -29,39 +27,43 @@ function start(options = {}) {
 
   // Connection request
   websocket = new WebSocket(url)
-  log(`WebSocket: REQUESTED ${url}`)
+  log(`REQUESTED ${url}`)
 
   // Events
   websocket.addEventListener('open', (event) => {
     localStorage.setItem("server_offline", "false")
-    log(`WebSocket: OPENED ${url}`)
+    log(`OPENED ${url}`)
   })
   websocket.addEventListener('error', (event) => {
-    log(`WebSocket: ERROR ${url}`)
+    log(`ERROR ${url}`)
   })
   websocket.addEventListener('message', (event) => {
-    // log(`WebSocket: MESSGAGE ${event.data}`)
+    if (isJSON(event.data)) log("RECEIVE", JSON.parse(event.data))
+    else log("RECEIVE", event.data)
   })
   websocket.addEventListener('close', (event) => {
     if (localStorage.getItem("server_offline") === "false") {
       const date = new Date()
-      log(`WebSocket: CLOSED ${url} on ${date}`)
+      log(`CLOSED ${url} on ${date}`)
       localStorage.setItem("server_offline", date)
     }
     else {
-      log(`WebSocket: STILL CLOSED ${url} on ${localStorage.getItem("server_offline")}`)
+      log(`STILL CLOSED ${url} on ${localStorage.getItem("server_offline")}`)
     }
-    // log(`WebSocket: RECONNECTING in 5 sec... ${url}`)
+    // log(`RECONNECTING in 5 sec... ${url}`)
     // setTimeout(() => {
-    //   log(`WebSocket: TRY TO CONNECT ${url}`)
+    //   log(`TRY TO CONNECT ${url}`)
     //   start(options)
     // }, reconnectTimeout_ms)
   })
 
 }
 function send(obj) {
-  if (websocket.readyState === 1) websocket.send(JSON.stringify(obj))
-  else console.log("WebSocket: didn't send", obj)
+  if (websocket.readyState === 1) {
+    log("SEND", obj)
+    websocket.send(JSON.stringify(obj))
+  }
+  else log("didn't send", obj)
 }
 function sendGet(name) {
   send({ "name": name, "event": "get" })
@@ -76,7 +78,7 @@ function sendEvent(name, event, body = null) {
   send({ "name": name, "event": event, "body": body })
 }
 function sendPublish(name, body) {
-  event(name, "publish", body)
+  send({ "name": name, "event": "publish", "body": body })
 }
 function sendSubscribed() {
   send({ "event": "subscribed" })
@@ -86,6 +88,7 @@ function sendUnsubscribeAll() {
 }
 function receive(callback) {
   if (websocket.readyState === 1) websocket.addEventListener('message', (event) => {
+    // log("RECEIVE LISTENING", event.data`)
     callback(event.data)
   })
 }
@@ -111,15 +114,18 @@ function receiveEvent(name, event, callback) {
 
 // Svelte Store
 function createStore() {
+  let OPENED = false
 
   // Create Store
 	const { subscribe, set, update } = writable({
-    "status": "",
+    "status": "not started",
     "time": "2022-04-20T21:20:00.000Z",
+    "auth": false,
     "user": {
       "username": null,
       "role": null,
-    }
+    },
+    "server": {}
   })
 
   // Return WebSocket functions with a svelte store
@@ -131,7 +137,8 @@ function createStore() {
 
     // Main Functions
     setDebug,
-    connect: (options, offline = false) => {
+    setOffline,
+    connect: (options) => {
       if (offline) {
         update(store => {
           store.status = "offline"
@@ -176,6 +183,16 @@ function createStore() {
 
     },
 
+    // On connect
+    connected: (callback) => {
+      setTimeout(() => {        
+        websocket.addEventListener('open', event => {
+          log(`OPENED`)
+          callback()
+        })
+      }, 5);
+    },
+
     // Send Functions
     send: {
       raw: send,
@@ -187,7 +204,7 @@ function createStore() {
       publish: sendPublish,
       event: sendEvent,
     },
-
+    
     // Receive Functions
     receive: {
       raw: receive,
