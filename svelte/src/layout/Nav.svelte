@@ -7,7 +7,6 @@
   
   // Components
   import NavItem from '../layout/NavItem.svelte'
-    import { transition_out } from 'svelte/internal';
 
   // Variables
   export let show = true

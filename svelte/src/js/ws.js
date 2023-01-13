@@ -183,16 +183,6 @@ function createStore() {
 
     },
 
-    // On connect
-    connected: (callback) => {
-      setTimeout(() => {        
-        websocket.addEventListener('open', event => {
-          log(`OPENED`)
-          callback()
-        })
-      }, 5);
-    },
-
     // Send Functions
     send: {
       raw: send,

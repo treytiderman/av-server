@@ -98,9 +98,6 @@
     ws.setDebug(true)
     ws.setOffline($settings.offline)
     ws.connect({port: 4620})
-    ws.connected(() => {
-      ws.send.get("system")
-    })
 
   })
 
@@ -112,26 +109,17 @@
   
 </script>
 
-<!-- Login Page -->
-<Login/>
-
-<!-- Server Offline -->
-{#if $ws.status === "offline"}
-  <main class="grid" style="padding: var(--gap)">
-    <h2>Lost connection to server {$global.url.ip}:{$global.url.port} on {localStorage.getItem("server_offline")}</h2>
-    <section>
-      <button on:click={() => window.location.reload(true)}>Reload?</button>
-    </section>
-  </main>
-{/if}
 
 <!-- Main -->
-{#if $ws.status !== "offline" && $ws.auth === true}
+{#if $ws.status === "open" && $ws.auth === false}
+  <Login/>
+
+{:else if $ws.status === "open" && $ws.auth === true}
   <Header title={$location}
-    on:nav={() => navShow = !navShow}/>
+  on:nav={() => navShow = !navShow}/>
   <div class="navMain">
     <Nav show={navShow} navItems={navItems} 
-      on:itemPress={event => {
+    on:itemPress={event => {
         navItem = event.detail
         if ($global.screen.width < 1200) navShow = false
       }}/>
@@ -139,6 +127,15 @@
       <Router {routes}/>
     </main>
   </div>
+  
+<!-- Server Offline -->
+{:else}
+  <main class="grid" style="padding: var(--gap)">
+    <h2>Lost connection to server {$global.url.ip}:{$global.url.port} on {localStorage.getItem("server_offline")}</h2>
+    <section>
+      <button on:click={() => window.location.reload(true)}>Reload?</button>
+    </section>
+  </main>
 {/if}
 
 

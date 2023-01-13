@@ -37,6 +37,6 @@ export const settings = writable({
   "theme": "dark",
   "themes": ["dark", "light"],
   "font_size": 14,
-  "animation_ms": 200,
+  "animation_ms": 100,
   "hex_spacer": " "
 })

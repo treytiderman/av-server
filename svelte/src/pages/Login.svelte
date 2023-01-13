@@ -11,7 +11,6 @@
   let username = "user"
   let password = "password"
   let error = ""
-  let role = ""
   
   // Functions
   function log(...params) { if (true) console.log("ws.js |", ...params) }
@@ -22,44 +21,44 @@
     })
   }
 
-  // WebSocket Connected
-  ws.connected(() => {
-    ws.receive.event("/user/v1", "user", body => {
-      log("user", body)
-      $ws.user = body
-    })
-    ws.receive.event("/user/v1", "login", body => {
-      log("login", body)
-      if (body === "success") {
-        $ws.auth = true
-      }
-      else if (body === "username or password incorrect") {          
-        $ws.auth = false
-        error = body
-      }
-    })
-    ws.receive.event("/user/v1", "token", body => {
-      log("token", body)
-      if (body === "bad token") {
-        // error = body
-        // localStorage.setItem("token", body)
-      }
-      else if (body === "good token") {
-        $ws.auth = true
-      }
-      else {
-        $ws.auth = true
-        localStorage.setItem("token", body)
-      }
-    })
-    ws.receive.event("/user/v1", "logout", body => {
-      log("logout", body)
-      if (body === true) {          
-        $ws.auth = false
-      }
-    })
-    ws.send.event("/user/v1", "token", localStorage.getItem("token"))
+  // WebSocket Receive
+  ws.receive.event("/user/v1", "user", body => {
+    log("user", body)
+    $ws.user = body
   })
+  ws.receive.event("/user/v1", "login", body => {
+    log("login", body)
+    if (body === "success") {
+      $ws.auth = true
+    }
+    else if (body === "username or password incorrect") {          
+      $ws.auth = false
+      error = body
+    }
+  })
+  ws.receive.event("/user/v1", "token", body => {
+    log("token", body)
+    if (body === "bad token") {
+      // error = body
+      // localStorage.setItem("token", body)
+    }
+    else if (body === "good token") {
+      $ws.auth = true
+    }
+    else {
+      $ws.auth = true
+      localStorage.setItem("token", body)
+    }
+  })
+  ws.receive.event("/user/v1", "logout", body => {
+    log("logout", body)
+    if (body === true) {          
+      $ws.auth = false
+    }
+  })
+
+  // WebSocket Send
+  ws.send.event("/user/v1", "token", localStorage.getItem("token"))
 
 </script>
 
@@ -94,6 +93,7 @@
 <style>
   article {
     background-color: black;
+    z-index: 100;
     position: fixed;
     top: 0;
     right: 0;
@@ -105,9 +105,25 @@
     max-width: 25rem;
     margin: auto;
     margin-top: 10rem;
-    background-color: black;
+    /* background-color: var(--color-bg); */
+    background-color: #00000033;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
     border-radius: var(--radius-lg);
-    border: var(--border);
-    /* border-color: var(--color-text-dim); */
   }
+  /* main {
+    background-color: var(--color-purple-200);
+    color: var(--color-purple-600);
+  }
+  h1 {
+    color: var(--color-purple-900);
+  }
+  input {
+    background-color: var(--color-purple-400);
+    color: var(--color-purple-800);
+  }
+  button {
+    background-color: var(--color-purple-400);
+    color: var(--color-purple-900);
+  } */
 </style>

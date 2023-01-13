@@ -8,17 +8,21 @@
   // Functions
   function logout() {
     ws.send.event("/user/v1", "logout")
+    $ws.auth = false
+    localStorage.removeItem("token")
   }
   
-  // WebSocket Events
-  ws.connected(() => {
-    ws.receive.event("/user/v1", "logout", body => {
-      if (body === true) {
-        console.log("token deleted")
-        localStorage.removeItem("token")
-      }
-    })
+  // WebSocket Receive
+  ws.receive.event("/user/v1", "logout", body => {
+    if (body === true) {
+      console.log("token deleted")
+      $ws.auth = false
+      localStorage.removeItem("token")
+    }
   })
+
+  // WebSocket Send
+  ws.send.get("system")
 
 </script>
 
@@ -28,7 +32,7 @@
   <div>
     <button on:click={logout}>Logout</button>
   </div>
-  <pre>{JSON.stringify($ws, null, 2)}</pre>
+  <pre class="mono" style="font-size: small;">{JSON.stringify($ws, null, 2)}</pre>
 </article>
 
 <!-- CSS -->

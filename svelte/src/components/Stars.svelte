@@ -122,7 +122,7 @@
 
     // Render
     let p = [];
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 2000; i++) {
       let radius = (randomBetween(5, 40)/50)+.5;
       let x = randomBetween(radius, canvas.width/c.dpi - radius);
       let y = randomBetween(radius, canvas.height/c.dpi - radius);
@@ -132,21 +132,13 @@
       let h = randomBetween(220, 290);
       let s = 100;
       let l = 70;
-      let a = randomBetween(10, 100)/200;
+      let a = randomBetween(10, 100)/120;
       p[i] = new Partical(x, y, xVel, yVel, radius, `hsla(${h},${s}%,${l}%,${a})`);
     }
     c.update(() => {
       for (let i = 0; i < p.length; i++) {
         p[i].draw();
       }
-      const time = new Date(Date.now()).toLocaleTimeString('en-US');
-      let hr = new Date(Date.now()).getHours();
-      let min = new Date(Date.now()).getMinutes();
-      hr = hr%12;
-      let hr0 = `${hr}`;
-      if (hr < 10) hr0 = `0${hr}`;
-      let min0 = `${min}`;
-      if (min < 10) min0 = `0${min}`;
     });
   })
 
