@@ -105,3 +105,6 @@ br.m {
 
 /* #endregion Positioning */
 
+/* :where(svg:not([fill])) {
+  fill: currentColor;
+} */
