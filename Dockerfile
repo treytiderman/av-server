@@ -3,6 +3,7 @@
 
 # Run
 # sudo docker run -d -p 4620:4620 -v $(pwd)/public:/app/public --restart unless-stopped --name AV-Tools AV-Tools
+# podman run -d -p 4620:4620 -v $(pwd)/public:/app/public:Z --restart unless-stopped --name av-Tools av-Tools
 
 # Lastest nginx image
 FROM node:lts-alpine
