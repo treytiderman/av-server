@@ -178,29 +178,7 @@ sudo netstat -lpn |grep :'6969'
 kill -9 1029825
 ```
 
-### Client | Web UI with Svelte
-
-1. Run the following commands in the `./client` folder
-2. Install project dependencies (package.json) with
-```
-npm install
-```
-3. Then to start the bundler Vite (Updates live) with
-```
-npm run dev
-```
-4. Go to http://SERVER_IP:5173
-    - Example: http://192.168.1.1:5173
-5. Build a bundle and put it in the public folder `./public/svelte` with
-```
-npm run build
-```
-6. Build and Preview the bundle if needed with
-```
-npm run preview
-```
-
-### Docker
+#### Docker
 
 1. Run the following commands in the `./` folder
 2. Build the image
@@ -232,6 +210,62 @@ sudo docker start AV-Tools
 ```
 ```
 sudo docker restart AV-Tools
+```
+
+### Client | Web UI with Svelte
+
+1. Run the following commands in the `./svelte` folder
+2. Install project dependencies (package.json) with
+```
+npm install
+```
+3. Then to start the bundler Vite (Updates live) with
+```
+npm run dev
+```
+4. Go to http://SERVER_IP:5173
+    - Example: http://192.168.1.1:5173
+5. Build a bundle and put it in the public folder `./public/svelte` with
+```
+npm run build
+```
+6. Build and Preview the bundle if needed with
+```
+npm run preview
+```
+
+#### Docker
+
+1. Run the following commands in the `./svelte` folder
+2. Build the image
+    - Folder to build: "PATH"
+    - Tag: "-t NAME_OF_TAG"
+```
+sudo docker build . -t AV-Tools-UI
+```
+3. Remove the current running container if it exists
+    - Image Name: "NAME"
+```
+sudo docker rm AV-Tools-UI
+```
+4. Then to run the image
+    - Detach: "-d" (run in background)
+    - Port: "-p SERVER_PORT:CONTAINER_PORT"
+    - Volume: "-v SERVER_DIRECTORY:CONTAINER_DIRECTORY"
+    - Image Name: "NAME"
+```
+sudo docker run -d -p 5173:5173 -v $(pwd)/public:/app/public --restart unless-stopped --name AV-Tools-UI AV-Tools-UI
+```
+5. Stop / Start / Restart when needed
+    - Image Name: "NAME"
+```
+sudo docker stop AV-Tools-UI
+```
+```
+sudo docker start AV-Tools-UI
+```
+```
+sudo docker restart AV-Tools-UI
 ```
 
 ### Electron App (for the OS you are on)

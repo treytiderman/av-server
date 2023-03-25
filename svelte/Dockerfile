@@ -9,16 +9,16 @@
 FROM node:lts-alpine
 
 # Set working directory
-WORKDIR /app/server
+WORKDIR /app/svelte
 
 # Copy all the files in the same folder as the Dockerfile
-COPY ./server .
+COPY ./ .
 
 # Install node dependencies
 RUN npm install
 
 # Environment variables
-ENV port=4620
+ENV port=5713
 
 # Run the app
-CMD "npm" "start"
+CMD "npm" "run" "dev"
