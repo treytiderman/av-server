@@ -268,17 +268,17 @@ sudo docker start AV-Tools-UI
 sudo docker restart AV-Tools-UI
 ```
 
-### Install as a service
+### Install as a service (Windows)
 
 1. Run the following commands in the `./server` folder
 2. Create the service with
 
 ```
-npm run install
+npm run service-install
 ```
 
 3. Uninstall service when needed
 
 ```
-npm run uninstall
+npm run service-uninstall
 ```

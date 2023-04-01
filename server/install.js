@@ -32,13 +32,16 @@ if (system === "Windows_NT") {
         console.log("http://localhost:4620")
     })
 
+    console.log('Installing on Windows')
     svc.install()
 }
 else if (system === "Darwin") {
-    // const Service = require('node-mac').Service
+    // const Service = require('node-mac').Service // Issues using this
+    console.log('Not setup for Mac yet')
 }
 else if (system === "Linux") {
     // const Service = require('node-linux').Service
+    console.log('Not setup for Linux yet')
 }
 else {
     console.log('Unknown OS')

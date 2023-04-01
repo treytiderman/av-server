@@ -16,7 +16,9 @@ if (system === "Windows_NT") {
     svc.uninstall()
 }
 else if (system === "Darwin") {
-    // let Service = require('node-mac').Service
+    // Issues
+    // const Service = require('node-mac').Service // Issues using this
+    console.log('Not setup for Mac yet')
 }
 else if (system === "Linux") {
     // let Service = require('node-linux').Service
@@ -25,6 +27,4 @@ else {
     console.log('Unknown OS')
     console.log('Installing as a service is only available for:')
     console.log('Windows_NT (Windows 10, 11)')
-    console.log('Darwin (MacOS)')
-    console.log('Linux (Tested with Fedora 37 and Ubuntu 20.04)')
 }
