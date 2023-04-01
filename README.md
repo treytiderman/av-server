@@ -268,10 +268,17 @@ sudo docker start AV-Tools-UI
 sudo docker restart AV-Tools-UI
 ```
 
-### Electron App (for the OS you are on)
+### Install as a service
 
 1. Run the following commands in the `./server` folder
-2. Build the electron installer with
+2. Create the service with
+
 ```
-npm run electron-build
+npm run install
+```
+
+3. Uninstall service when needed
+
+```
+npm run uninstall
 ```

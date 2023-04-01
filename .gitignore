@@ -1,6 +1,7 @@
 # Custom ignores
 out
 .DS_Store
+daemon/
 
 # Logs
 *.log

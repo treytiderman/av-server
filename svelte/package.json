@@ -1,7 +1,7 @@
 {
-  "name": "av-tools-ui",
+  "name": "av-server-ui",
   "version": "0.1.0",
-  "description": "av-tools-ui",
+  "description": "av-server-ui",
   "author": "trey",
   "license": "MIT",
   "type": "module",

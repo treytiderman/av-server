@@ -1,16 +1,13 @@
 {
-  "name": "av-tools",
-  "version": "0.3.0",
-  "description": "av-tools",
-  "main": "modules/electron.js",
+  "name": "av-server",
+  "version": "0.3.1",
+  "description": "av-server",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "electron": "electron-forge start",
-    "electron-build": "electron-forge make",
-    "pkg-win-notworking": "pkg -t node18-win-x64 --out-path out/pkg server.js",
-    "pkg-mac-notworking": "pkg -t node18-macos-arm64 --out-path out/pkg server.js",
-    "pkg-linux-notworking": "pkg -t node18-linux-x64 --out-path out/pkg server.js"
+    "install": "node install.js",
+    "uninstall": "node uninstall.js"
   },
   "keywords": [],
   "author": "trey",
@@ -18,73 +15,16 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dhcp": "^0.2.20",
-    "electron-squirrel-startup": "^1.0.0",
     "express": "^4.18.1",
     "jsonwebtoken": "^8.5.1",
     "node-rtsp-stream": "^0.0.9",
+    "node-windows": "^1.0.0-beta.8",
     "open": "^8.4.0",
     "serialport": "^10.4.0",
     "showdown": "^2.1.0",
     "ws": "^8.8.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.3",
-    "@electron-forge/maker-deb": "^6.0.3",
-    "@electron-forge/maker-dmg": "^6.0.3",
-    "@electron-forge/maker-rpm": "^6.0.3",
-    "@electron-forge/maker-squirrel": "^6.0.3",
-    "@electron-forge/maker-zip": "^6.0.3",
-    "electron": "19.0.7",
-    "nodemon": "^2.0.15",
-    "pkg": "^5.8.0"
-  },
-  "pkg": {
-    "scripts": "**",
-    "assets": [
-      "../public/**"
-    ],
-    "targets": [],
-    "outputPath": "."
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "icon": "./icons/icon"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "AV-Tools"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-dmg",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {
-            "options": {
-              "icon": "./icons/icon.png"
-            }
-          }
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {
-            "options": {
-              "icon": "./icons/icon.png"
-            }
-          }
-        }
-      ]
-    }
+    "nodemon": "^2.0.15"
   }
 }
