@@ -9,7 +9,7 @@
 FROM node:lts-alpine
 
 # Set working directory
-WORKDIR /app/svelte
+WORKDIR /app
 
 # Copy all the files in the same folder as the Dockerfile
 COPY ./ .
