@@ -1,33 +1,52 @@
-# AV-Tools v0.3
+# av-server v0.4
 
-[Download](https://github.com/TreyTiderman/AV-Tools/releases/tag/v0.3) or check out the [Demo UI](https://trey.app/av-tools)
+[Download](https://github.com/TreyTiderman/av-server/releases/tag/v0.4) or check out the [Demo UI](https://trey.app/av-server)
 
-### Goals
-- Simple tools for testing AV control systems
-- Run as its own control system
-- API is general and open ended so that the frontend or backend can do the scripting
-- Run on Windows, Linux, and Mac
-  - Electron
-  - Docker container (favorite)
-  - Direct with Node JS
-  - PKG (not working with "serialport")
-  - Tauri if backend was rewritten in rust (overkill)
+## Goals
 
-## Tools
+- AV control system
+- Simple tools for testing and troubleshooting
+- Changes to code or UI happen instantly
+- API is easy to use and open ended
+- Run on any device and any OS
+    - Linux
+        - Podman / Docker container
+        - Source Code with Node JS
+    - Windows
+        - Podman / Docker container in WSL2
+        - Source Code with Node JS
+            - Install as a service (node-windows)
+    - Mac
+        - Podman / Docker container
+        - Source Code with Node JS
 
-I refer to the computer that this application is running on "the server"
+## Core
 
-### Server v0.3
+- [ ] TCP Client v1
+    - [ ] Open tcp connections to any device on the network
+        - Connection Views
+        - [x] Log + 3 Simple send commands
+        - [ ] Terminal Tool / Telnet / SSH style
+        - [ ] Visca tool
+        - [ ] Device specific builder?
+- [x] Web UI
+    - [ ] Provide easy tools for testing and troubleshooting
+    - See source code at [here](https://github.com/TreyTiderman/av-server-ui)
+- [ ] API v1
+    - [Docs](./public/docs/api/api.md)
+    - [ ] WebSocket
+    - [ ] TCP
 - [x] HTTP Server
-  - Any files put in the `./public` directory will be served
+    - Any files put in the `./public` directory will be served
 - [ ] Auth / User accounts / Permissions
-- [x] HTTP API v0 | [Docs](./public/docs/api_http/http.md)
-- [x] WebSocket API v0 | [Docs](./public/docs/api_websocket/ws.md)
-- [ ] TCP API
-- [ ] UDP API
-- [ ] Multicast API?
-- [ ] Choose what services are bound to which of the servers NICs
-- [ ] Encrypt all data between the server and clients?
+- [ ] Multicast Discovery
+    - [ ] mDNS?
+- [ ] Choose what services are bound to which network interface
+- [ ] Encrypt all data between the server and clients
+- Help sections
+  - How to run on startup
+  - How to use the web server
+  - How to use the API
 
 Dependencies
 ```
@@ -41,114 +60,11 @@ npm     8.19.2
 "ws": "^8.8.0"
 ```
 
-### Network v2
-
-- [x] Set IP address of the server
-- [x] Add IP addresses to the server
-- [x] Save presets local presets to recall
-- [ ] Custom routing for multiple nics
-- Platforms
-  - [x] Windows
-  - [ ] Mac
-  - [ ] Linux
-
-Notes
-- Windows requires running the app as administrator
-
-Dependencies
-```
-NONE
-```
-
-### DHCP Server v2
-- [x] Start a DHCP server hosted on your computer
-- [ ] View the ip addresses it hands out
-- [ ] Choose the order IPs are handed out
-- [ ] Set reserved IPs by Mac Address
-
-Notes
-- Make sure port 53 traffic isn't blocked by your firewall or virus protection software
-- Mac OS set "Server's static IP" to 0.0.0.0. Doesn't work with 192.168.1.42 for some reason
-
-Dependencies
-```
-"dhcp": "^0.2.20"
-```
-
-### Serial (RS232/RS485/DMX) v1
-- [x] Open an available serial port and send / receive data from it
-- Connection Views
-  - [x] Log + 3 Simple send commands
-  - [ ] Terminal Tool / Telnet / SSH style
-  - [ ] Visca tool
-  - [ ] DMX tool
-  - [ ] Device specific builder?
-
-Notes
-- Linux: The USER needs added to the dialout group to open serial connections
-
-```
-sudo gpasswd --add ${USER} dialout
-sudo reboot
-```
-
-Dependencies
-```
-"serialport": "^10.4.0",
-```
-
-### TCP Client v1
-
-- [ ] Open tcp connections to any device on the network
-- Connection Views
-  - [x] Log + 3 Simple send commands
-  - [ ] Terminal Tool / Telnet / SSH style
-  - [ ] Visca tool
-  - [ ] Device specific builder?
-
-Dependencies
-```
-NONE
-```
-
-### Restream to Web v0
-
-Currently that means the RTSP stream gets transcoded with FFMPEG then streamed out via WebSocket to be decoded by [JSMpeg](https://github.com/phoboslab/jsmpeg) on the frontend. This is the lowest latency option I have found (<1sec). HLS always will have latencies >1sec practically >6sec
-
-- [x] View WebSocket streams with JSMpeg
-  - [ ] Audio
-- [ ] Start/Stop the transcoding and WebSocket server
-- [ ] Bundle FFMPEG with the app
-- [ ] Support other input streams RTMP, NDI, Multicast?
-- [ ] Support other output streams HLS, MPEG2, MPEG-DASH?
-
-Dependencies
-```
-"node-rtsp-stream": "^0.0.9",
-```
-
-### Road map Ideas
-- HTTP Server
-- TCP Server
-- UDP Client / Server
-- Websocket Client / Server
-- IR TX / RX
-- QR code generator
-- Video/Audio/Image Player
-- Test patterns
-  - Standard patterns
-  - Vertical Sync testing
-  - Clock
-- Help sections
-  - How to run on startup
-  - How to use the web server
-  - How to use the API
-
 # Run source code
 
 First clone the github repo [link](https://github.com/TreyTiderman/AV-Tools)
 
-### Server | AV-Tools
+### Server | av-server
 
 1. Run the following commands in the `./server` folder
 2. Install project dependencies (package.json) with
@@ -210,62 +126,6 @@ sudo docker start AV-Tools
 ```
 ```
 sudo docker restart AV-Tools
-```
-
-### Client | Web UI with Svelte
-
-1. Run the following commands in the `./svelte` folder
-2. Install project dependencies (package.json) with
-```
-npm install
-```
-3. Then to start the bundler Vite (Updates live) with
-```
-npm run dev
-```
-4. Go to http://SERVER_IP:5173
-    - Example: http://192.168.1.1:5173
-5. Build a bundle and put it in the public folder `./public/svelte` with
-```
-npm run build
-```
-6. Build and Preview the bundle if needed with
-```
-npm run preview
-```
-
-#### Docker
-
-1. Run the following commands in the `./svelte` folder
-2. Build the image
-    - Folder to build: "PATH"
-    - Tag: "-t NAME_OF_TAG"
-```
-sudo docker build . -t AV-Tools-UI
-```
-3. Remove the current running container if it exists
-    - Image Name: "NAME"
-```
-sudo docker rm AV-Tools-UI
-```
-4. Then to run the image
-    - Detach: "-d" (run in background)
-    - Port: "-p SERVER_PORT:CONTAINER_PORT"
-    - Volume: "-v SERVER_DIRECTORY:CONTAINER_DIRECTORY"
-    - Image Name: "NAME"
-```
-sudo docker run -d -p 5173:5173 -v $(pwd)/public:/app/public --restart unless-stopped --name AV-Tools-UI AV-Tools-UI
-```
-5. Stop / Start / Restart when needed
-    - Image Name: "NAME"
-```
-sudo docker stop AV-Tools-UI
-```
-```
-sudo docker start AV-Tools-UI
-```
-```
-sudo docker restart AV-Tools-UI
 ```
 
 ### Install as a service (Windows)

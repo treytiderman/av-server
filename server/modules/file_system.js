@@ -437,16 +437,16 @@ exports.exists = exists
 
 // ----------------------------------------------------------------
 
-// getStats("../public/logs/example.log")
+// getStats("../private/logs/example.log")
 //   .then(stats => console.log(stats))
 
-// getStats("../public/docs")
-//   .then(stats => writeJSON("../public/DELETE_ME/test.json", stats))
+// getStats("../private/docs")
+//   .then(stats => writeJSON("../private/DELETE_ME/test.json", stats))
 
-// getStatsRecursive("../public/docs")
-//   .then(stats => writeJSON("../public/DELETE_ME/test.json", stats))
+// getStatsRecursive("../private/docs")
+//   .then(stats => writeJSON("../private/DELETE_ME/test.json", stats))
 
-// writeJSON("../public/DELETE_ME/test.json", { 
+// writeJSON("../private/DELETE_ME/test.json", { 
 //   name: 'Mike',
 //   age: 24, 
 //   gender: 'Male',
@@ -454,18 +454,18 @@ exports.exists = exists
 //   car: 'Honda' 
 // })
 
-// readJSON("../public/DELETE_ME/test.json")
+// readJSON("../private/DELETE_ME/test.json")
 //   .then(json => console.log(json))
 
-// appendText("../public/DELETE_ME/go/ddd/example.log", "test other \n")
+// appendText("../private/DELETE_ME/go/ddd/example.log", "test other \n")
 
-// readText("../public/logs/example.log").then(async text => {
+// readText("../private/logs/example.log").then(async text => {
 //   log(text)
-//   await writeText("../public/DELETE_ME/example.log", text)
-//   await appendText("../public/DELETE_ME/example.log", "test others \n")
+//   await writeText("../private/DELETE_ME/example.log", text)
+//   await appendText("../private/DELETE_ME/example.log", "test others \n")
 // })
 
-// writeJSON("../public/DELETE_ME/1/2/test.json", { 
+// writeJSON("../private/DELETE_ME/1/2/test.json", { 
 //   name: 'John',
 //   age: 29, 
 //   gender: 'Male',
@@ -473,15 +473,15 @@ exports.exists = exists
 //   car: 'Honda' 
 // })
 
-// makeDir("../public/DELETE_ME/super/path/")
-// makeDir("../public/DELETE_ME/super/path2")
+// makeDir("../private/DELETE_ME/super/path/")
+// makeDir("../private/DELETE_ME/super/path2")
 
-// exists("../public/DELETE_ME/1/2/test.json")
+// exists("../private/DELETE_ME/1/2/test.json")
 //   .then(bool => console.log(bool))
 
-// rename("../public/DELETE_ME/1/2/test.json", "../public/DELETE_ME/1/test.json")
-// rename("../public/DELETE_ME/1/2/test.json", "../public/DELETE_ME/1/3/test.json")
+// rename("../private/DELETE_ME/1/2/test.json", "../private/DELETE_ME/1/test.json")
+// rename("../private/DELETE_ME/1/2/test.json", "../private/DELETE_ME/1/3/test.json")
 
-// deleteFile("../public/DELETE_ME/example.log")
+// deleteFile("../private/DELETE_ME/example.log")
 
-// deleteFolder("../public/DELETE_ME/")
+// deleteFolder("../private/DELETE_ME/")

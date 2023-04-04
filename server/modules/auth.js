@@ -50,10 +50,10 @@ function verifyJWT(token, cb) {
   jwt.verify(token, jwtKey, (error, json) => cb(error, json) )
 }
 async function getUsersFile() {
-  return await file_system.readJSON("../public/configs/users.json")
+  return await file_system.readJSON("../private/configs/users.json")
 }
 async function saveUsersFile(users) {
-  return await file_system.writeJSON("../public/configs/users.json", users)
+  return await file_system.writeJSON("../private/configs/users.json", users)
 }
 
 // Script startup

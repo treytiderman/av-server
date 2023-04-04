@@ -31,7 +31,7 @@ const logInConsole = false
 function log(text) {
   text = addEscapeCharsToAscii(text)
   const logger = require('./logger')
-  logger.log(text, "../public/logs/", 'tcp client', logInConsole)
+  logger.log(text, "../private/logs/", 'tcp client', logInConsole)
 }
 function addEscapeCharsToAscii(text) {
   text = text.replace(/\r/g, "\\r")

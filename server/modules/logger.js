@@ -17,7 +17,7 @@ function log(text, folderPath, filename, debug = false) {
   // Log text to a log all file
   // *TODO* add spaces so that all filenames are the same length when added to the log everything file
   const allLine = `${time} > ${filename} | ${text}`;
-  const allPath = `../public/logs/all ${date}.log`;
+  const allPath = `../private/logs/all ${date}.log`;
   fs.appendFile(allPath, allLine + '\n')
   // Log to Console
   if (debug) console.log(allLine)

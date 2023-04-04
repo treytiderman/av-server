@@ -1,9 +1,9 @@
 // HTTP Server
-const http = require('./_http/_http_server')
+const http = require('./http/http_server')
 const http_server = http.start()
 
 // WebSocket Server
-const ws = require('./_websocket/_ws_server')
+const ws = require('./websocket/ws_server')
 const server = ws.start(http_server)
 
 // Get System Info
