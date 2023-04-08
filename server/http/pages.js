@@ -4,7 +4,7 @@ const router = express.Router()
 
 // Routes
 router.get('/', async (req, res) => {
-  res.redirect(302, '/web/ui')
+  res.redirect(302, '/av-server-ui')
 })
 
 // Export

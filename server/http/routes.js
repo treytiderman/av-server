@@ -14,9 +14,6 @@ router.use(mw.renderMarkdown)
 // Public folder, everything in this folder is available to anyone
 router.use(express.static("../public"))
 
-// Public folder - Mac OS + Electron
-// router.use(express.static(require('path').resolve(__dirname + "/../../../../../../public"))) 
-
 // Log requests (exclude public routes)
 router.use(mw.logRequests)
 

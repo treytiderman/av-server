@@ -15,7 +15,7 @@ const store = {
 const logInConsole = false
 function log(text) {
   const logger = require('../modules/logger')
-  logger.log(text, "../public/logs/", 'ws server', logInConsole)
+  logger.log(text, "../private/logs/", 'ws server', logInConsole)
 }
 function isJSON(text) {
   try { JSON.parse(text) }

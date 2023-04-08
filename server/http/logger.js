@@ -1,7 +1,7 @@
 const logger = require('../modules/logger')
 
 function log(req) {
-  const path = "../public/logs/"
+  const path = "../private/logs/"
 
   // URL
   logger.log(`${req.method} ${req.protocol}://${req.headers.host}${req.url}`, path, 'http')

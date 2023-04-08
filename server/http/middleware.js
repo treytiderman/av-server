@@ -1,7 +1,7 @@
 // Log HTTP Requests
 const logger = require('../modules/logger')
 function log(req) {
-  const path = "../public/logs/"
+  const path = "../private/logs/"
 
   // URL
   logger.log(`${req.method} ${req.protocol}://${req.headers.host}${req.url}`, path, 'http')
@@ -138,7 +138,7 @@ const { markdown2htmlPage } = require('../modules/markdown')
 async function renderMarkdown(req, res, next) {
   if (req.url.endsWith(".md")) {
     const text = await readText(`../public${req.url}`)
-    const css = await readText(`../server/_http/assets/markdown.css`)
+    const css = await readText(`../server/http/assets/markdown.css`)
     const html = await markdown2htmlPage(text, css, req.url)
     res.send(html)
   }

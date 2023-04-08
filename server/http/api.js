@@ -29,7 +29,7 @@ async function getClientFiles(folder) {
 
 // Routes
 router.get('/', async (req, res) => {
-  const file = await fs.readFile('./_http/assets/api.html','utf8')
+  const file = await fs.readFile('./http/assets/api.html','utf8')
   res.send(file)
 })
 router.get('/time', async (req, res) => {
@@ -62,7 +62,7 @@ router.get('/try/json', async (req, res) => {
   res.status(200).json(json)
 })
 router.get('/try/download', async (req, res) => {
-  res.status(200).download('../public/logs/example.log')
+  res.status(200).download('../private/logs/example.log')
 })
 router.get('/try/:path', async (req, res) => {
   res.status(200).send(req.params.path)
