@@ -37,16 +37,16 @@ if (system === "Windows_NT") {
 }
 else if (system === "Darwin") {
     // const Service = require('node-mac').Service // Issues using this
-    console.log('Not setup for Mac yet')
+    console.log('Not setup for Mac')
 }
 else if (system === "Linux") {
     // const Service = require('node-linux').Service
-    console.log('Not setup for Linux yet')
+    console.log('Not setup for Linux')
 }
 else {
     console.log('Unknown OS')
     console.log('Installing as a service is only available for:')
     console.log('Windows_NT (Windows 10, 11)')
-    console.log('Darwin (MacOS)')
-    console.log('Linux (Tested with Fedora 37 and Ubuntu 20.04)')
+    // console.log('Darwin (MacOS)')
+    // console.log('Linux (Tested with Fedora 37 and Ubuntu 20.04)')
 }

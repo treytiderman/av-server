@@ -39,10 +39,10 @@
     - [ ] mDNS?
 - [ ] Choose what services are bound to which network interface
 - [ ] Encrypt all data between the server and clients
-- Help sections
-    - How to run on startup
-    - How to use the web server
-    - How to use the API
+- [ ] Help sections
+    - [ ] How to run on startup
+    - [ ] How to use the web server
+    - [ ] How to use the API
 
 ```
 "dependencies": {

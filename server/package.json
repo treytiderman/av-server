@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "service-install": "node install.js",
-    "service-uninstall": "node uninstall.js"
+    "windows-service-install": "node install.js",
+    "windows-service-uninstall": "node uninstall.js"
   },
   "keywords": [],
   "author": "trey",

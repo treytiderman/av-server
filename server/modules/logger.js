@@ -1,48 +1,82 @@
-// Log to console and file
-const fs = require('fs').promises;
-const fss = require('fs');
+const { appendText, readText, makeDir, getStatsRecursive, deleteFile } = require('./files')
+
+// Overview
+// Location: /private/logs/log_date.log
+// Syntax: Timestamp ISO <DELIMITER> Group <DELIMITER> Message <DELIMITER> Obj to be JSON.stringify
+// Files: One file per day, No more than <NUMBER_OF_FILES_MAX> files
+// File: No longer than <NUMBER_OF_LINES_MAX> lines
+
+// Variables
+const DELIMITER = " >> "
+const NUMBER_OF_FILES_MAX = 10
+const NUMBER_OF_LINES_MAX = 10_000
+const LOG_FOLDER_PATH = "../private/logs/"
+
+let logFileIndex = 0
 
 // Functions
-function log(text, folderPath, filename, debug = false) {
-  // Time & date
-  const timeDate = new Date(Date.now()).toLocaleString();
-  const time = timeDate.split(', ')[1];
-  const date = timeDate.split(',')[0].replace(/\//ig, "-");
-  // If folderPath doesn't exist create it
-  // if (!fss.existsSync(folderPath)) fss.mkdirSync(folderPath)
-  // Log text to the file path
-  const line = `${time} > ${text}`;
-  const path = `${folderPath}${filename} ${date}.log`;
-  fs.appendFile(path, line + '\n')
-  // Log text to a log all file
-  // *TODO* add spaces so that all filenames are the same length when added to the log everything file
-  const allLine = `${time} > ${filename} | ${text}`;
-  const allPath = `../private/logs/all ${date}.log`;
-  fs.appendFile(allPath, allLine + '\n')
-  // Log to Console
-  if (debug) console.log(allLine)
+function formatLine(group, message, obj = "") {
+    const timestampISO = new Date(Date.now()).toISOString()
+    const objJSON = JSON.stringify(obj)
+    return timestampISO + DELIMITER + group + DELIMITER + message + DELIMITER + objJSON + "\n"
 }
+function formatPath() {
+    const timeDate = new Date(Date.now()).toISOString()
+    const date = timeDate.split('T')[0]
+    return LOG_FOLDER_PATH + date + `_${logFileIndex}.log`
+}
+async function log(group, message, obj = "") {
+    const line = formatLine(group, message, obj)
+    const path = formatPath()
+    await makeDir(LOG_FOLDER_PATH)
+    await updateLogFileIndex()
+    await appendText(path, line)
+    await checkNumberOfLines(path)
+    await deleteOldLogs()
+}
+async function deleteOldLogs() {
+    const logFilesStats = await getStatsRecursive(LOG_FOLDER_PATH)
+    const numberOfFiles = logFilesStats.contains_files.length
+    if (numberOfFiles > NUMBER_OF_FILES_MAX) {
+        // Works if logFilesStats.contains_files is always in alphabetical order
+        const deletePath = logFilesStats.contains_files[0].path
+        await deleteFile(deletePath)
+    }
+}
+async function updateLogFileIndex() {
+    const timeDate = new Date(Date.now()).toISOString()
+    const date = timeDate.split('T')[0]
+    const logFilesStats = await getStatsRecursive(LOG_FOLDER_PATH)
+    logFilesStats.contains_files.forEach(async (file) => {
+        const fromToday = file.file_name.startsWith(date)
+        if (fromToday) {
+            const indexFromFile = file.file_name.replace(date + "_", "").replace(".log", "")
+            if (logFileIndex < indexFromFile) { logFileIndex = indexFromFile }
+        }
+    })
+}
+async function checkNumberOfLines(path) {
+    const file = await readText(path) || ""
+    const fileLines = file.split("\n")
+    const fileLinesLength = fileLines.length
+    const hasMaxLines = fileLinesLength > NUMBER_OF_LINES_MAX
+    if (hasMaxLines) { logFileIndex++ }
+}
+
+// Startup
+makeDir(LOG_FOLDER_PATH)
+updateLogFileIndex()
+deleteOldLogs()
 
 // Exports
-exports.log = log;
+exports.log = log
 
-/* Examples
+// Testing
 
-function log(text) {
-  const logger = require('./log');
-  logger.log(text, "./logs/", 'ws');
-}
+// let val = 0
+// log("log test", LOG_FOLDER_PATH, val)
 
-function httpLog(req) {
-  const { log } = require('./log');
-  // Path
-  const path = "./logs/";
-  // URL
-  log(`${req.method} ${req.protocol}://${req.headers.host}${req.url}`, path, 'http');
-  // Query Params
-  if (JSON.stringify(req.query) !== '{}') log(`PARAMS ${JSON.stringify(req.query)}`, path, 'http');
-  // Body
-  if (JSON.stringify(req.body) !== '{}') log(`BODY ${JSON.stringify(req.body)}`, path, 'http');
-}
-
-*/
+// setInterval(() => {
+//     val++
+//     log("log test", formatPath(), val)
+// }, 1_000)
