@@ -1,7 +1,7 @@
 // Require
 const showdown = require('showdown')
 const converter = new showdown.Converter()
-const { readText } = require('../modules/files')
+const { readText } = require('../files/files')
 
 // Functions
 function markdown2html(markdown) {

@@ -72,7 +72,7 @@ function isPythonInstalled() {
 }
 
 // Startup
-log("system", "startup")
+log("system", "startup", getSystemInfo())
 
 // Exports
 exports.getNICs = getNICs

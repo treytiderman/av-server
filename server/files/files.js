@@ -435,7 +435,7 @@ exports.deleteFolder = deleteFolder
 exports.rename = rename
 exports.exists = exists
 
-// ----------------------------------------------------------------
+// Testing
 
 // getStats("../private/logs/example.log")
 //   .then(stats => console.log(stats))

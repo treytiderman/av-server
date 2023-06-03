@@ -1,4 +1,4 @@
-const { appendText, readText, makeDir, getStatsRecursive, deleteFile } = require('./files')
+const { appendText, readText, makeDir, getStatsRecursive, deleteFile } = require('../files/files')
 
 // Overview
 // Location: /private/logs/log_date.log

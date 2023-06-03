@@ -2,6 +2,7 @@
 // const mw = require("./middleware")
 const { logRequests } = require("./middleware_logger")
 const { renderMarkdown } = require("./middleware_markdown")
+const { checkRequest } = require("../users/users_middleware")
 
 // Create Express router
 const express = require('express')
@@ -11,25 +12,26 @@ const router = express.Router()
 router.use(renderMarkdown)
 
 // Public folder, everything in this folder is available to anyone
-router.use(express.static("../public"))
-router.use(express.static("../server/server_http/public"))
+router.use("/", express.static("../public"))
+router.use("/", express.static("../server/server_http/public"))
+router.use("/ui", express.static("../server/ui"))
 
 // Log requests (exclude public routes)
 router.use(logRequests)
 
-/* Request Checking
-1. Is localhost? req.isLocalhost = true || false
-2. Has Token? req.token = token || "no token" || "bad token"
-3. What User? req.user { username, role }
-4. Auth level? req.user.role = 0 though 99
-5. Is self or ADMIN? req.isSelf = true || false */
-// router.use(mw.checkRequest)
+// Request Checking
+// 1. Is localhost? req.isLocalhost = true || false
+// 2. Has Token? req.token = token || "no token" || "bad token"
+// 3. What User? req.user { username, role }
+// 4. Auth level? req.user.role = 0 though 99
+// 5. Is self or ADMIN? req.isSelf = true || false
+router.use(checkRequest)
 
 // Core
 router.get('/', async (req, res) => {
-    res.redirect(302, '/av-server-ui')
+    res.redirect(302, '/ui')
 })
-// router.use('/', require('./user').router) // auth used
+router.use('/', require('../users/users_http').router)
 // router.use('/api', require('./files').router)
 
 // Tools
@@ -50,12 +52,11 @@ router.get('/try/query', async (req, res) => {
     res.status(200).json(req.query)
 })
 router.get('/try/json', async (req, res) => {
-    const json = {
-        "number": 42,
-        "string": "Hello World",
-        "bool": true
-    }
+    const json = { "number": 42, "string": "Hello World", "bool": true }
     res.status(200).json(json)
+})
+router.post('/try/json', async (req, res) => {
+    res.status(200).json(req.body)
 })
 // router.get('/try/download', async (req, res) => {
 //   res.status(200).download('../private/logs/example.log')
@@ -63,11 +64,8 @@ router.get('/try/json', async (req, res) => {
 router.get('/try/:path', async (req, res) => {
     res.status(200).send(req.params.path)
 })
-router.post('/try/json', async (req, res) => {
-    res.status(200).json(req.body)
-})
 
-// Catch All
+// 404 / Catch All
 const fs = require('fs').promises
 router.get('*', async (req, res) => {
     const file = await fs.readFile('./server_http/public/404/index.html', 'utf8')
@@ -76,7 +74,6 @@ router.get('*', async (req, res) => {
 router.all('*', function (req, res) {
     res.status(404).send("not found")
 })
-
 
 // Export
 exports.router = router

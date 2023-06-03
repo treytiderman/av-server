@@ -1,0 +1,4 @@
+2023-06-02T21:32:31.672Z >> system >> startup >> ""
+2023-06-02T21:33:32.314Z >> server_http >> GET http://192.168.1.12:4620/ >> {}
+2023-06-02T21:33:32.370Z >> server_websocket >> new connection 192.168.1.9 | 1 client(s) >> ""
+2023-06-02T21:33:32.373Z >> server_websocket >> 192.168.1.9 emit event token name /user/v1 >> ""

@@ -166,7 +166,7 @@
       const tryUser = document.getElementById("tryUser")
       const tryUserResponse = document.getElementById("tryUserResponse")
       tryUser.addEventListener("click", async () => {
-        const response = await getJSON("/api/user/v1")
+        const response = await getJSON("/api/me/v1")
         tryUserResponse.innerText = JSON.stringify(response, null, 2)
         tryUserResponse.style.color = "hsl(60, 99%, 65%)"
       })
