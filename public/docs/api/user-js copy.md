@@ -4,7 +4,7 @@
 
 ```js
 // Login to get auth token
-ws.send.event("user_v1", "login", {
+ws.send.event("user-v1", "login", {
 	"username": "admin",
 	"password": "admin"
 })
@@ -13,7 +13,7 @@ ws.send.event("user_v1", "login", {
 ```js
 // Login error or recieve auth token
 let token
-ws.receive.event("user_v1", "login", body => {
+ws.receive.event("user-v1", "login", body => {
 	// Login failed
 	if (body.error === true) {}
 	// Login success
@@ -27,12 +27,12 @@ ws.receive.event("user_v1", "login", body => {
 
 ```js
 // Send auth token, received from login, to access api
-ws.send.event("user_v1", "token", token)
+ws.send.event("user-v1", "token", token)
 ```
 
 ```js
 // Token error or successful auth
-ws.receive.event("user_v1", "token", body => {
+ws.receive.event("user-v1", "token", body => {
 	// Bad token
 	if (body.error === true) {}
 	// Good token
@@ -44,12 +44,12 @@ ws.receive.event("user_v1", "token", body => {
 
 ```js
 // Lose access to the api
-ws.send.event("user_v1", "logout")
+ws.send.event("user-v1", "logout")
 ```
 
 ```js
 // Confirms logout
-ws.receive.event("user_v1", "logout", body => {
+ws.receive.event("user-v1", "logout", body => {
 	// Logout success
 })
 ```
@@ -58,12 +58,12 @@ ws.receive.event("user_v1", "logout", body => {
 
 ```js
 // Get roles that users can be
-ws.send.event("user_v1", "roles")
+ws.send.event("user-v1", "roles")
 ```
 
 ```js
 // Receive roles
-ws.receive.event("user_v1", "roles", roles => {
+ws.receive.event("user-v1", "roles", roles => {
 	const roles_example = {
         ADMIN: 99,
         USER: 50,
@@ -76,12 +76,12 @@ ws.receive.event("user_v1", "roles", roles => {
 
 ```js
 // Get current user
-ws.send.event("user_v1", "get")
+ws.send.event("user-v1", "get")
 ```
 
 ```js
 // Receive current user
-ws.receive.event("user_v1", "get", user => {
+ws.receive.event("user-v1", "get", user => {
 	const user_example = {
 		username: "admin",
 	    role: 99,
@@ -93,7 +93,7 @@ ws.receive.event("user_v1", "get", user => {
 
 ```js
 // Create new user
-ws.send.event("user_v1", "new", {
+ws.send.event("user-v1", "new", {
 	username: "test",
 	password: "test",
 	passwordConfirm: "test",
@@ -103,7 +103,7 @@ ws.send.event("user_v1", "new", {
 
 ```js
 // Receive errors or the new user
-ws.receive.event("user_v1", "new", body => {
+ws.receive.event("user-v1", "new", body => {
 	if (body.error === ture) {
 		if (body.errorMessage === "requested role greater than user's role") {}
 		else if (body.errorMessage === "passwords does not match") {}
@@ -123,7 +123,7 @@ ws.receive.event("user_v1", "new", body => {
 
 ```js
 // Update user
-ws.send.event("user_v1", "update", {
+ws.send.event("user-v1", "update", {
 	username: "test",
 	password: "test",
 	passwordNew: "test", // Optional
@@ -134,7 +134,7 @@ ws.send.event("user_v1", "update", {
 
 ```js
 // Receive errors or updated user
-ws.receive.event("user_v1", "update", body => {
+ws.receive.event("user-v1", "update", body => {
 	if (body.error === ture) {
 		if (body.errorMessage === "requested role greater than user's role") {}
 		else if (body.errorMessage === "passwords does not match") {}
@@ -155,7 +155,7 @@ ws.receive.event("user_v1", "update", body => {
 
 ```js
 // Update user
-ws.send.event("user_v1", "delete", {
+ws.send.event("user-v1", "delete", {
 	username: "test",
 	password: "test"
 })
@@ -163,7 +163,7 @@ ws.send.event("user_v1", "delete", {
 
 ```js
 // Receive errors or updated user
-ws.receive.event("user_v1", "delete", body => {
+ws.receive.event("user-v1", "delete", body => {
 	if (body.error === ture) {
 		if (body.errorMessage === "username doesn't exists") {}
 		else if (body.errorMessage === "passwords incorrect") {}
@@ -178,17 +178,17 @@ ws.receive.event("user_v1", "delete", body => {
 
 ```js
 // Get all users
-ws.send.event("user_v1/all", "get")
+ws.send.event("user-v1/all", "get")
 ```
 
 ```js
 // Get all users
-ws.send.event("user_v1/all", "get")
+ws.send.event("user-v1/all", "get")
 ```
 
 ```js
 // Receive errors or updated user
-ws.receive.event("user_v1", "all", body => {
+ws.receive.event("user-v1", "all", body => {
 	if (body.error === ture) {
 		if (body.errorMessage === "role to low") {}
 	}

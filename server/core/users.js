@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
-const file_system = require('../files/files')
-const logger = require('../modules/logger')
+const file_system = require('./files')
+const logger = require('./logger')
 
 // Variables
 const CRYPTO_KEYSIZE = 64
@@ -89,7 +89,7 @@ function isUser(username) {
     username = username || ""
     return state.users.some(user => user.username === username)
 }
-function login(username, password) {
+function getToken(username, password) {
     username = username || ""
     password = password || ""
     const user = getUserAndPassword(username)
@@ -99,8 +99,14 @@ function login(username, password) {
     else if (!isHashedPassword(password, user.password.hash, user.password.salt)) result = "password incorrect"
     else result = generateJWT({ username: user.username })
 
-    log(`login("${username}", "${password}")`, result)
+    log(`getToken("${username}", "${password}")`, result)
     return result
+}
+function verifyToken(token) {
+    verifyJWT(token, (error, jwtJson) => {
+        if (error) return "bad token"
+        else return jwtJson.username
+    })
 }
 async function createUser(username, password, passwordConfirm, role = 0) {
     username = username || ""
@@ -127,21 +133,18 @@ async function createUser(username, password, passwordConfirm, role = 0) {
     log(`createUser("${username}", "${password}", "${passwordConfirm}", "${role}")`, result)
     return result
 }
-async function deleteUser(username, password) {
+async function deleteUser(username) {
     username = username || ""
-    password = password || ""
-    const user = getUserAndPassword(username)
 
     let result = ""
-    if (!user) result = "username doesn't exists"
-    else if (!isHashedPassword(password, user.password.hash, user.password.salt)) result = "password incorrect"
+    if (isUser(username)) result = "username doesn't exists"
     else {
         state.users = state.users.filter(user => user.username !== username)
         await saveUsersFile()
-        result = "user deleted"
+        result = "success"
     }
 
-    log(`deleteUser("${username}", "${password}")`, result)
+    log(`deleteUser("${username}")`, result)
     return result
 }
 async function updateUserRole(username, password, role = 0) {
@@ -184,7 +187,7 @@ async function updateUserPassword(username, password, newPassword, newPasswordCo
     return result
 }
 
-// Script startup
+// Startup
 getUsersFile().then(async file => {
     if (file) {
         clearUsersArray()
@@ -207,7 +210,8 @@ exports.getUsersFile = getUsersFile
 exports.saveUsersFile = saveUsersFile
 exports.defaultUsersFile = defaultUsersFile
 
-exports.login = login
+exports.getToken = getToken
+exports.verifyToken = verifyToken
 exports.isUser = isUser
 exports.getUser = getUser
 exports.getUsers = getUsers
@@ -239,12 +243,12 @@ exports.updateUserPassword = updateUserPassword
 //     console.log('createUser("user", "password", "password", 50)', await createUser("user", "password", "password", 50))
 //     console.log('getUser("user")', getUser("user"))
 //     console.log('isUser("user")', isUser("user"))
-//     console.log('login("user", "password")', login("user", "password"))
+//     console.log('getToken("user", "password")', getToken("user", "password"))
 //     console.log('updateUserRole("user", "password", 69)', await updateUserRole("user", "password", 69))
 //     console.log('updateUserRole("user", "password", 42)', await updateUserRole("user", "password", 42))
 //     console.log('getUser("user")', getUser("user"))
 //     console.log('updateUserPassword("user", "password", "password2", "password2")', await updateUserPassword("user", "password", "password2", "password2"))
-//     console.log('login("user", "password2")', login("user", "password2"))
+//     console.log('getToken("user", "password2")', getToken("user", "password2"))
 //     console.log('deleteUser("user", "password")', await deleteUser("user", "password"))
 //     console.log('deleteUser("user", "password2")', await deleteUser("user", "password2"))
 //     console.log('defaultUsersFile()', await defaultUsersFile())

@@ -1,8 +1,8 @@
 // const auth = require("../modules/users")
 // const mw = require("./middleware")
-const { logRequests } = require("./middleware_logger")
-const { renderMarkdown } = require("./middleware_markdown")
-const { checkRequest } = require("../users/users_middleware")
+const { logRequests } = require("./http-logger")
+const { renderMarkdown } = require("./http-markdown")
+const { checkRequest } = require("./users-middleware")
 
 // Create Express router
 const express = require('express')
@@ -13,8 +13,8 @@ router.use(renderMarkdown)
 
 // Public folder, everything in this folder is available to anyone
 router.use("/", express.static("../public"))
-router.use("/", express.static("../server/server_http/public"))
-router.use("/ui", express.static("../server/ui"))
+router.use("/", express.static("../server/core/public"))
+router.use("/ui", express.static("../server/frontend"))
 
 // Log requests (exclude public routes)
 router.use(logRequests)
@@ -28,10 +28,8 @@ router.use(logRequests)
 router.use(checkRequest)
 
 // Core
-router.get('/', async (req, res) => {
-    res.redirect(302, '/ui')
-})
-router.use('/', require('../users/users_http').router)
+router.get('/', (req, res) => res.redirect(302, '/ui'))
+router.use('/api', require('./users-http').router)
 // router.use('/api', require('./files').router)
 
 // Tools
@@ -68,7 +66,7 @@ router.get('/try/:path', async (req, res) => {
 // 404 / Catch All
 const fs = require('fs').promises
 router.get('*', async (req, res) => {
-    const file = await fs.readFile('./server_http/public/404/index.html', 'utf8')
+    const file = await fs.readFile('./core/public/404/index.html', 'utf8')
     res.send(file)
 })
 router.all('*', function (req, res) {

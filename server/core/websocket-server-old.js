@@ -2,7 +2,7 @@ const WebSocket = require('ws')
 const events = require('events')
 let wsServer
 
-// Constants
+// Variables
 const emitter = new events.EventEmitter()
 const store = {
   time: new Date(Date.now()).toISOString(),
@@ -13,9 +13,9 @@ const store = {
 
 // Helper Functions
 const logInConsole = false
-const logger = require('../modules/logger').log
+const logger = require('./logger')
 function log(text, obj = "") {
-  logger("server_websocket", text, obj)
+  logger.log("server_websocket", text, obj)
   if (logInConsole) {console.log("ws-server", text, obj)}
 }
 function isJSON(text) {
@@ -25,7 +25,7 @@ function isJSON(text) {
 }
 
 // Functions
-function start(app) {
+function create(app) {
   const server = require('http').createServer(app)
   wsServer = new WebSocket.Server({ server: server })
 
@@ -45,7 +45,7 @@ function start(app) {
   }, 30 * 1000)
 
   // API Routes
-  // require('./routes')
+  require('./websocket-routes')
 
   // Return
   return server
@@ -194,7 +194,7 @@ function subscribe(ws, name) {
 
 // Export
 exports.emitter = emitter
-exports.start = start
+exports.create = create
 exports.send = send
 exports.get = get
 exports.event = event
@@ -205,17 +205,18 @@ exports.subscribe = subscribe
 /* Examples
 
 // HTTP Server
-const http = require('./_http/_http_server')
-const http_server = http.start()
+const http = require('./core/http-server')
+const http_server = http.create()
 
 // WebSocket Server
-const ws = require('./_websocket/_ws_server')
-const server = ws.start(http_server)
+const ws = require('./core/websocket-server')
+const server = ws.create(http_server)
 
-// Start web server
-const port = 3000
+// Start Server
+const port = process.env.port || 4620
 server.listen(port, () => {
-  console.log(`\nServer available at: http://localhost:${port}`)
+    console.log(`AV-Tools server is up and running`)
+    http.startupConsoleLog(port)
 })
 
 */

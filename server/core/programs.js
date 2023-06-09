@@ -1,6 +1,6 @@
 const { spawn } = require('child_process')
 const events = require('events')
-const { getStatsRecursive } = require('../modules/files')
+const { getStatsRecursive, readText } = require('./files')
 
 // TODO: Check out: https://pm2.keymetrics.io/docs/usage/pm2-api/
 
@@ -32,8 +32,6 @@ function clampHistory(name) {
         state.programs[name].out.shift()
     }
 }
-
-// Functions
 async function updateAvailablePrograms() {
     const availableAsJSON_prev = JSON.stringify(state.available)
     const stats = await getStatsRecursive("../private/programs")
@@ -46,7 +44,7 @@ async function updateAvailablePrograms() {
             args: "",
             env: {},
         }
-        folder.contains_files.forEach(file => {
+        folder.contains_files.forEach(async file => {
             state.available[folderName].files.push(file.file_name)
             if (file.file_name.endsWith(".js")) {
                 state.available[folderName].program = "node"
@@ -56,8 +54,17 @@ async function updateAvailablePrograms() {
                 state.available[folderName].program = "python"
                 state.available[folderName].args = file.path
             }
-        });
-    });
+            else if (file.file_name.endsWith(".env")) {
+                const envFile = await readText(file.path)
+                const envFileLines = envFile.split("\n")
+                envFileLines.forEach(line => {
+                    const key = line.split("=")[0].trim()
+                    const value = line.split("=")[1].trim()
+                    state.available[folderName].env[key] = value
+                });
+            }
+        })
+    })
 
     const availableAsJSON = JSON.stringify(state.available)
     if (availableAsJSON !== availableAsJSON_prev) {
@@ -66,7 +73,9 @@ async function updateAvailablePrograms() {
 
     return state.available
 }
-function getAvailablePrograms() {
+
+// Functions
+function getAvailable() {
     return state.available
 }
 function start(name, program, args, env = {}) {
@@ -75,7 +84,7 @@ function start(name, program, args, env = {}) {
     if (state.programs[name]?.running === true) {
         const error = "program already running"
         console.log(`${name} error ${error}`)
-        emitter.emit('error', name, { error: error })
+        emitter.emit('start', name, { error: error })
         return error
     }
 
@@ -131,9 +140,9 @@ function start(name, program, args, env = {}) {
         emitter.emit('out', name, dataObj)
     })
 }
-function startAvailable(folderName, name = folderName, env = {}) {
-    const program = state.available[folderName].program
-    const args = state.available[folderName].args
+function startAvailable(programFolderName, name = programFolderName, env = {}) {
+    const program = state.available[programFolderName].program
+    const args = state.available[programFolderName].args
     start(name, program, args, env)
 }
 function kill(name) {
@@ -152,17 +161,19 @@ function restart(name) {
     state.programs[name].spawn.kill()
     setTimeout(() => {
         start(name, program, args, env)
-    }, RESTART_TIMEOUT_MS);
+    }, RESTART_TIMEOUT_MS)
 }
 function getProgram(name) {
-    return {
-        program: state.programs[name].program,
-        args: state.programs[name].args,
-        env: state.programs[name].env,
-        pid: state.programs[name].pid,
-        running: state.programs[name].running,
-        out: state.programs[name].out,
+    if (state.programs[name]) {
+        return {
+            program: state.programs[name].program,
+            args: state.programs[name].args,
+            env: state.programs[name].env,
+            pid: state.programs[name].pid,
+            running: state.programs[name].running,
+        }
     }
+    return `${name} program not defined`
 }
 function getPrograms() {
     const array = []
@@ -170,6 +181,12 @@ function getPrograms() {
         array.push(getProgram(name))
     })
     return array
+}
+function getDataHistory(name) {
+    if (state.programs[name]) {
+        return state.programs[name].out
+    }
+    return `${name} program not defined`
 }
 
 // Startup
@@ -179,6 +196,7 @@ setInterval(async () => {
 
 // Export
 exports.emitter = emitter
+exports.getAvailable = getAvailable
 exports.start = start
 exports.startAvailable = startAvailable
 exports.kill = kill
@@ -186,8 +204,7 @@ exports.killAll = killAll
 exports.restart = restart
 exports.getProgram = getProgram
 exports.getPrograms = getPrograms
-exports.getAvailablePrograms = getAvailablePrograms
-exports.updateAvailablePrograms = updateAvailablePrograms
+exports.getDataHistory = getDataHistory
 
 // Testing
 
@@ -211,10 +228,13 @@ exports.updateAvailablePrograms = updateAvailablePrograms
 // setTimeout(() => killAll(), 15_000)
 
 // setTimeout(() => {
-//     console.log(getAvailablePrograms())
+//     console.log(getAvailable())
 //     startAvailable("test-python-log")
-//     startAvailable("test-nodejs-express", "test-nodejs-express", {port: 2009})
+//     // startAvailable("test-nodejs-express", "test-nodejs-express", {port: 2009})
 // }, 2_000)
+// setTimeout(() => {
+//     console.log(getProgram("test-python-log"))
+// }, 4_000)
 // setTimeout(() => killAll(), 15_000)
 
 // sudo netstat -lpn |grep :200*

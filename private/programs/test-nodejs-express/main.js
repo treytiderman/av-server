@@ -10,4 +10,5 @@ app.get('/', async (req, res) => {
 const port = process.env.port || 2004;
 app.listen(port, () => {
   console.log(`Available at: http://localhost:${port}`)
+  console.log(`Enviorment Variable "name" = ${process.env.name}`)
 })

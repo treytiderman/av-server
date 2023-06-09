@@ -3,7 +3,18 @@ const dns = require("dns")
 const exec = require('child_process').exec
 const { log } = require("./logger")
 
+const startupTime = Date.now()
+
 // Functions
+function getTime() {
+    return Date.now()
+}
+function getTimeAsISO() {
+    return new Date(Date.now()).toISOString()
+}
+function getUptime() {
+    return Date.now() - startupTime
+}
 function getNICs() {
     const results = []
     const nets = os.networkInterfaces()
@@ -67,18 +78,21 @@ function getSystemInfo() {
         eol: os.EOL,
     }
 }
-function isPythonInstalled() {
-
-}
 
 // Startup
 log("system", "startup", getSystemInfo())
 
 // Exports
-exports.getNICs = getNICs
-exports.getOS = getOS
 exports.isAdmin = isAdmin
+exports.getTime = getTime
+exports.getTimeAsISO = getTimeAsISO
+exports.getUptime = getUptime
+exports.getOS = getOS
+exports.getNICs = getNICs
 exports.getSystemInfo = getSystemInfo
 
 // Testing
 // console.log(getSystemInfo())
+// console.log(getTime())
+// console.log(getTimeAsISO())
+// console.log(getUptime())

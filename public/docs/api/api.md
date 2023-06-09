@@ -20,20 +20,31 @@ ws.connect({
 })
 ```
 
-# Events v1
+# Topics
 
-### [system_v1](./system_v1.md)
-### [user_v1](user_v1.md)
-### [script_v1](./script_v1.md)
-### [tcp_client_v1](tcp_client_v1.md)
-### [tcp_server_v1](./tcp_server_v1.md)
-### [udp_client_v1](./udp_client_v1.md)
-### [udp_server_v1](./udp_server_v1.md)
-### [http_client_v1](./http_client_v1.md)
-### [http_server_v1](./http_server_v1.md)
-### [websocket_client_v1](./websocket_client_v1.md)
-### [websocket_server_v1](./websocket_server_v1.md)
-### [serial_v1](./serial_v1.md)
+[system](./system-json.md)
+
+[user](./user-json.md)
+
+[script](./script-json.md)
+
+[tcp-client](tcp-client-json.md)
+
+[tcp-server](./tcp-server-json.md)
+
+[udp-client](./udp-client-json.md)
+
+[udp-server](./udp-server-json.md)
+
+[http-client](./http-client-json.md)
+
+[http-server](./http-server-json.md)
+
+[websocket-client](./websocket-client-json.md)
+
+[websocket-server](./websocket-server-json.md)
+
+[serial](./serial-json.md)
 
 # Structure
 
@@ -57,7 +68,7 @@ ws.connect({
 
 // Send json
 ws.send.json({
-	"topic": "user_v1",
+	"topic": "user",
 	"event": "login",
 	"body": {
 		"username": "admin",
@@ -66,14 +77,14 @@ ws.send.json({
 })
 
 // Send event
-ws.send.event("user_v1", "login", {
+ws.send.event("user", "login", {
 	"username": "admin",
 	"password": "admin"
 })
 
 // Receive json
 ws.receive.json(json => {
-	if (json.topic === "user_v1" && json.event === "login") {
+	if (json.topic === "user" && json.event === "login") {
 		if (body.error === true) {
 			// Login failed
 		}
@@ -84,7 +95,7 @@ ws.receive.json(json => {
 })
 
 // Receive event
-ws.receive.event("user_v1", "login", body => {
+ws.receive.event("user", "login", body => {
 	if (body.error === true) {
 		// Login failed
 	 }

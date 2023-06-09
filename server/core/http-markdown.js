@@ -1,7 +1,7 @@
 // Require
 const showdown = require('showdown')
 const converter = new showdown.Converter()
-const { readText } = require('../files/files')
+const { readText } = require('./files')
 
 // Functions
 function markdown2html(markdown) {
@@ -29,7 +29,7 @@ async function markdown2htmlPage(markdown, css, title = "markdown") {
 async function renderMarkdown(req, res, next) {
   if (req.url.endsWith(".md")) {
     const text = await readText(`../public${req.url}`)
-    const css = await readText(`../server/server_http/public/other/markdown.css`)
+    const css = await readText(`../server/core/public/other/markdown.css`)
     const html = await markdown2htmlPage(text, css, req.url)
     res.send(html)
   }

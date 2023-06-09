@@ -3,8 +3,8 @@ const express = require('express')
 const cors = require('cors')
 
 // Require
-const { router } = require('./http_routes')
-const { getSystemInfo } = require("../modules/system")
+const { router } = require('./http-routes')
+const { getSystemInfo } = require("./system")
 
 // Functions
 function create() {
@@ -26,7 +26,7 @@ function create() {
 }
 function startupConsoleLog(port) {
     const systemInfo = getSystemInfo()
-    console.log(`The user interface is available at:`)
+    console.log(`user interface available at:`)
     console.log(`- http://localhost:${port}`)
     systemInfo.nics.forEach(nic => {
         console.log(`- http://${nic.ip}:${port}`)
@@ -42,17 +42,18 @@ exports.startupConsoleLog = startupConsoleLog
 /* Examples
 
 // HTTP Server
-const http = require('./server_http/http_server')
+const http = require('./core/http-server')
 const http_server = http.create()
 
 // WebSocket Server
-const ws = require('./_websocket/_ws_server')
-const server = ws.start(http_server)
+const ws = require('./core/websocket-server')
+const server = ws.create(http_server)
 
-// Start web server
-const port = process.env.port || 3000
+// Start Server
+const port = process.env.port || 4620
 server.listen(port, () => {
-  http.startupConsoleLog(port)
+    console.log(`AV-Tools server is up and running`)
+    http.startupConsoleLog(port)
 })
 
 */

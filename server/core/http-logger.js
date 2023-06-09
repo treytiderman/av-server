@@ -1,8 +1,8 @@
 // Log HTTP Requests
-const logger = require('../modules/logger').log
+const logger = require('./logger')
 function log(req) {
   const url = `${req.method} ${req.protocol}://${req.headers.host}${req.url}`
-  logger("server_http", url, req.body)
+  logger.log("server_http", url, req.body)
 }
 function logRequests(req, res, next) {
   log(req)

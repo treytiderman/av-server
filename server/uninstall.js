@@ -18,10 +18,11 @@ if (system === "Windows_NT") {
 else if (system === "Darwin") {
     // Issues
     // const Service = require('node-mac').Service // Issues using this
-    console.log('Not setup for Mac yet')
+    console.log('Not setup for Mac')
 }
 else if (system === "Linux") {
     // let Service = require('node-linux').Service
+    console.log('Not setup for Linux')
 }
 else {
     console.log('Unknown OS')
