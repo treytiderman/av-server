@@ -1,8 +1,10 @@
 const { spawn } = require('child_process')
-const events = require('events')
 const { getStatsRecursive, readText } = require('./files')
-
 // TODO: Check out: https://pm2.keymetrics.io/docs/usage/pm2-api/
+
+// Event Emitter
+const events = require('events')
+const emitter = new events.EventEmitter()
 
 /* Events example
 const programs = require('../modules/programs')
@@ -17,8 +19,7 @@ programs.emitter.on("out", (name, body) => {}
 const MAX_HISTORY_LENGTH = 1_000
 const UPDATE_AVAILABLE_MS = 1_000
 const RESTART_TIMEOUT_MS = 1_000
-const emitter = new events.EventEmitter()
-const state = {
+const STATE = {
     programs: {},
     available: {},
 }
@@ -28,16 +29,16 @@ function splitByWhitespace(string) {
     return string.trim().split(/\s+/)
 }
 function clampHistory(name) {
-    if (state.programs[name].out.length > MAX_HISTORY_LENGTH) {
-        state.programs[name].out.shift()
+    if (STATE.programs[name].out.length > MAX_HISTORY_LENGTH) {
+        STATE.programs[name].out.shift()
     }
 }
 async function updateAvailablePrograms() {
-    const availableAsJSON_prev = JSON.stringify(state.available)
+    const availableAsJSON_prev = JSON.stringify(STATE.available)
     const stats = await getStatsRecursive("../private/programs")
     stats.contains_folders.forEach(folder => {
         const folderName = folder.folder_name.replace("/", "")
-        state.available[folderName] = {
+        STATE.available[folderName] = {
             path: `../private/programs/${folderName}`,
             files: [],
             program: "node",
@@ -45,14 +46,14 @@ async function updateAvailablePrograms() {
             env: {},
         }
         folder.contains_files.forEach(async file => {
-            state.available[folderName].files.push(file.file_name)
+            STATE.available[folderName].files.push(file.file_name)
             if (file.file_name.endsWith(".js")) {
-                state.available[folderName].program = "node"
-                state.available[folderName].args = file.path
+                STATE.available[folderName].program = "node"
+                STATE.available[folderName].args = file.path
             }
             else if (file.file_name.endsWith(".py")) {
-                state.available[folderName].program = "python"
-                state.available[folderName].args = file.path
+                STATE.available[folderName].program = "python"
+                STATE.available[folderName].args = file.path
             }
             else if (file.file_name.endsWith(".env")) {
                 const envFile = await readText(file.path)
@@ -60,28 +61,28 @@ async function updateAvailablePrograms() {
                 envFileLines.forEach(line => {
                     const key = line.split("=")[0].trim()
                     const value = line.split("=")[1].trim()
-                    state.available[folderName].env[key] = value
+                    STATE.available[folderName].env[key] = value
                 });
             }
         })
     })
 
-    const availableAsJSON = JSON.stringify(state.available)
+    const availableAsJSON = JSON.stringify(STATE.available)
     if (availableAsJSON !== availableAsJSON_prev) {
-        emitter.emit('avaiable', state.available)
+        emitter.emit('avaiable', STATE.available)
     }
 
-    return state.available
+    return STATE.available
 }
 
 // Functions
 function getAvailable() {
-    return state.available
+    return STATE.available
 }
 function start(name, program, args, env = {}) {
     console.log(`${name} starting "${program} ${args}"`, env === {} ? JSON.stringify(env) : "")
 
-    if (state.programs[name]?.running === true) {
+    if (STATE.programs[name]?.running === true) {
         const error = "program already running"
         console.log(`${name} error ${error}`)
         emitter.emit('start', name, { error: error })
@@ -94,7 +95,7 @@ function start(name, program, args, env = {}) {
         env: env,
     })
 
-    state.programs[name] = {
+    STATE.programs[name] = {
         program: program,
         args: args,
         env: env,
@@ -106,13 +107,13 @@ function start(name, program, args, env = {}) {
 
     spawned.on('spawn', (code, signal) => {
         console.log(`${name} start`)
-        state.programs[name].running = true
+        STATE.programs[name].running = true
         emitter.emit('start', name)
     })
 
     spawned.on('exit', (code, signal) => {
         console.log(`${name} exit`)
-        state.programs[name].running = false
+        STATE.programs[name].running = false
         emitter.emit('exit', name)
     })
 
@@ -123,7 +124,7 @@ function start(name, program, args, env = {}) {
             ascii: data.toString('ascii'),
         }
         console.log(`${name} stdout: ${dataObj.ascii}`)
-        state.programs[name].out.push(dataObj)
+        STATE.programs[name].out.push(dataObj)
         clampHistory(name)
         emitter.emit('out', name, dataObj)
     })
@@ -135,56 +136,56 @@ function start(name, program, args, env = {}) {
             ascii: data.toString('ascii'),
         }
         console.log(`${name} stderr: ${dataObj.ascii}`)
-        state.programs[name].out.push(dataObj)
+        STATE.programs[name].out.push(dataObj)
         clampHistory(name)
         emitter.emit('out', name, dataObj)
     })
 }
 function startAvailable(programFolderName, name = programFolderName, env = {}) {
-    const program = state.available[programFolderName].program
-    const args = state.available[programFolderName].args
+    const program = STATE.available[programFolderName].program
+    const args = STATE.available[programFolderName].args
     start(name, program, args, env)
 }
 function kill(name) {
-    const running = state.programs[name].running
+    const running = STATE.programs[name].running
     console.log(`${name} killed ${running ? "" : "...wasn't running"}`)
-    state.programs[name].spawn.kill()
+    STATE.programs[name].spawn.kill()
 }
 function killAll() {
-    Object.keys(state.programs).forEach(name => kill(name))
+    Object.keys(STATE.programs).forEach(name => kill(name))
 }
 function restart(name) {
     console.log(`${name} restarting`)
-    const program = state.programs[name].program
-    const args = state.programs[name].args
-    const env = state.programs[name].env
-    state.programs[name].spawn.kill()
+    const program = STATE.programs[name].program
+    const args = STATE.programs[name].args
+    const env = STATE.programs[name].env
+    STATE.programs[name].spawn.kill()
     setTimeout(() => {
         start(name, program, args, env)
     }, RESTART_TIMEOUT_MS)
 }
 function getProgram(name) {
-    if (state.programs[name]) {
+    if (STATE.programs[name]) {
         return {
-            program: state.programs[name].program,
-            args: state.programs[name].args,
-            env: state.programs[name].env,
-            pid: state.programs[name].pid,
-            running: state.programs[name].running,
+            program: STATE.programs[name].program,
+            args: STATE.programs[name].args,
+            env: STATE.programs[name].env,
+            pid: STATE.programs[name].pid,
+            running: STATE.programs[name].running,
         }
     }
     return `${name} program not defined`
 }
 function getPrograms() {
     const array = []
-    Object.keys(state.programs).forEach(name => {
+    Object.keys(STATE.programs).forEach(name => {
         array.push(getProgram(name))
     })
     return array
 }
 function getDataHistory(name) {
-    if (state.programs[name]) {
-        return state.programs[name].out
+    if (STATE.programs[name]) {
+        return STATE.programs[name].out
     }
     return `${name} program not defined`
 }

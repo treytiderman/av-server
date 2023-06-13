@@ -2,6 +2,13 @@ const WebSocket = require('ws')
 const events = require('events')
 let wsServer
 
+// Structure
+// {
+//   "topic": "string",
+//   "event": "string",
+//   "body": "string" or [] or {}
+// }
+
 // Variables
 const emitter = new events.EventEmitter()
 
@@ -49,6 +56,7 @@ function newConnection(ws, req) {
     // New connection
     ws.ip = req.socket.remoteAddress.split('f:')[1]
     ws.subs = []
+    ws.auth = false
     log(`new connection ${ws.ip}`, { "clients": wsServer.clients.size })
 
     // Listen for pong
@@ -61,6 +69,7 @@ function newConnection(ws, req) {
 
     // Client is no longer connected
     ws.on('close', () => {
+        ws.auth = false
         log(`closed connection ${ws.ip}`, { "clients": wsServer.clients.size })
     })
 
@@ -76,14 +85,8 @@ function receive(ws, data) {
     }
 }
 function receiveJSON(ws, rx) {
-    // rx-example = {
-    //   "topic": "time",
-    //   "event": "get",
-    //   "body": "if needed"
-    // }
-
     if (rx.event === "subscribe") subscribe(ws, rx.topic)
-    else if (rx.event === "subscribed") subscribed(ws)
+    else if (rx.event === "subscriptions") subscriptions(ws)
     else if (rx.event === "unsubscribe") unsubscribe(ws, topic)
     else {
         emitter.emit(rx.topic, ws, rx.event, rx.body)
@@ -174,7 +177,7 @@ const ws = require('./core/websocket-server')
 const server = ws.create(http_server)
 
 // Start Server
-const port = process.env.port || 4620
+const port = process.env.PORT || 4620
 server.listen(port, () => {
     console.log(`AV-Tools server is up and running`)
     http.startupConsoleLog(port)

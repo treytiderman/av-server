@@ -2,7 +2,7 @@ const fs = require('fs').promises
 
 // Helper Functions
 function log(...params) { if (false) console.log("file_system.js |", ...params) }
-function err(...params) { if (true) console.error("ERROR | file_system.js |", ...params) }
+function err(...params) { if (false) console.error("ERROR | file_system.js |", ...params) }
 
 // Functions
 async function getStatsRaw(path) {

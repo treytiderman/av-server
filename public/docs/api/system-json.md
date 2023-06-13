@@ -1,8 +1,11 @@
-# time
+# Topic: system/time
+
+## Event: get
 
 ```json
 // [Send]
-// get: servers time (ISO format)
+// Function: get server time
+// Subscribes Topic: system/time
 {
 	"topic": "system/time",
 	"event": "get"
@@ -11,14 +14,15 @@
 
 ```json
 // [Recieve]
-// payload: servers time (ISO format)
+// Body: server time (ISO format)
 {
 	"topic": "system/time",
 	"event": "get",
 	"body": "2022-12-26T17:08:20.264Z"
 }
-// updates: every second
-// payload: servers time (ISO format)
+
+// Updates: every second
+// Body: server time (ISO format)
 {
 	"topic": "system/time",
 	"event": "update",
@@ -26,11 +30,14 @@
 }
 ```
 
-# uptime
+# Topic: system/uptime
+
+## Event: get
 
 ```json
 // [Send]
-// get: servers uptime (ISO format)
+// Function: get server uptime
+// Subscribes Topic: system/uptime
 {
 	"topic": "system/uptime",
 	"event": "get"
@@ -39,26 +46,30 @@
 
 ```json
 // [Recieve]
-// payload: servers uptime (ISO format)
+// Body: servers uptime (ms)
 {
 	"topic": "system/uptime",
 	"event": "get",
-	"body": "2022-12-26T17:08:20.264Z"
+	"body": "5000"
 }
-// updates: every second
-// payload: servers uptime (ISO format)
+
+// Updates: every second
+// Body: servers uptime (ms)
 {
 	"topic": "system/uptime",
 	"event": "update",
-	"body": "2022-12-26T17:08:20.264Z"
+	"body": "6000"
 }
 ```
 
-# info
+# Topic: system/info
+
+## Event: get
 
 ```json
 // [Send]
-// get: servers info
+// Function: get servers info
+// Subscribes Topic: system/info
 {
 	"topic": "system/info",
 	"event": "get"
@@ -67,7 +78,7 @@
 
 ```json
 // [Recieve]
-// payload: servers info
+// Body: servers info object
 {
 	"topic": "system/info",
 	"event": "get",
@@ -113,8 +124,9 @@
 		"eol": "\n"
 	}
 }
-// updates: every second
-// payload: servers info
+
+// Updates: every second
+// Body: servers info object
 {
 	"topic": "system/uptime",
 	"event": "update",

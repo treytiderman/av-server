@@ -1,20 +1,23 @@
-# available
+# Topic: programs/available
+
+## Event: available
 
 ```json
 // [Send]
-// get: status the tcp connection
+// Function: get available programs in the ./private/programs folder
+// Subscribes Topic: programs
 {
-	"topic": "programs/available",
-	"event": "get"
+	"topic": "programs",
+	"event": "available"
 }
 ```
 
 ```json
 // [Recieve]
-// payload: object of available programs
+// Body: object of available programs
 {
-	"topic": "programs/available",
-	"event": "get",
+	"topic": "programs",
+	"event": "available",
 	"body": {
 		"test-nodejs-express": {
 			"path": "../private/programs/test-nodejs-express",
@@ -32,27 +35,57 @@
 		}
 	}
 }
-// update: if changed
+```
+
+## Event: kill-all
+
+```json
+// [Send]
+// Function: kill all running programs
+// Subscribes Topic: programs
 {
-	"topic": "programs/available",
-	"event": "update",
+	"topic": "programs",
+	"event": "kill-all"
+}
+```
+
+## Event: status-all
+
+```json
+// [Send]
+// Function: get all defined programs
+// Subscribes Topic: programs
+{
+	"topic": "programs",
+	"event": "status-all"
+}
+```
+
+```json
+// Body: program state object
+{
+	"topic": "programs",
+	"event": "status-all",
 	"body": {
-		"test-nodejs-log": {
-			"path": "../private/programs/test-nodejs-log",
-			"files": [ "main.js" ],
+		"program-name": {
 			"program": "node",
-			"args": "../private/programs/test-nodejs-log/main.js",
-			"env": {}
+			"args": "../private/programs/test-nodejs-express/main.js",
+			"env": { "port": "8626" },
+			"pid": 3455370,
+			"running": false
 		}
 	}
 }
 ```
 
-# start
+# Topic: programs/NAME
+
+## Event: start
 
 ```json
 // [Send]
-// function: status the tcp connection
+// Function: status the tcp connection
+// Subscribes Topic: programs/program-name
 {
 	"topic": "programs/program-name",
 	"event": "start",
@@ -66,15 +99,17 @@
 
 ```json
 // [Recieve]
-// ok: returns ok if the program started up
-// error: returns "error " + description
+// Body: "ok" or "error " + description
 {
 	"topic": "programs/program-name",
 	"event": "start",
 	"body": "ok"
 	// "body": "error program already running"
+	// "body": "error env expects an object"
 }
-// payload: program state object
+
+// If: "start" "ok"
+// Body: program state object
 {
 	"topic": "programs/program-name",
 	"event": "status",
@@ -86,7 +121,8 @@
 		"running": true
 	}
 }
-// payload: data sent to standard out or error (stdout, stderr)
+
+// Body: data sent to standard out or error (stdout, stderr)
 {
 	"topic": "programs/program-name",
 	"event": "data",
@@ -98,11 +134,12 @@
 }
 ```
 
-# start-available
+## Event: start-available
 
 ```json
 // [Send]
-// function: status the tcp connection
+// Function: status the tcp connection
+// Subscribes Topic: programs/program-name
 {
 	"topic": "programs/program-name",
 	"event": "start-available",
@@ -114,15 +151,16 @@
 
 ```json
 // [Recieve]
-// ok: returns ok if the program started up
-// error: returns "error " + description
+// Body: "ok" or "error " + description
 {
 	"topic": "programs/program-name",
 	"event": "start",
 	"body": "ok"
 	// "body": "error program already running"
+	// "body": "error programFolderName does not exist"
 }
-// payload: data sent to standard out or error (stdout, stderr)
+// If: "start" "ok"
+// Body: data sent to standard out or error (stdout, stderr)
 {
 	"topic": "programs/program-name",
 	"event": "data",
@@ -134,11 +172,12 @@
 }
 ```
 
-# data-history
+## Event: data-history
 
 ```json
 // [Send]
-// get: all outputs
+// Function: get all standard out or standard error (stdout, stderr)
+// Subscribes Topic: programs/program-name
 {
 	"topic": "programs/program-name",
 	"event": "data-history"
@@ -147,7 +186,7 @@
 
 ```json
 // [Recieve]
-// payload: array of data sent to standard out or error (stdout, stderr)
+// Body: array of data sent to standard out or error (stdout, stderr) or "error " + description
 {
 	"topic": "programs/program-name",
 	"event": "data-history",
@@ -168,15 +207,16 @@
 			"ascii": "Oh no\n"
 	    }
     ]
+	// "body": "error program-name doesn't exist"
 }
 ```
 
-# kill
+## Event: kill
 
 ```json
 // [Send]
-// ok: returns ok if the program started up
-// error: returns "error " + description
+// Function: kill the program
+// Subscribes Topic: programs/program-name
 {
 	"topic": "programs/program-name",
 	"event": "kill"
@@ -185,20 +225,22 @@
 
 ```json
 // [Recieve]
-// payload: array of data sent to standard out or error (stdout, stderr)
+// Body: "ok" or "error " + description
 {
 	"topic": "programs/program-name",
 	"event": "kill",
 	"body": "ok"
+	// "body": "error program-name doesn't exist"
 	// "body": "error program was not running"
 }
 ```
 
-# status
+## Event: status
 
 ```json
 // [Send]
-// get: 
+// Function: get status of program
+// Subscribes Topic: programs/program-name
 {
 	"topic": "programs/program-name",
 	"event": "status"
@@ -206,7 +248,7 @@
 ```
 
 ```json
-// payload: program state object
+// Body: program state object or "error " + description
 {
 	"topic": "programs/program-name",
 	"event": "status",
@@ -217,44 +259,6 @@
 		"pid": 3455370,
 		"running": false
 	}
-}
-```
-
-# kill-all
-
-```json
-// [Send]
-// get: 
-{
-	"topic": "programs",
-	"event": "kill-all"
-}
-```
-
-# status-all
-
-```json
-// [Send]
-// get: 
-{
-	"topic": "programs",
-	"event": "status-all"
-}
-```
-
-```json
-// payload: program state object
-{
-	"topic": "programs",
-	"event": "status-all",
-	"body": {
-		"program-name": {
-			"program": "node",
-			"args": "../private/programs/test-nodejs-express/main.js",
-			"env": { "port": "8626" },
-			"pid": 3455370,
-			"running": false
-		}
-	}
+	// "body": "error program-name doesn't exist"
 }
 ```

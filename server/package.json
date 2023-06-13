@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
+    "dev": "TEST=true nodemon server.js",
     "windows-service-install": "node install.js",
     "windows-service-uninstall": "node uninstall.js"
   },

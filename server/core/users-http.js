@@ -8,6 +8,7 @@ const {
     updateUserRole,
     defaultUsersFile,
     getUsers,
+    getGroups,
     deleteUser
 } = require('./users')
 const { gate } = require('./users-middleware')
@@ -18,7 +19,7 @@ const router = express.Router()
 
 // User roles
 router.get('/user/roles/v1', async (req, res) => {
-    res.json(ROLES)
+    res.json(getGroups)
 })
 
 // Get User
@@ -48,7 +49,7 @@ router.post('/login/v1', async (req, res) => {
 })
 
 // Create User
-router.post('/user/v1', gate({ minRole: ROLES.ADMIN }), async (req, res) => {
+router.post('/user/v1', gate({ requiredGroup: "admins" }), async (req, res) => {
     const result = createUser(req.body.username, req.body.password, req.body.passwordConfirm, req.body.role)
     if (result === "user created") res.json("user created")
     else if (result === "password does not match passwordConfirm") res.status(400).json("password does not match passwordConfirm")
@@ -58,7 +59,7 @@ router.post('/user/v1', gate({ minRole: ROLES.ADMIN }), async (req, res) => {
 })
 
 // Delete User
-router.delete('/user/v1', gate({ minRole: ROLES.ADMIN }), async (req, res) => {
+router.delete('/user/v1', gate({ requiredGroup: "admins" }), async (req, res) => {
     const result = deleteUser(req.body.username, req.body.password)
     if (result === "user deleted") res.json("user created")
     else if (result === "username doesn't exists") res.status(400).json("username doesn't exists")
@@ -67,7 +68,7 @@ router.delete('/user/v1', gate({ minRole: ROLES.ADMIN }), async (req, res) => {
 })
 
 // Update User
-router.put('/user/v1', gate({ minRole: ROLES.ADMIN }), async (req, res) => {
+router.put('/user/v1', gate({ requiredGroup: "admins" }), async (req, res) => {
     const roleResult = updateUserRole(req.body.username, req.body.password, req.body.role)
     const passResult = updateUserPassword(req.body.username, req.body.password, req.body.newPassword, req.body.newPasswordConfirm)
     if (roleResult === "user updated" && passResult === "user updated") res.json("user updated")

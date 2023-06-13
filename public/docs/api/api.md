@@ -20,6 +20,18 @@ ws.connect({
 })
 ```
 
+# JSON Objects
+
+[system](./system-json.md)
+
+[user](./user-json.md)
+
+[programs](./programs-json.md)
+
+[tcp-client](tcp-client-json.md)
+
+[serial](./serial-json.md)
+
 # Topics
 
 [system](./system-json.md)
@@ -67,7 +79,7 @@ ws.connect({
 })
 
 // Send json
-ws.send.json({
+ws.sendJson({
 	"topic": "user",
 	"event": "login",
 	"body": {
@@ -77,13 +89,13 @@ ws.send.json({
 })
 
 // Send event
-ws.send.event("user", "login", {
+ws.sendEvent("user", "login", {
 	"username": "admin",
 	"password": "admin"
 })
 
 // Receive json
-ws.receive.json(json => {
+ws.receiveJson(json => {
 	if (json.topic === "user" && json.event === "login") {
 		if (body.error === true) {
 			// Login failed
@@ -95,7 +107,7 @@ ws.receive.json(json => {
 })
 
 // Receive event
-ws.receive.event("user", "login", body => {
+ws.receiveEvent("user", "login", body => {
 	if (body.error === true) {
 		// Login failed
 	 }

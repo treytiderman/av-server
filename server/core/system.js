@@ -80,7 +80,7 @@ function getSystemInfo() {
 }
 
 // Startup
-log("system", "startup", getSystemInfo())
+log("system.js", "startup", getSystemInfo())
 
 // Exports
 exports.isAdmin = isAdmin

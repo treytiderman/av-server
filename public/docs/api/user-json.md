@@ -42,12 +42,15 @@
 
 ```json
 // [Send]
-// Function: login with TOKEN received from "login-with-password"
+// Function: login with username and TOKEN received from "login-with-password"
 // Subscribes Topic: "user"
 {
 	"topic": "user",
 	"event": "login-with-token",
-	"body": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNjg1ODI4MTUwfQ.nE-RHN62HgLsIpjydRejeBsfP3V0u2tCZMjbbp_77Is"
+	"body": {
+		"username": "admin",
+		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNjg1ODI4MTUwfQ.nE-RHN62HgLsIpjydRejeBsfP3V0u2tCZMjbbp_77Is"
+	}
 }
 ```
 
@@ -167,8 +170,8 @@
 			"groups": [ "admins" ]
 		},
 		{
-			"username": "guest",
-			"groups": [ "guests" ]
+			"username": "user",
+			"groups": [ "users" ]
 		}
 	]
 }
@@ -200,23 +203,30 @@
 	"topic": "user",
 	"event": "new",
 	"body": "ok"
-	// "body": "error username exists"
 	// "body": "error username invailed"
 	// "body": "error password invailed"
 	// "body": "error passwordConfirm does not match password"
-	// "body": "error group group_example does not exist"
+	// "body": "error username exists"
+	// "body": "error group in groups does not exist"
 	// "body": "error not in group admins"
+	// "body": "error login first"
 }
 
 // If: "new" "ok"
-// Body: user object of the connection
+// Body: array of user objects
 {
 	"topic": "user",
-	"event": "who-am-i",
-	"body": {
-		"username": "user",
-		"groups": [ "admins" ]
-	}
+	"event": "users",
+	"body": [
+		{
+			"username": "admin",
+			"groups": [ "admins" ]
+		},
+		{
+			"username": "user",
+			"groups": [ "admins" ]
+		}
+	]
 }
 ```
 
@@ -250,9 +260,26 @@
 	// "body": "error username does not exist"
 	// "body": "error newPassword invailed"
 	// "body": "error newPasswordConfirm does not match newPassword"
-	// "body": "error newGroup group_example does not exist"
+	// "body": "error group in newGroups does not exist"
 	// "body": "error users can not join group admins"
 	// "body": "error not in group users or admins"
+}
+
+// If: "update" "ok"
+// Body: array of user objects
+{
+	"topic": "user",
+	"event": "users",
+	"body": [
+		{
+			"username": "admin",
+			"groups": [ "admins" ]
+		},
+		{
+			"username": "user",
+			"groups": [ "admins" ]
+		}
+	]
 }
 
 // If: "update" "ok"
@@ -262,7 +289,7 @@
 	"event": "who-am-i",
 	"body": {
 		"username": "user",
-		"role": 50
+		"groups": [ "admins" ]
 	}
 }
 ```
@@ -292,6 +319,27 @@
 	"body": "ok"
 	// "body": "error username does not exist"
 	// "body": "error not in group admins"
+}
+
+// If: "delete" "ok"
+// Body: array of user objects
+{
+	"topic": "user",
+	"event": "users",
+	"body": [
+		{
+			"username": "admin",
+			"groups": [ "admins" ]
+		}
+	]
+}
+
+// If: user deleted was currently logged in
+// Body: user object of the connection
+{
+	"topic": "user",
+	"event": "who-am-i",
+	"body": "error not logged in"
 }
 ```
 

@@ -50,7 +50,7 @@ const ws = require('./core/websocket-server')
 const server = ws.create(http_server)
 
 // Start Server
-const port = process.env.port || 4620
+const port = process.env.PORT || 4620
 server.listen(port, () => {
     console.log(`AV-Tools server is up and running`)
     http.startupConsoleLog(port)

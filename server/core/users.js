@@ -1,255 +1,304 @@
-const crypto = require('crypto')
-const jwt = require('jsonwebtoken')
-const file_system = require('./files')
+const { hashPassword, isHashedPassword, generateJWT, verifyJWT } = require('./auth')
+const { State } = require('./state')
 const logger = require('./logger')
 
 // Variables
-const CRYPTO_KEYSIZE = 64
-const CRYPTO_ITERATIONS = 9999
-// const JWT_KEY = crypto.randomBytes(CRYPTO_KEYSIZE).toString('base64')
-const JWT_KEY = "DELETE_ME_8UrIDqNu3GhKV8DUqYM2W7SYZ1RmBniygRvIb6gGRZ48"
-const ROLES = {
-    ADMIN: 99,
-    USER: 50,
-    ANY: 0,
+const DEFAULT_GROUPS = [ "admins", "users", "guests" ]
+const DEFAULT_USER = {
+    username: 'admin',
+    password: hashPassword("admin"),
+    groups: ["admins"],
 }
-const DEFAULT_USERS = [
-    {
-        username: 'admin',
-        password: hashPassword("admin"),
-        role: ROLES.ADMIN,
-    }
-]
-const state = { users: [] }
+const DEFAULT_STATE = {
+    groups: DEFAULT_GROUPS,
+    users: [ DEFAULT_USER ]
+}
+const _State = new State('users', DEFAULT_STATE)
 
 // Helper Functions
 function log(message, obj = {}) {
-    logger.log("users", message, obj)
+    logger.log("users.js", message, obj)
 }
-function hashPassword(password) {
-    const salt = crypto.randomBytes(CRYPTO_KEYSIZE).toString('base64')
-    const hash = crypto.pbkdf2Sync(password, salt, CRYPTO_ITERATIONS, CRYPTO_KEYSIZE, 'sha256').toString('base64')
-    return { salt: salt, hash: hash }
-}
-function isHashedPassword(password, hash, salt) {
-    const hashTesting = crypto.pbkdf2Sync(password, salt, CRYPTO_ITERATIONS, CRYPTO_KEYSIZE, 'sha256').toString('base64')
-    return hash === hashTesting
-}
-function generateJWT(json) {
-    return jwt.sign(json, JWT_KEY)
-}
-function verifyJWT(token, cb) {
-    jwt.verify(token, JWT_KEY, (error, json) => cb(error, json))
-}
-function clearUsersArray() {
-    state.users = []
-    return state.users
-}
-async function getUsersFile() {
-    return await file_system.readJSON("../private/configs/users.json")
-}
-async function saveUsersFile() {
-    return await file_system.writeJSON("../private/configs/users.json", state.users)
-}
-async function defaultUsersFile() {
-    state.users = DEFAULT_USERS
-    await saveUsersFile()
-    log("set to default users file")
-    return state.users
-}
-
-// Functions
 function validUsermame(username) {
-    return username || ""
+    return username &&
+        username.length >= 4;
 }
 function validPassword(password) {
-    return password || ""
+    return password &&
+        password.length >= 4;
 }
-function validRole(role) {
-    if (role < 0 || role > 100) return false
-    return true
+
+function isUser(username) {
+    return _State.get("users").some(user => user.username === username)
+}
+function getUserAndPassword(username) {
+    const user = _State.get("users").find(user => user.username === username)
+    return user
 }
 function getUser(username) {
-    username = username || ""
-    const user = state.users.find(user => user.username === username)
-    if (!user) return "username doesn't exists"
-    return { username: user.username, role: user.role }
+    if (!isUser(username)) return "username doesn't exists"
+    const user = getUserAndPassword(username)
+    return { username: user.username, groups: user.groups }
 }
 function getUsers() {
     const array = []
-    state.users.forEach(user => array.push(getUser(user.username)))
+    _State.get("users").forEach(user => array.push(getUser(user.username)))
     return array
 }
-function getUserAndPassword(username) {
-    username = username || ""
-    const user = state.users.find(user => user.username === username)
-    return user
+
+function getGroups() {
+    return _State.get("groups")
 }
-function isUser(username) {
-    username = username || ""
-    return state.users.some(user => user.username === username)
+function isGroup(groupName) {
+    return getGroups().some(group => group === groupName)
 }
+function areGroups(groupsArray) {
+    if (!Array.isArray(groupsArray)) return false
+    if (groupsArray.length < 1) return false
+    return groupsArray.every(group => isGroup(group))
+}
+async function addGroup(groupToAdd) {
+    if (isGroup(groupToAdd)) return false
+    const newGroups = getGroups()
+    newGroups.push(groupToAdd)
+    await _State.set("groups", newGroups)
+    log(`addGroup("${groupToAdd}")`)
+}
+async function removeGroup(groupToRemove) {
+    if (groupToRemove === "admins") {
+        log(`removeGroup("${groupToRemove}")`, "error can not delete admins group")
+        return "error can not delete admins group"
+    }
+    const newGroups = getGroups().filter(group => group !== groupToRemove)
+    await _State.set("groups", newGroups)
+    log(`removeGroup("${groupToRemove}")`, "ok")
+}
+
+// Functions
 function getToken(username, password) {
-    username = username || ""
-    password = password || ""
+    let result = ""
     const user = getUserAndPassword(username)
 
-    let result = ""
-    if (!user) result = "username doesn't exists"
-    else if (!isHashedPassword(password, user.password.hash, user.password.salt)) result = "password incorrect"
+    if (!isUser(username)) result = "error username doesn't exists"
+    else if (!isHashedPassword(password, user.password.hash, user.password.salt)) result = "error password incorrect"
     else result = generateJWT({ username: user.username })
 
-    log(`getToken("${username}", "${password}")`, result)
+    // log(`getToken("${username}", "${password}")`, result)
+    log(`getToken("${username}", "********")`, result)
     return result
 }
 function verifyToken(token) {
-    verifyJWT(token, (error, jwtJson) => {
-        if (error) return "bad token"
-        else return jwtJson.username
-    })
-}
-async function createUser(username, password, passwordConfirm, role = 0) {
-    username = username || ""
-    password = password || ""
-    passwordConfirm = passwordConfirm || ""
-
-    // TODO validate username and password (length, special chars, etc...)
     let result = ""
-    if (password === "") result = "password is empty"
-    else if (password !== passwordConfirm) result = "password does not match passwordConfirm"
-    else if (isUser(username)) result = "username exists"
-    else if (role < 0 || role > 100) result = "role not between 0 and 100"
+
+    verifyJWT(token, (error, jwtJson) => {
+        if (error) result = "error bad token"
+        else result = jwtJson
+    })
+    
+    // log(`verifyToken("${token}")`, result)
+    log(`verifyToken("********")`, result)
+    return result
+}
+
+async function addUser(username, password, passwordConfirm, groups = []) {
+    let result = ""
+
+    if (!validUsermame(username)) result = "error username invailed"
+    else if (!validPassword(password)) result = "error password invailed"
+    else if (password !== passwordConfirm) result = "error passwordConfirm does not match password"
+    else if (isUser(username)) result = "error username exists"
+    else if (!areGroups(groups)) result = "error group in groups does not exist"
     else {
         const user = {
             username: username,
             password: hashPassword(password),
-            role: role,
+            groups: groups,
         }
-        state.users.push(user)
-        await saveUsersFile()
-        result = "user created"
+        let newUsers = _State.get("users")
+        newUsers.push(user)
+        await _State.set("users", newUsers)
+        result = "ok"
     }
 
-    log(`createUser("${username}", "${password}", "${passwordConfirm}", "${role}")`, result)
+    // log(`addUser("${username}", "${password}", "${passwordConfirm}", "${groups}")`, result)
+    log(`addUser("${username}", "********", "********", "${groups}")`, result)
     return result
 }
-async function deleteUser(username) {
-    username = username || ""
-
+async function removeUser(username) {
     let result = ""
-    if (isUser(username)) result = "username doesn't exists"
+
+    if (!isUser(username)) result = "error username doesn't exists"
     else {
-        state.users = state.users.filter(user => user.username !== username)
-        await saveUsersFile()
-        result = "success"
+        let newUsers = _State.get("users")
+        newUsers = newUsers.filter(user => user.username !== username)
+        await _State.set("users", newUsers)
+        result = "ok"
     }
 
-    log(`deleteUser("${username}")`, result)
+    log(`removeUser("${username}")`, result)
     return result
 }
-async function updateUserRole(username, password, role = 0) {
-    username = username || ""
-    password = password || ""
-    const user = getUserAndPassword(username)
-
+async function addGroupToUser(username, groupToAdd) {
     let result = ""
-    if (!user) result = "username doesn't exists"
-    // else if (user.role < role) result = "user's role is less than the requested role"
-    else if (!isHashedPassword(password, user.password.hash, user.password.salt)) result = "password incorrect"
+    const user = getUser(username)
+    const isUserInGroup = user.groups.some(group => group === groupToAdd)
+
+    if (!isUser(username)) result = "error username doesn't exists"
+    else if (!isGroup(groupToAdd)) result = "error groupToAdd does not exist"
+    else if (isUserInGroup) result = "error user already in groupToAdd"
     else {
-        user.role = role
-        await saveUsersFile()
-        result = "user updated"
+        const newUsers = _State.get("users")
+        const newUser = newUsers.find(u => u.username === user.username)
+        newUser.groups.push(groupToAdd)
+        await _State.set("users", newUsers)
+        result = "ok"
     }
     
-    log(`updateUserRole("${username}", "${password}", "${role}")`, result)
+    log(`addGroupToUser("${username}", "${groupToAdd}")`, result)
     return result
 }
-async function updateUserPassword(username, password, newPassword, newPasswordConfirm) {
-    username = username || ""
-    password = password || ""
-    newPassword = newPassword || ""
-    newPasswordConfirm = newPasswordConfirm || ""
-    const user = getUserAndPassword(username)
-
+async function removeGroupFromUser(username, groupToRemove) {
     let result = ""
-    if (newPassword === "") result = "newPassword is empty"
-    else if (newPassword !== newPasswordConfirm) result = "newPassword does not match newPasswordConfirm"
-    else if (!user) result = "username doesn't exists"
-    else if (!isHashedPassword(password, user.password.hash, user.password.salt)) result = "password incorrect"
+    const user = getUser(username)
+    const isUserInGroup = user.groups.some(group => group === groupToRemove)
+
+    if (!isUser(username)) result = "error username doesn't exists"
+    else if (!isGroup(groupToRemove)) result = "error groupToRemove does not exist"
+    else if (!isUserInGroup) result = "error user is not in groupToRemove"
     else {
-        user.password = hashPassword(newPassword)
-        await saveUsersFile()
-        result = "user updated"
+        const newUsers = _State.get("users")
+        const newUser = newUsers.find(u => u.username === user.username)
+        newUser.groups = newUser.groups.filter(group => group === groupToRemove)
+        await _State.set("users", newUsers)
+        result = "ok"
+    }
+    
+    log(`removeGroupFromUser("${username}", "${groupToRemove}")`, result)
+    return result
+}
+async function changeUserPassword(username, newPassword, newPasswordConfirm) {    
+    let result = ""
+    
+    if (!isUser(username)) result = "error username doesn't exists"
+    else if (!validPassword(newPassword)) result = "error newPassword invailed"
+    else if (newPassword !== newPasswordConfirm) result = "error newPasswordConfirm does not match newPassword"
+    else {
+        const user = getUser(username)
+        const newUsers = _State.get("users")
+        const newUser = newUsers.find(u => u.username === user.username)
+        newUser.password = hashPassword(newPassword)
+        await _State.set("users", newUsers)
+        result = "ok"
     }
 
-    log(`updateUserPassword("${username}", "${password}", "${newPassword}", "${newPasswordConfirm}")`, result)
+    // log(`changeUserPassword("${username}", "${newPassword}", "${newPasswordConfirm}")`, result)
+    log(`changeUserPassword("${username}", "********", "********")`, result)
     return result
 }
 
-// Startup
-getUsersFile().then(async file => {
-    if (file) {
-        clearUsersArray()
-        state.users.push(...file)
-        // log("users.json file found")
-    }
-    else {
-        await defaultUsersFile()
-        log("no users.json file found. set to default users file")
-    }
-})
+// Testing
+setTimeout(async () => {
+    if (process.env.TEST) runTests("users.js")
+}, 1000)
+async function runTests(testName) {
+    let pass = true
+
+    if (validUsermame()) pass = false
+    if (validUsermame("")) pass = false
+    if (validUsermame(null)) pass = false
+    if (validUsermame(undefined)) pass = false
+    if (validUsermame("h")) pass = false
+    if (validUsermame(32400)) pass = false
+    if (!validUsermame("username")) pass = false
+    
+    if (isUser()) pass = false
+    if (isUser("")) pass = false
+    if (isUser(null)) pass = false
+    if (isUser(undefined)) pass = false
+    if (isUser("fakeUser")) pass = false
+    if (!isUser("admin")) pass = false
+
+    const adminUserWithPassword = getUserAndPassword("admin") || {}
+    const adminUser = getUser("admin") || {}
+    if (adminUserWithPassword.username !== DEFAULT_USER.username) pass = false
+    if (adminUser.username !== DEFAULT_USER.username) pass = false
+        
+    if (isGroup()) pass = false
+    if (isGroup("")) pass = false
+    if (isGroup(null)) pass = false
+    if (isGroup(undefined)) pass = false
+    if (isGroup("fakeGroup")) pass = false
+    if (!isGroup("admins")) pass = false
+
+    if (areGroups([])) pass = false
+    if (areGroups()) pass = false
+    if (areGroups("")) pass = false
+    if (areGroups(null)) pass = false
+    if (areGroups(undefined)) pass = false
+    if (areGroups("admins")) pass = false
+    if (areGroups([ "admins", "fakeGroup" ])) pass = false
+    if (!areGroups([ "admins", "users" ])) pass = false
+
+    const groups = getGroups()
+    if (JSON.stringify(groups) !== JSON.stringify(DEFAULT_GROUPS)) pass = false
+
+    await addGroup("testGroup")
+    await addGroup("testGroup")
+    if (!isGroup("testGroup")) pass = false
+    await removeGroup("testGroup")
+    if (isGroup("testGroup")) pass = false
+
+    const removeGroupResponse = await removeGroup("admins")
+    if (removeGroupResponse !== "error can not delete admins group") pass = false
+    if (!isGroup("admins")) pass = false
+
+    const token = getToken("admin", "admin")
+    if (token.startsWith("error")) pass = false
+    const verifyTokenResponse = verifyToken(token)
+    if (verifyTokenResponse === "error bad token") pass = false
+    if (verifyTokenResponse.username !== "admin") pass = false
+
+    const addUserResponse = await addUser("user4", "password", "password", [ "admins" ])
+    if (addUserResponse !== "ok") pass = false
+    const token2 = getToken("user4", "password")
+    if (token2.startsWith("error")) pass = false
+
+    const addGroupToUserResponse = await addGroupToUser("user4", "users")
+    if (addGroupToUserResponse !== "ok") pass = false
+    const removeGroupFromUserResponse = await removeGroupFromUser("user4", "users")
+    if (removeGroupFromUserResponse !== "ok") pass = false
+
+    const changeUserPasswordResponse = await changeUserPassword("user4", "password2", "password2")
+    if (changeUserPasswordResponse !== "ok") pass = false
+    const token3 = getToken("user4", "password2")
+    if (token3.startsWith("error")) pass = false
+
+    const removeUserResponse2 = await removeUser("user4")
+    if (removeUserResponse2 !== "ok") pass = false
+
+    if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
+}
 
 // Export
-exports.ROLES = ROLES
-exports.hashPassword = hashPassword
-exports.isHashedPassword = isHashedPassword
-exports.generateJWT = generateJWT
-exports.verifyJWT = verifyJWT
-exports.getUsersFile = getUsersFile
-exports.saveUsersFile = saveUsersFile
-exports.defaultUsersFile = defaultUsersFile
+exports.validUsermame = validUsermame
+exports.validPassword = validPassword
+
+exports.isUser = isUser
+exports.getUserAndPassword = getUserAndPassword
+exports.getUser = getUser
+exports.getUsers = getUsers
+
+exports.getGroups = getGroups
+exports.isGroup = isGroup
+exports.areGroups = areGroups
+exports.addGroup = addGroup
+exports.removeGroup = removeGroup
 
 exports.getToken = getToken
 exports.verifyToken = verifyToken
-exports.isUser = isUser
-exports.getUser = getUser
-exports.getUsers = getUsers
-exports.createUser = createUser
-exports.deleteUser = deleteUser
-exports.updateUserRole = updateUserRole
-exports.updateUserPassword = updateUserPassword
 
-// Testing
-
-// const testPass1 = "password"
-// const testPass2 = "password"
-// const hashTestPass1 = hashPassword(testPass1)
-// console.log(hashTestPass1)
-// const isTestPass1 = isHashedPassword(testPass2, hashTestPass1.hash, hashTestPass1.salt)
-// console.log(isTestPass1)
-
-// const testData = { boom: "pow" }
-// const testToken = generateJWT(testData)
-// console.log(testToken)
-// const testToken2 = testToken
-// console.log(testToken2)
-// verifyJWT(testToken2, (error, json) => {
-//   if (error) console.log("wrong token")
-//   else console.log("correct token", json)
-// })
-
-// setTimeout(async () => {
-//     console.log('createUser("user", "password", "password", 50)', await createUser("user", "password", "password", 50))
-//     console.log('getUser("user")', getUser("user"))
-//     console.log('isUser("user")', isUser("user"))
-//     console.log('getToken("user", "password")', getToken("user", "password"))
-//     console.log('updateUserRole("user", "password", 69)', await updateUserRole("user", "password", 69))
-//     console.log('updateUserRole("user", "password", 42)', await updateUserRole("user", "password", 42))
-//     console.log('getUser("user")', getUser("user"))
-//     console.log('updateUserPassword("user", "password", "password2", "password2")', await updateUserPassword("user", "password", "password2", "password2"))
-//     console.log('getToken("user", "password2")', getToken("user", "password2"))
-//     console.log('deleteUser("user", "password")', await deleteUser("user", "password"))
-//     console.log('deleteUser("user", "password2")', await deleteUser("user", "password2"))
-//     console.log('defaultUsersFile()', await defaultUsersFile())
-// }, 1000)
+exports.addUser = addUser
+exports.removeUser = removeUser
+exports.addGroupToUser = addGroupToUser
+exports.removeGroupFromUser = removeGroupFromUser
+exports.changeUserPassword = changeUserPassword

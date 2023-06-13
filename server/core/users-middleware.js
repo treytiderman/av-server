@@ -4,7 +4,7 @@
 3. What User? req.user { username, role }
 4. Auth level? req.user.role = 0 though 99
 5. Is self or ADMIN? req.isSelf = true || false */
-const { ROLES, getUser, verifyJWT } = require('./users')
+const { getUser, verifyJWT } = require('./users')
 function checkLocalhost(req) {
     const ip = req.headers.host.split(':')[0]
     if (ip === `localhost`) return true
@@ -33,19 +33,19 @@ function checkRequest(req, res, next) {
 }
 function gate(require = {
     isLocalhost: false,
-    minRole: 0,
+    requiredGroup: "admin",
     isSelf: false,
     token: false,
 }) {
     return (req, res, next) => {
         require.isLocalhost ?? false
-        require.minRole = require.minRole ?? null
+        require.requiredGroup = require.requiredGroup ?? null
         require.isSelf = require.isSelf ?? false
-        require.token = require.minRole !== null || require.isSelf
+        require.token = require.requiredGroup !== null || require.isSelf
 
         // Request required to come from localhost?
         if (require.isLocalhost && req.isLocalhost === false) {
-            return res.status(401).json("not autherized, localhost only")
+            return res.status(401).json("error not autherized, localhost only")
         }
 
         // Request requires a token / user?
@@ -53,25 +53,25 @@ function gate(require = {
 
             // No / Bad Token
             if (req.token === "no token" || req.token === "bad token") {
-                return res.status(401).json(`not autherized, ${req.token}, login needed`)
+                return res.status(401).json(`errornot autherized, ${req.token}, login needed`)
             }
 
             // User is valid
             else if (req.user === undefined) {
-                return res.status(401).json("not autherized, user doesn't exist")
+                return res.status(401).json("error not autherized, user doesn't exist")
             }
 
             // Users role is less than the minimum role level required
-            else if (req.user.role < require.minRole) {
-                return res.status(401).json("not autherized, role / auth level to low")
+            else if (req.user.groups.some(group => group === require.requiredGroup)) {
+                return res.status(401).json("error not in group " + require.requiredGroup)
             }
 
             // User is not the requested user or an ADMIN
             else if (require.isSelf && req.isSelf === false) {
 
                 // Admins don't have to follow this rule
-                if (req.user.role !== ROLES.ADMIN) {
-                    return res.status(401).json("not autherized, you are not the requested user or an ADMIN")
+                if (req.user.groups.some(group => group === "admins")) {
+                    return res.status(401).json("error not in group admins")
                 }
             }
 

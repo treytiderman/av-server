@@ -1,10 +1,19 @@
-[
-  {
-    "username": "admin",
-    "password": {
-      "salt": "qQ9pHf/pen9BnxGTytugxGBhhuleLzSgpVyEjyqfs8hjwgfjMaWP0dDRgRZyiJjCE96KgN4VRQQWFA4ryRNJMw==",
-      "hash": "OPWM0pEl8cD1eeAKq4CAq126bZHn4GSXUGAv72aHDn/p7Dr5MKHMxchzzT3Z2YBXVxn88lvRxZu1TwEWX9PyTg=="
-    },
-    "role": 99
-  }
-]
+{
+  "groups": [
+    "admins",
+    "users",
+    "guests"
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "password": {
+        "salt": "HljPCygrtoGLR6o2HbQgBO87zUsMmdvako+o+GbDxuo7X4J/EvgVLMx71kH7K9supP8X7D+Moee3O9+VJAcUyw==",
+        "hash": "4VmxwmsG+nT7ZdAVURRBnRCqeZbs2Z6zZL4KPfXUfasZInhCuEuoo3kL4sYLtCc9deg1VeGvyr5OAumrGfc2ZA=="
+      },
+      "groups": [
+        "admins"
+      ]
+    }
+  ]
+}
