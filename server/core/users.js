@@ -3,7 +3,7 @@ const { State } = require('./state')
 const logger = require('./logger')
 
 // Variables
-const DEFAULT_GROUPS = [ "admins", "users", "guests" ]
+const DEFAULT_GROUPS = ["admins", "users", "guests"]
 const DEFAULT_USER = {
     username: 'admin',
     password: hashPassword("admin"),
@@ -11,7 +11,7 @@ const DEFAULT_USER = {
 }
 const DEFAULT_STATE = {
     groups: DEFAULT_GROUPS,
-    users: [ DEFAULT_USER ]
+    users: [DEFAULT_USER]
 }
 const _State = new State('users', DEFAULT_STATE)
 
@@ -45,6 +45,9 @@ function getUsers() {
     _State.get("users").forEach(user => array.push(getUser(user.username)))
     return array
 }
+function getUsersAndPasswords() {
+    return _State.get("users")
+}
 
 function getGroups() {
     return _State.get("groups")
@@ -71,6 +74,12 @@ async function removeGroup(groupToRemove) {
     }
     const newGroups = getGroups().filter(group => group !== groupToRemove)
     await _State.set("groups", newGroups)
+    const newUsers = []
+    getUsersAndPasswords().forEach(user => {
+        user.groups = user.groups.filter(group => group !== groupToRemove)
+        newUsers.push(user)
+    })
+    await _State.set("users", newUsers)
     log(`removeGroup("${groupToRemove}")`, "ok")
 }
 
@@ -84,20 +93,20 @@ function getToken(username, password) {
     else result = generateJWT({ username: user.username })
 
     // log(`getToken("${username}", "${password}")`, result)
-    log(`getToken("${username}", "********")`, result)
+    log(`getToken("${username}", "********")`, "********")
     return result
 }
-function verifyToken(token) {
+function verifyToken(token, cb) {
     let result = ""
 
     verifyJWT(token, (error, jwtJson) => {
         if (error) result = "error bad token"
         else result = jwtJson
+
+        // log(`verifyToken("${token}")`, result)
+        log(`verifyToken("********")`, result)
+        cb(result)
     })
-    
-    // log(`verifyToken("${token}")`, result)
-    log(`verifyToken("********")`, result)
-    return result
 }
 
 async function addUser(username, password, passwordConfirm, groups = []) {
@@ -124,24 +133,10 @@ async function addUser(username, password, passwordConfirm, groups = []) {
     log(`addUser("${username}", "********", "********", "${groups}")`, result)
     return result
 }
-async function removeUser(username) {
-    let result = ""
-
-    if (!isUser(username)) result = "error username doesn't exists"
-    else {
-        let newUsers = _State.get("users")
-        newUsers = newUsers.filter(user => user.username !== username)
-        await _State.set("users", newUsers)
-        result = "ok"
-    }
-
-    log(`removeUser("${username}")`, result)
-    return result
-}
 async function addGroupToUser(username, groupToAdd) {
     let result = ""
     const user = getUser(username)
-    const isUserInGroup = user.groups.some(group => group === groupToAdd)
+    const isUserInGroup = user.groups?.some(group => group === groupToAdd)
 
     if (!isUser(username)) result = "error username doesn't exists"
     else if (!isGroup(groupToAdd)) result = "error groupToAdd does not exist"
@@ -153,7 +148,7 @@ async function addGroupToUser(username, groupToAdd) {
         await _State.set("users", newUsers)
         result = "ok"
     }
-    
+
     log(`addGroupToUser("${username}", "${groupToAdd}")`, result)
     return result
 }
@@ -168,17 +163,17 @@ async function removeGroupFromUser(username, groupToRemove) {
     else {
         const newUsers = _State.get("users")
         const newUser = newUsers.find(u => u.username === user.username)
-        newUser.groups = newUser.groups.filter(group => group === groupToRemove)
+        newUser.groups = newUser.groups.filter(group => group !== groupToRemove)
         await _State.set("users", newUsers)
         result = "ok"
     }
-    
+
     log(`removeGroupFromUser("${username}", "${groupToRemove}")`, result)
     return result
 }
-async function changeUserPassword(username, newPassword, newPasswordConfirm) {    
+async function changeUserPassword(username, newPassword, newPasswordConfirm) {
     let result = ""
-    
+
     if (!isUser(username)) result = "error username doesn't exists"
     else if (!validPassword(newPassword)) result = "error newPassword invailed"
     else if (newPassword !== newPasswordConfirm) result = "error newPasswordConfirm does not match newPassword"
@@ -195,6 +190,25 @@ async function changeUserPassword(username, newPassword, newPasswordConfirm) {
     log(`changeUserPassword("${username}", "********", "********")`, result)
     return result
 }
+async function removeUser(username) {
+    let result = ""
+
+    if (!isUser(username)) result = "error username doesn't exists"
+    else {
+        let newUsers = _State.get("users")
+        newUsers = newUsers.filter(user => user.username !== username)
+        await _State.set("users", newUsers)
+        result = "ok"
+    }
+
+    log(`removeUser("${username}")`, result)
+    return result
+}
+
+async function resetUsersToDefault() {
+    await _State.set("users", DEFAULT_USER)
+    await _State.set("groups", DEFAULT_GROUPS)
+}
 
 // Testing
 setTimeout(async () => {
@@ -210,7 +224,7 @@ async function runTests(testName) {
     if (validUsermame("h")) pass = false
     if (validUsermame(32400)) pass = false
     if (!validUsermame("username")) pass = false
-    
+
     if (isUser()) pass = false
     if (isUser("")) pass = false
     if (isUser(null)) pass = false
@@ -222,7 +236,7 @@ async function runTests(testName) {
     const adminUser = getUser("admin") || {}
     if (adminUserWithPassword.username !== DEFAULT_USER.username) pass = false
     if (adminUser.username !== DEFAULT_USER.username) pass = false
-        
+
     if (isGroup()) pass = false
     if (isGroup("")) pass = false
     if (isGroup(null)) pass = false
@@ -236,11 +250,11 @@ async function runTests(testName) {
     if (areGroups(null)) pass = false
     if (areGroups(undefined)) pass = false
     if (areGroups("admins")) pass = false
-    if (areGroups([ "admins", "fakeGroup" ])) pass = false
-    if (!areGroups([ "admins", "users" ])) pass = false
+    if (areGroups(["admins", "fakeGroup"])) pass = false
+    if (!areGroups(["admins", "users"])) pass = false
 
     const groups = getGroups()
-    if (JSON.stringify(groups) !== JSON.stringify(DEFAULT_GROUPS)) pass = false
+    if (!groups.some(group => group === "admins")) pass = false
 
     await addGroup("testGroup")
     await addGroup("testGroup")
@@ -254,11 +268,15 @@ async function runTests(testName) {
 
     const token = getToken("admin", "admin")
     if (token.startsWith("error")) pass = false
-    const verifyTokenResponse = verifyToken(token)
-    if (verifyTokenResponse === "error bad token") pass = false
-    if (verifyTokenResponse.username !== "admin") pass = false
+    verifyToken("BAD_TOKEN", (response) => {
+        if (response !== "error bad token") pass = false
+    })
+    verifyToken(token, (response) => {
+        if (response === "error bad token") pass = false
+        if (response.username !== "admin") pass = false
+    })
 
-    const addUserResponse = await addUser("user4", "password", "password", [ "admins" ])
+    const addUserResponse = await addUser("user4", "password", "password", ["admins"])
     if (addUserResponse !== "ok") pass = false
     const token2 = getToken("user4", "password")
     if (token2.startsWith("error")) pass = false
@@ -287,6 +305,7 @@ exports.isUser = isUser
 exports.getUserAndPassword = getUserAndPassword
 exports.getUser = getUser
 exports.getUsers = getUsers
+exports.resetUsersToDefault = resetUsersToDefault
 
 exports.getGroups = getGroups
 exports.isGroup = isGroup

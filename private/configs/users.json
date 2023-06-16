@@ -8,8 +8,8 @@
     {
       "username": "admin",
       "password": {
-        "salt": "HljPCygrtoGLR6o2HbQgBO87zUsMmdvako+o+GbDxuo7X4J/EvgVLMx71kH7K9supP8X7D+Moee3O9+VJAcUyw==",
-        "hash": "4VmxwmsG+nT7ZdAVURRBnRCqeZbs2Z6zZL4KPfXUfasZInhCuEuoo3kL4sYLtCc9deg1VeGvyr5OAumrGfc2ZA=="
+        "salt": "i/JedX/rjqfVB+cbDPZJmzWoiHZHAfGoxueDLj9Tu0usro+vIZ280oL+Rwbzf47HqHMyjynSh0I7KaJx0wiyaA==",
+        "hash": "h70753wRNeHyUy2TO/bBX9bmNMvdgIZAW2a5cxWZ0DOTwy7eapeq1X9Z57xSgg0FdRYI+d5Q1Rc4NziG6npkDQ=="
       },
       "groups": [
         "admins"

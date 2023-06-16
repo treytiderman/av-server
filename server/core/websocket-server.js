@@ -11,12 +11,13 @@ let wsServer
 
 // Variables
 const emitter = new events.EventEmitter()
+emitter.setMaxListeners(100) // number of receiveTopic and receiveEvent uses
 
 // Helper Functions
 const logInConsole = false
 const logger = require('./logger')
 function log(text, obj = {}) {
-    logger.log("websocket", text, obj)
+    logger.log("websocket-server.js", text, obj)
     if (logInConsole) { console.log("websocket", text, obj) }
 }
 function isJSON(text) {

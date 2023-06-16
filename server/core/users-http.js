@@ -1,82 +1,149 @@
-const fs = require('fs').promises
 const {
-    ROLES,
     getUser,
-    getToken,
-    createUser,
-    updateUserPassword,
-    updateUserRole,
-    defaultUsersFile,
     getUsers,
+    resetUsersToDefault,
     getGroups,
-    deleteUser
+    addGroup,
+    removeGroup,
+    getToken,
+    addUser,
+    removeUser,
+    addGroupToUser,
+    removeGroupFromUser,
+    changeUserPassword
 } = require('./users')
-const { gate } = require('./users-middleware')
+const { verifyJWT } = require('./auth')
 
 // Create Express router
 const express = require('express')
 const router = express.Router()
 
-// User roles
-router.get('/user/roles/v1', async (req, res) => {
-    res.json(getGroups)
+
+// Functions
+function checkReqIsLocalhost(req) {
+    const ip = req.headers.host.split(':')[0]
+    if (ip === `localhost`) return true
+    else return false
+}
+function getTokenFromHeader(req) {
+    // Grab Token from authorization header "Authorization: Bearer <TOKEN>"
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    return token ?? "no token"
+}
+
+// Request checking middleware
+// Is localhost? req.isLocalhost = true || false
+// Has Token? req.token = token || "no token" || "bad token"
+// What User? req.user { username, groups }
+// Admin? req.isAdmin = in group "admins"
+// Is self? req.isSelf = true || false
+function checkRequest(req, res, next) {
+    req.user = {}
+    req.token = getTokenFromHeader(req)
+    req.isSelf = false
+    req.isAdmin = false
+    req.isLocalhost = checkReqIsLocalhost(req)
+
+    if (req.token !== "no token") {
+        verifyJWT(req.token, (error, jwtJson) => {
+            if (error) req.token = "bad token"
+            else {
+                const user = getUser(jwtJson.username)
+                if (user) {
+                    req.user = user
+                    req.isSelf = req.user.username === req.body.username
+                    req.isAdmin = req.user.groups.some(group => group === "admins")
+                }
+            }
+        })
+    }
+    next()
+}
+
+// Gatekeep middleware for endpoints
+function gate(require = {
+    token: false,
+    isSelf: false,
+    isAdmin: false,
+    isLocalhost: false,
+    requiredGroup: false,
+}) {
+    return (req, res, next) => {
+        if (require.token && (req.token === "no token" || req.token === "bad token")) {
+            return res.status(401).json(`error ${req.token}, login needed`)
+        }
+        if (require.isSelf && req.isSelf === false) {
+            return res.status(401).json("error not self, token must be for username specified")
+        }
+        if (require.isAdmin && req.isAdmin === false) {
+            return res.status(401).json("error not in group admins")
+        }
+        if (require.isLocalhost && req.isLocalhost === false) {
+            return res.status(401).json("error localhost only")
+        }
+        if (require.requiredGroup !== false && req.user.groups.some(group => group === require.requiredGroup)) {
+            return res.status(401).json("error not in group " + require.requiredGroup)
+        }
+        next() // Passed all checks
+    }
+}
+
+// Routes
+router.get('/user/get-token', async (req, res) => {
+    const response = getToken(req.body.username, req.body.password)
+    if (response === "error password incorrect") res.json("error username or password incorrect")
+    else if (response === "error username doesn't exists") res.json("error username or password incorrect")
+    else res.json(response)
+})
+router.get('/user/who-am-i', gate({token: true}), async (req, res) => {
+    res.json(req.user)
 })
 
-// Get User
-router.get('/user/v1', async (req, res) => {
-    const user = getUser(req.body?.username)
-    res.json(user)
+router.get('/user/groups', async (req, res) => {
+    const response = await await getGroups()
+    res.json(response)
 })
-
-// Get All Users
-router.get('/users/v1', async (req, res) => {
-    const response = getUsers()
+router.get('/user/add-group', gate({isAdmin: true}), async (req, res) => {
+    const response = await addGroup(req.body.groupToAdd)
+    res.json(response)
+})
+router.get('/user/remove-group', gate({isAdmin: true}), async (req, res) => {
+    const response = await removeGroup(req.body.groupToRemove)
     res.json(response)
 })
 
-// Get User from token
-router.get('/me/v1', gate({ isSelf: true }), async (req, res) => {
-    const user = getUser(req.user.username)
-    res.json(user)
+router.get('/user/users', async (req, res) => {
+    const response = getUsers()
+    res.json(response)
+})
+router.get('/user/add', gate({isAdmin: true}), async (req, res) => {
+    const response = await addUser(req.body.username, req.body.password, req.body.passwordConfirm, req.body.groups)
+    res.json(response)
+})
+router.get('/user/add-group-to-user', gate({isAdmin: true}), async (req, res) => {
+    const response = await addGroupToUser(req.body.username, req.body.groupToAdd)
+    res.json(response)
+})
+router.get('/user/remove-group-from-user', gate({isAdmin: true}), async (req, res) => {
+    const response = await removeGroupFromUser(req.body.username, req.body.groupToRemove)
+    res.json(response)
+})
+router.get('/user/change-user-password', gate({isAdmin: true}), async (req, res) => {
+    const response = await changeUserPassword(req.body.username, req.body.newPassword, req.body.newPasswordConfirm)
+    res.json(response)
+})
+router.get('/user/remove', gate({isAdmin: true}), async (req, res) => {
+    const response = await removeUser(req.body.username)
+    res.json(response)
 })
 
-// Login to receive Token
-router.post('/login/v1', async (req, res) => {
-    const token = getToken(req.body.username, req.body.password)
-    if (token === "password incorrect") res.status(400).json("password incorrect")
-    else if (token === "username doesn't exists") res.status(400).json("username doesn't exists")
-    else res.json(token)
-})
-
-// Create User
-router.post('/user/v1', gate({ requiredGroup: "admins" }), async (req, res) => {
-    const result = createUser(req.body.username, req.body.password, req.body.passwordConfirm, req.body.role)
-    if (result === "user created") res.json("user created")
-    else if (result === "password does not match passwordConfirm") res.status(400).json("password does not match passwordConfirm")
-    else if (result === "username exists") res.status(400).json("username exists")
-    else if (result === "role not between 0 and 100") res.status(400).json("role not between 0 and 100")
-    else res.status(500).json("unknown error")
-})
-
-// Delete User
-router.delete('/user/v1', gate({ requiredGroup: "admins" }), async (req, res) => {
-    const result = deleteUser(req.body.username, req.body.password)
-    if (result === "user deleted") res.json("user created")
-    else if (result === "username doesn't exists") res.status(400).json("username doesn't exists")
-    else if (result === "password incorrect") res.status(400).json("password incorrect")
-    else res.status(500).json("unknown error")
-})
-
-// Update User
-router.put('/user/v1', gate({ requiredGroup: "admins" }), async (req, res) => {
-    const roleResult = updateUserRole(req.body.username, req.body.password, req.body.role)
-    const passResult = updateUserPassword(req.body.username, req.body.password, req.body.newPassword, req.body.newPasswordConfirm)
-    if (roleResult === "user updated" && passResult === "user updated") res.json("user updated")
-    else if (roleResult === "username doesn't exists") res.status(400).json("username doesn't exists")
-    else if (roleResult === "password incorrect") res.status(400).json("password incorrect")
-    else if (passResult === "newPassword does not match newPasswordConfirm") res.status(400).json("newPassword does not match newPasswordConfirm")
-    else res.status(500).json("unknown error")
+router.get('/user/reset-users-to-default', gate({isAdmin: true}), async (req, res) => {
+    await resetUsersToDefault()
+    res.json("ok")
 })
 
 // Export
 exports.router = router
+exports.checkRequest = checkRequest
+exports.gate = gate

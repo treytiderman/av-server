@@ -2,7 +2,7 @@
 // const mw = require("./middleware")
 const { logRequests } = require("./http-logger")
 const { renderMarkdown } = require("./http-markdown")
-const { checkRequest } = require("./users-middleware")
+const { checkRequest } = require("./users-http")
 
 // Create Express router
 const express = require('express')
@@ -19,12 +19,12 @@ router.use("/ui", express.static("../server/frontend"))
 // Log requests (exclude public routes)
 router.use(logRequests)
 
-// Request Checking
-// 1. Is localhost? req.isLocalhost = true || false
-// 2. Has Token? req.token = token || "no token" || "bad token"
-// 3. What User? req.user { username, role }
-// 4. Auth level? req.user.role = 0 though 99
-// 5. Is self or ADMIN? req.isSelf = true || false
+// Request checking middleware
+// Is localhost? req.isLocalhost = true || false
+// Has Token? req.token = token || "no token" || "bad token"
+// What User? req.user { username, groups }
+// Admin? req.isAdmin = in group "admins"
+// Is self? req.isSelf = true || false
 router.use(checkRequest)
 
 // Core
