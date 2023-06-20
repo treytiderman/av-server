@@ -6,6 +6,18 @@ const { log } = require("./logger")
 const startupTime = Date.now()
 
 // Functions
+function isAdmin() {
+    if (os.type() === "Windows_NT") {
+        exec('NET SESSION', function (err, so, se) {
+            if (se.length === 0) return true
+            else return false
+        })
+        return false
+    }
+    else {
+        return process.getuid && process.getuid() === 0;
+    }
+}
 function getTime() {
     return Date.now()
 }
@@ -41,18 +53,6 @@ function getOS() {
     else if (system === "Linux") return "linux"
     else return "unknown"
 }
-function isAdmin() {
-    if (os.type() === "Windows_NT") {
-        exec('NET SESSION', function (err, so, se) {
-            if (se.length === 0) return true
-            else return false
-        })
-        return false
-    }
-    else {
-        return process.getuid && process.getuid() === 0;
-    }
-}
 function getSystemInfo() {
     return {
         os: getOS(),
@@ -87,8 +87,8 @@ exports.isAdmin = isAdmin
 exports.getTime = getTime
 exports.getTimeAsISO = getTimeAsISO
 exports.getUptime = getUptime
-exports.getOS = getOS
 exports.getNICs = getNICs
+exports.getOS = getOS
 exports.getSystemInfo = getSystemInfo
 
 // Testing

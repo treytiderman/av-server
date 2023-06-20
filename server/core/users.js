@@ -212,7 +212,7 @@ async function resetUsersToDefault() {
 
 // Testing
 setTimeout(async () => {
-    if (process.env.TEST) runTests("users.js")
+    if (process.env.RUN_TESTS) runTests("users.js")
 }, 1000)
 async function runTests(testName) {
     let pass = true

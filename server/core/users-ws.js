@@ -180,5 +180,3 @@ wss.receiveEvent("user", "remove", async (ws, body) => {
         }
     }
 })
-
-// Send

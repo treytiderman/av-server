@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 // Variables
 const CRYPTO_KEYSIZE = 64
 const CRYPTO_ITERATIONS = 9999
-const JWT_KEY = process.env.TEST ? "test" : crypto.randomBytes(CRYPTO_KEYSIZE).toString('base64')
+const JWT_KEY = process.env.RUN_TESTS ? "test" : crypto.randomBytes(CRYPTO_KEYSIZE).toString('base64')
 
 // Functions
 function hashPassword(password) {
@@ -25,7 +25,7 @@ function verifyJWT(token, cb) {
 
 // Testing
 setTimeout(() => {
-    if (process.env.TEST) runTests("auth.js")
+    if (process.env.RUN_TESTS) runTests("auth.js")
 }, 1000)
 function runTests(testName) {
     let pass = true

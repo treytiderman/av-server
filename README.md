@@ -77,6 +77,7 @@ git clone https://github.com/treytiderman/av-server.git
 2. Install project dependencies (package.json) with
 
 ```
+cd ~/av-server/server
 npm install
 ```
 

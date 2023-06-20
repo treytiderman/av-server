@@ -5,24 +5,21 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "TEST=true nodemon server.js",
-    "windows-service-install": "node install.js",
-    "windows-service-uninstall": "node uninstall.js"
+    "dev": "RUN_TESTS=true nodemon server.js",
+    "windows-install-service": "node install.js",
+    "windows-uninstall-service": "node uninstall.js"
   },
   "keywords": [],
   "author": "trey",
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",
-    "dhcp": "^0.2.20",
     "express": "^4.18.1",
+    "ws": "^8.8.0",
     "jsonwebtoken": "^8.5.1",
-    "node-rtsp-stream": "^0.0.9",
     "node-windows": "^1.0.0-beta.8",
-    "open": "^8.4.0",
-    "serialport": "^10.4.0",
     "showdown": "^2.1.0",
-    "ws": "^8.8.0"
+    "serialport": "^10.4.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"

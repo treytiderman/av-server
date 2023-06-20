@@ -1,14 +1,9 @@
-// const auth = require("../modules/users")
-// const mw = require("./middleware")
-const { logRequests } = require("./http-logger")
-const { renderMarkdown } = require("./http-markdown")
-const { checkRequest } = require("./users-http")
-
 // Create Express router
 const express = require('express')
 const router = express.Router()
 
 // Render Markdown Files
+const { renderMarkdown } = require("./http-markdown")
 router.use(renderMarkdown)
 
 // Public folder, everything in this folder is available to anyone
@@ -16,7 +11,13 @@ router.use("/", express.static("../public"))
 router.use("/", express.static("../server/core/public"))
 router.use("/ui", express.static("../server/frontend"))
 
-// Log requests (exclude public routes)
+// Log HTTP requests (exclude public routes)
+const logger = require('./logger')
+function logRequests(req, res, next) {
+    const url = `${req.method} ${req.protocol}://${req.headers.host}${req.url}`
+    logger.log("server_http", url, req.body)
+    next()
+}
 router.use(logRequests)
 
 // Request checking middleware
@@ -25,18 +26,25 @@ router.use(logRequests)
 // What User? req.user { username, groups }
 // Admin? req.isAdmin = in group "admins"
 // Is self? req.isSelf = true || false
+const { checkRequest } = require("./users-http")
 router.use(checkRequest)
 
 // Core
 router.get('/', (req, res) => res.redirect(302, '/ui'))
 router.use('/api', require('./users-http').router)
-// router.use('/api', require('./files').router)
+// router.use('/api', require('./system-http').router)
+// router.use('/api', require('./files-http').router)
+// router.use('/api', require('./logger-http').router)
+// router.use('/api', require('./programs-http').router)
 
 // Tools
-// router.use('/api/network/v1', require('./network').router)
-// router.use('/api/serial/v1', require('./serial').router)
-// router.use('/api/rtsp2ws/v1', require('./rtsp2ws').router)
-// router.use('/api/dhcp/server/v1', require('./dhcp_server').router)
+// router.use('/api/http-client', require('./http-client-http').router)
+// router.use('/api/http-server', require('./http-server-http').router)
+// router.use('/api/tcp-client', require('./tcp-client-http').router)
+// router.use('/api/tcp-server', require('./tcp-server-http').router)
+// router.use('/api/udp-client', require('./udp-client-http').router)
+// router.use('/api/udp-server', require('./udp-server-http').router)
+// router.use('/api/serial', require('./serial').router)
 
 // Try Test Routes
 router.get('/try/time', async (req, res) => {

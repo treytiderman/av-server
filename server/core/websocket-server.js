@@ -11,7 +11,7 @@ let wsServer
 
 // Variables
 const emitter = new events.EventEmitter()
-emitter.setMaxListeners(100) // number of receiveTopic and receiveEvent uses
+emitter.setMaxListeners(100) // number of receiveTopic() and receiveEvent() uses
 
 // Helper Functions
 const logInConsole = false
@@ -137,8 +137,7 @@ function sendEventAll(topic, event, body) {
     })
 }
 function subscriptions(ws) {
-    const payload = { "topic": "client", "event": "subscriptions", "body": ws.subs }
-    sendJSON(ws, payload)
+    sendEvent(ws, "client", "subscriptions", ws.subs)
     // log(`subscriptions ${ws.ip}`, ws.subs)
 }
 function subscribe(ws, topic) {
