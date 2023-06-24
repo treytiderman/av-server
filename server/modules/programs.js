@@ -1,6 +1,9 @@
+// Overview: spawn sub processes / user scripts
+// TODO: tests
+// TODO: use logger.js
+// TODO: Check out: https://pm2.keymetrics.io/docs/usage/pm2-api/
 const { spawn } = require('child_process')
 const { getStatsRecursive, readText } = require('./files')
-// TODO: Check out: https://pm2.keymetrics.io/docs/usage/pm2-api/
 
 // Event Emitter
 const events = require('events')

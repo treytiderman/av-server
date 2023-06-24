@@ -1,6 +1,4 @@
-// wss = websocket server
-// ws  = websocket client
-const wss = require('./websocket-server')
+// Overview: websocket routes for the users.js module
 const {
     getUser,
     getUsers,
@@ -16,6 +14,10 @@ const {
     removeGroupFromUser,
     changeUserPassword
 } = require('./users')
+
+// wss = websocket server
+// ws  = websocket client
+const wss = require('../tools/websocket-server')
 
 // Receive
 wss.receiveEvent("user", "login-with-password", async (ws, body) => {

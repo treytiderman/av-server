@@ -1,3 +1,4 @@
+// Overview: user managment
 const { hashPassword, isHashedPassword, generateJWT, verifyJWT } = require('./auth')
 const { State } = require('./state')
 const logger = require('./logger')
@@ -28,6 +29,7 @@ function validPassword(password) {
         password.length >= 4;
 }
 
+// Functions
 function isUser(username) {
     return _State.get("users").some(user => user.username === username)
 }
@@ -83,7 +85,6 @@ async function removeGroup(groupToRemove) {
     log(`removeGroup("${groupToRemove}")`, "ok")
 }
 
-// Functions
 function getToken(username, password) {
     let result = ""
     const user = getUserAndPassword(username)

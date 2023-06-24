@@ -1,9 +1,9 @@
 // HTTP Server
-const http = require('./core/http-server')
+const http = require('./tools/http-server')
 const http_server = http.create()
 
 // WebSocket Server
-const ws = require('./core/websocket-server')
+const ws = require('./tools/websocket-server')
 const server = ws.create(http_server)
 
 // Start Server

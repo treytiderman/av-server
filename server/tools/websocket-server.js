@@ -15,7 +15,7 @@ emitter.setMaxListeners(100) // number of receiveTopic() and receiveEvent() uses
 
 // Helper Functions
 const logInConsole = false
-const logger = require('./logger')
+const logger = require('../modules/logger')
 function log(text, obj = {}) {
     logger.log("websocket-server.js", text, obj)
     if (logInConsole) { console.log("websocket", text, obj) }
@@ -47,7 +47,7 @@ function create(app) {
     }, 30 * 1000)
 
     // API Routes
-    require('./websocket-routes')
+    require('../core/websocket-routes')
 
     // Return
     return server
@@ -165,22 +165,3 @@ exports.receiveEvent = receiveEvent
 exports.subscribe = subscribe
 exports.subscriptions = subscriptions
 exports.unsubscribe = unsubscribe
-
-/* Examples
-
-// HTTP Server
-const http = require('./core/http-server')
-const http_server = http.create()
-
-// WebSocket Server
-const ws = require('./core/websocket-server')
-const server = ws.create(http_server)
-
-// Start Server
-const port = process.env.PORT || 4620
-server.listen(port, () => {
-    console.log(`AV-Tools server is up and running`)
-    http.startupConsoleLog(port)
-})
-
-*/

@@ -1,3 +1,4 @@
+// Overview: basic local JSON database to maintain state
 const { readJSON, writeJSON, deleteFile } = require('./files')
 const { log } = require('./logger')
 

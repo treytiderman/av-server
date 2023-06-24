@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 
 // Render Markdown Files
-const { renderMarkdown } = require("./http-markdown")
+const { renderMarkdown } = require("../core/http-markdown")
 router.use(renderMarkdown)
 
 // Public folder, everything in this folder is available to anyone
@@ -12,7 +12,7 @@ router.use("/", express.static("../server/core/public"))
 router.use("/ui", express.static("../server/frontend"))
 
 // Log HTTP requests (exclude public routes)
-const logger = require('./logger')
+const logger = require('../modules/logger')
 function logRequests(req, res, next) {
     const url = `${req.method} ${req.protocol}://${req.headers.host}${req.url}`
     logger.log("server_http", url, req.body)
@@ -26,25 +26,28 @@ router.use(logRequests)
 // What User? req.user { username, groups }
 // Admin? req.isAdmin = in group "admins"
 // Is self? req.isSelf = true || false
-const { checkRequest } = require("./users-http")
+const { checkRequest } = require("../modules/users-http")
 router.use(checkRequest)
 
-// Core
+// Modules
 router.get('/', (req, res) => res.redirect(302, '/ui'))
-router.use('/api', require('./users-http').router)
-// router.use('/api', require('./system-http').router)
-// router.use('/api', require('./files-http').router)
-// router.use('/api', require('./logger-http').router)
-// router.use('/api', require('./programs-http').router)
+// router.use('/api/files', require('../modules/files-http').router)
+// router.use('/api/logger', require('../modules/logger-http').router)
+// router.use('/api/programs', require('../modules/programs-http').router)
+// router.use('/api/state', require('../modules/state-http').router)
+router.use('/api/system', require('../modules/system-http').router)
+router.use('/api/user', require('../modules/users-http').router)
 
 // Tools
-// router.use('/api/http-client', require('./http-client-http').router)
-// router.use('/api/http-server', require('./http-server-http').router)
-// router.use('/api/tcp-client', require('./tcp-client-http').router)
-// router.use('/api/tcp-server', require('./tcp-server-http').router)
-// router.use('/api/udp-client', require('./udp-client-http').router)
-// router.use('/api/udp-server', require('./udp-server-http').router)
-// router.use('/api/serial', require('./serial').router)
+// router.use('/api/http-client', require('../tools/http-client-http').router)
+// router.use('/api/http-server', require('../tools/http-server-http').router)
+// router.use('/api/serial', require('../tools/serial').router)
+// router.use('/api/tcp-client', require('../tools/tcp-client-http').router)
+// router.use('/api/tcp-server', require('../tools/tcp-server-http').router)
+// router.use('/api/udp-client', require('../tools/udp-client-http').router)
+// router.use('/api/udp-server', require('../tools/udp-server-http').router)
+// router.use('/api/websocket-client', require('../tools/websocket-client-http').router)
+// router.use('/api/websocket-server', require('../tools/websocket-server-http').router)
 
 // Try Test Routes
 router.get('/try/time', async (req, res) => {
@@ -74,7 +77,7 @@ router.get('/try/:path', async (req, res) => {
 // 404 / Catch All
 const fs = require('fs').promises
 router.get('*', async (req, res) => {
-    const file = await fs.readFile('./core/public/404/index.html', 'utf8')
+    const file = await fs.readFile('../core/public/404/index.html', 'utf8')
     res.send(file)
 })
 router.all('*', function (req, res) {

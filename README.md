@@ -4,10 +4,12 @@
 
 ## Goals
 
-- AV control system
-- Simple tools for testing and troubleshooting
-- Changes to code or UI happen instantly
-- API is easy to use and open ended
+- Quickest path to functional control system
+    - This is for controling a room or home. Not much going on... 
+    - Intended concurrent users would be 0 to maybe a 100 (made this number up)
+- Simple tools for testing and troubleshooting control systems
+- Live changes to code or UI happen instantly
+- API is easy to use and consistant
 - Run on any device and any OS
     - Linux
         - Podman / Docker container
@@ -20,47 +22,56 @@
         - Podman / Docker container
         - Source Code with Node JS
 
-## Core
+## Features
 
-- [ ] Web UI
-    - [ ] Provide easy tools for testing and troubleshooting
+- Web UI
+    - Provide easy access to the API
     - See source code at [here](https://github.com/TreyTiderman/av-server-ui)
-- [ ] API v1
+- Api
     - [Docs](./public/docs/api/api.md)
-    - [ ] WebSocket
-    - [ ] TCP
-    - Tools
-        - [ ] TCP Client v1
-        - [ ] WS Client v1
+    - Intercat with the API in the following ways
+        - 13% websocket
+        - 13% http
+        - [ ] tcp
+        - [ ] ipc
+    - Api modules (system managment)
+        - [ ] files
+        - [ ] logger
+        - [ ] programs
+        - [ ] state
+        - [ ] system
+        - [ ] users
+    - Api tools
+        - [ ] http-client
+        - [ ] http-server
+        - [ ] serial (com ports, rs232, rs485 / dmx)
+        - [ ] tcp-client
+        - [ ] tcp-server
+        - [ ] udp-client
+        - [ ] udp-server
+        - [ ] websocket-client
+        - [ ] websocket-server
+    - Api extentions (ideas for add on modules)
+        - [ ] netsh (set Network info on windows)
+        - [ ] av-touch-panel (https://github.com/treytiderman/av-touchpanel)
+        - [ ] dhcp-server
+        - [ ] ssh-client
+        - [ ] telnet-client
+        - [ ] raspberry-pi-hw
+        - [ ] rstp-to-ws
+        - [ ] mdns-client
+        - [ ] mqqt
 - [x] HTTP Server
     - Any files put in the `./public` directory will be served
-- [ ] Auth / User accounts / Permissions
-- [ ] Multicast Discovery
-    - [ ] mDNS?
-- [ ] Choose what services are bound to which network interface
-- [ ] Encrypt all data between the server and clients
-- [ ] Help sections
-    - [ ] How to run on startup
-    - [ ] How to use the web server
-    - [ ] How to use the API
-
-```
-"dependencies": {
-    "cors": "^2.8.5",
-    "dhcp": "^0.2.20",
-    "express": "^4.18.1",
-    "jsonwebtoken": "^8.5.1",
-    "node-rtsp-stream": "^0.0.9",
-    "node-windows": "^1.0.0-beta.8",
-    "open": "^8.4.0",
-    "serialport": "^10.4.0",
-    "showdown": "^2.1.0",
-    "ws": "^8.8.0"
-},
-"devDependencies": {
-    "nodemon": "^2.0.15"
-}
-```
+- [ ] HTTPS / WSS (encrypt all data between the server and clients)
+- [ ] Help
+    - [ ] How to run on startup?
+    - [ ] How to use the web server?
+    - [ ] How to use the API?
+- Ideas
+    - Rewrite in Rust? Tauri is nice
+    - Linux Cockpit integration
+    - Node-RED programs
 
 # Source Code
 
@@ -69,6 +80,22 @@
 ```
 cd ~/
 git clone https://github.com/treytiderman/av-server.git
+```
+
+## Install as a service (Windows 10, 11)
+
+1. Run the following commands in the `/av-server/server` folder
+2. Create the service with
+
+```
+npm install
+npm run service-install
+```
+
+3. Uninstall service when needed
+
+```
+npm run service-uninstall
 ```
 
 ## Run
@@ -162,19 +189,4 @@ Disable
 
 ```
 systemctl --user disable av-server.service
-```
-
-### Install as a service (Windows 10, 11)
-
-1. Run the following commands in the `/av-server/server` folder
-2. Create the service with
-
-```
-npm run service-install
-```
-
-3. Uninstall service when needed
-
-```
-npm run service-uninstall
 ```

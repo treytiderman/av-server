@@ -1,3 +1,4 @@
+// Overview: create and verify hashed passwords and jsonwebtokens
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 

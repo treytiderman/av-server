@@ -18,7 +18,6 @@ const { verifyJWT } = require('./auth')
 const express = require('express')
 const router = express.Router()
 
-
 // Functions
 function checkReqIsLocalhost(req) {
     const ip = req.headers.host.split(':')[0]
@@ -90,55 +89,55 @@ function gate(require = {
 }
 
 // Routes
-router.get('/user/get-token', async (req, res) => {
+router.get('/get-token', async (req, res) => {
     const response = getToken(req.body.username, req.body.password)
     if (response === "error password incorrect") res.json("error username or password incorrect")
     else if (response === "error username doesn't exists") res.json("error username or password incorrect")
     else res.json(response)
 })
-router.get('/user/who-am-i', gate({token: true}), async (req, res) => {
+router.get('/who-am-i', gate({token: true}), async (req, res) => {
     res.json(req.user)
 })
 
-router.get('/user/groups', async (req, res) => {
-    const response = await await getGroups()
+router.get('/groups', async (req, res) => {
+    const response = await getGroups()
     res.json(response)
 })
-router.get('/user/add-group', gate({isAdmin: true}), async (req, res) => {
+router.get('/add-group', gate({isAdmin: true}), async (req, res) => {
     const response = await addGroup(req.body.groupToAdd)
     res.json(response)
 })
-router.get('/user/remove-group', gate({isAdmin: true}), async (req, res) => {
+router.get('/remove-group', gate({isAdmin: true}), async (req, res) => {
     const response = await removeGroup(req.body.groupToRemove)
     res.json(response)
 })
 
-router.get('/user/users', async (req, res) => {
+router.get('/users', async (req, res) => {
     const response = getUsers()
     res.json(response)
 })
-router.get('/user/add', gate({isAdmin: true}), async (req, res) => {
+router.get('/add', gate({isAdmin: true}), async (req, res) => {
     const response = await addUser(req.body.username, req.body.password, req.body.passwordConfirm, req.body.groups)
     res.json(response)
 })
-router.get('/user/add-group-to-user', gate({isAdmin: true}), async (req, res) => {
+router.get('/add-group-to-user', gate({isAdmin: true}), async (req, res) => {
     const response = await addGroupToUser(req.body.username, req.body.groupToAdd)
     res.json(response)
 })
-router.get('/user/remove-group-from-user', gate({isAdmin: true}), async (req, res) => {
+router.get('/remove-group-from-user', gate({isAdmin: true}), async (req, res) => {
     const response = await removeGroupFromUser(req.body.username, req.body.groupToRemove)
     res.json(response)
 })
-router.get('/user/change-user-password', gate({isAdmin: true}), async (req, res) => {
+router.get('/change-user-password', gate({isAdmin: true}), async (req, res) => {
     const response = await changeUserPassword(req.body.username, req.body.newPassword, req.body.newPasswordConfirm)
     res.json(response)
 })
-router.get('/user/remove', gate({isAdmin: true}), async (req, res) => {
+router.get('/remove', gate({isAdmin: true}), async (req, res) => {
     const response = await removeUser(req.body.username)
     res.json(response)
 })
 
-router.get('/user/reset-users-to-default', gate({isAdmin: true}), async (req, res) => {
+router.get('/reset-users-to-default', gate({isAdmin: true}), async (req, res) => {
     await resetUsersToDefault()
     res.json("ok")
 })
