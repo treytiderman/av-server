@@ -33,7 +33,7 @@
         - 13% websocket
         - 13% http
         - [ ] tcp
-        - [ ] ipc
+        - [ ] ipc / cli
     - Api modules (system managment)
         - [ ] files
         - [ ] logger

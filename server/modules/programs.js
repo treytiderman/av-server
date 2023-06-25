@@ -1,9 +1,11 @@
 // Overview: spawn sub processes / user scripts
 // TODO: tests
-// TODO: use logger.js
+// TODO: use state.js
 // TODO: Check out: https://pm2.keymetrics.io/docs/usage/pm2-api/
 const { spawn } = require('child_process')
 const { getStatsRecursive, readText } = require('./files')
+const Logger = require('./logger')
+const log = new Logger("programs.js")
 
 // Event Emitter
 const events = require('events')
@@ -83,11 +85,11 @@ function getAvailable() {
     return STATE.available
 }
 function start(name, program, args, env = {}) {
-    console.log(`${name} starting "${program} ${args}"`, env === {} ? JSON.stringify(env) : "")
+    log.debug(`${name} starting "${program} ${args}"`, env === {} ? JSON.stringify(env) : "")
 
     if (STATE.programs[name]?.running === true) {
         const error = "program already running"
-        console.log(`${name} error ${error}`)
+        log.debug(`${name} error ${error}`)
         emitter.emit('start', name, { error: error })
         return error
     }
@@ -109,13 +111,13 @@ function start(name, program, args, env = {}) {
     }
 
     spawned.on('spawn', (code, signal) => {
-        console.log(`${name} start`)
+        log.debug(`${name} start`)
         STATE.programs[name].running = true
         emitter.emit('start', name)
     })
 
     spawned.on('exit', (code, signal) => {
-        console.log(`${name} exit`)
+        log.debug(`${name} exit`)
         STATE.programs[name].running = false
         emitter.emit('exit', name)
     })
@@ -126,7 +128,7 @@ function start(name, program, args, env = {}) {
             timestampISO: new Date(Date.now()).toISOString(),
             ascii: data.toString('ascii'),
         }
-        console.log(`${name} stdout: ${dataObj.ascii}`)
+        log.debug(`${name} stdout: ${dataObj.ascii}`)
         STATE.programs[name].out.push(dataObj)
         clampHistory(name)
         emitter.emit('out', name, dataObj)
@@ -138,7 +140,7 @@ function start(name, program, args, env = {}) {
             timestampISO: new Date(Date.now()).toISOString(),
             ascii: data.toString('ascii'),
         }
-        console.log(`${name} stderr: ${dataObj.ascii}`)
+        log.debug(`${name} stderr: ${dataObj.ascii}`)
         STATE.programs[name].out.push(dataObj)
         clampHistory(name)
         emitter.emit('out', name, dataObj)
@@ -151,14 +153,14 @@ function startAvailable(programFolderName, name = programFolderName, env = {}) {
 }
 function kill(name) {
     const running = STATE.programs[name].running
-    console.log(`${name} killed ${running ? "" : "...wasn't running"}`)
+    log.debug(`${name} killed ${running ? "" : "...wasn't running"}`)
     STATE.programs[name].spawn.kill()
 }
 function killAll() {
     Object.keys(STATE.programs).forEach(name => kill(name))
 }
 function restart(name) {
-    console.log(`${name} restarting`)
+    log.debug(`${name} restarting`)
     const program = STATE.programs[name].program
     const args = STATE.programs[name].args
     const env = STATE.programs[name].env

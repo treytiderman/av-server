@@ -32,6 +32,25 @@ ws.connect({
 
 [serial](./serial-json.md)
 
+# Keywords
+
+crud
+- create (post)
+- read (get)
+- update (put)
+- delete (delete)
+
+crud
+- new
+- add
+- change
+- remove
+
+events
+- get
+- sub
+- pub
+
 # Topics
 
 [system](./system-json.md)

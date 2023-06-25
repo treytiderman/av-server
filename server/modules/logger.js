@@ -1,41 +1,57 @@
 // Overview: Standard way to create log files
-// TODO: tests
-// TODO: limit size of log obj
-// TODO: fix NUMBER_OF_LINES_MAX
-// TODO (new syntax): Timestamp ISO <DELIMITER> Log Level (error, warning, info, debug) <DELIMITER> Group <DELIMITER> Message <DELIMITER> Obj to be JSON.stringify
-// Location: /private/logs/log_date.log
-// Syntax: Timestamp ISO <DELIMITER> Group <DELIMITER> Message <DELIMITER> Obj to be JSON.stringify
-// Files: One file per day, No more than <NUMBER_OF_FILES_MAX> files
-// File: No longer than <NUMBER_OF_LINES_MAX> lines
 const { appendText, readText, makeDir, getStatsRecursive, deleteFile } = require('./files')
+const events = require('events')
+
+// Location: /private/logs/log_date.log
+// Log Object: {
+//     "timestampISO": timestampISO,
+//     "level": level,
+//     "group": group,
+//     "message": message,
+//     "obj": obj,
+// }
+// Files: One file per day, No more than <NUMBER_OF_FILES_MAX> files
+// File: Is split into a new file if files lines greater than <NUMBER_OF_LINES_MAX>
 
 // Variables
-const DELIMITER = " >> "
 const NUMBER_OF_FILES_MAX = 10
 const NUMBER_OF_LINES_MAX = 10_000
+const OBJ_JSON_LENGTH_MAX = 1_000
 const LOG_FOLDER_PATH = "../private/logs/"
+const emitter = new events.EventEmitter()
 
 let logFileIndex = 0
 
 // Functions
-function formatLine(group, message, obj = "") {
+function newLogObj(level, group, message, obj) {
     const timestampISO = new Date(Date.now()).toISOString()
-    const objJSON = JSON.stringify(obj)
-    return timestampISO + DELIMITER + group + DELIMITER + message + DELIMITER + objJSON + "\n"
+    if (JSON.stringify(obj).length > OBJ_JSON_LENGTH_MAX) obj = `length greater than ${OBJ_JSON_LENGTH_MAX} characters`
+    const lineObj = {
+        "timestampISO": timestampISO,
+        "level": level,
+        "group": group,
+        "message": message,
+        "obj": obj,
+    }
+    return lineObj
 }
-function formatPath() {
+function getPath() {
     const timeDate = new Date(Date.now()).toISOString()
     const date = timeDate.split('T')[0]
     return LOG_FOLDER_PATH + date + `_${logFileIndex}.log`
+} 
+async function getLogFileStats() {
+    const logFilesStats = await getStatsRecursive(LOG_FOLDER_PATH)
+    return logFilesStats.contains_files
 }
 async function updateLogFileIndex() {
     const timeDate = new Date(Date.now()).toISOString()
     const date = timeDate.split('T')[0]
-    const logFilesStats = await getStatsRecursive(LOG_FOLDER_PATH)
-    logFilesStats.contains_files.forEach(async (file) => {
+    const fileNames = await getLogFileStats()
+    fileNames.forEach(async (file) => {
         const fromToday = file.file_name.startsWith(date)
         if (fromToday) {
-            const indexFromFile = file.file_name.replace(date + "_", "").replace(".log", "")
+            const indexFromFile = Number(file.file_name.replace(date + "_", "").replace(".log", ""))
             if (logFileIndex < indexFromFile) { logFileIndex = indexFromFile }
         }
     })
@@ -43,27 +59,49 @@ async function updateLogFileIndex() {
 async function checkNumberOfLines(path) {
     const file = await readText(path) || ""
     const fileLines = file.split("\n")
-    const fileLinesLength = fileLines.length
-    const hasMaxLines = fileLinesLength > NUMBER_OF_LINES_MAX
+    const hasMaxLines = fileLines.length >= NUMBER_OF_LINES_MAX
     if (hasMaxLines) { logFileIndex++ }
 }
 async function deleteOldLogs() {
-    const logFilesStats = await getStatsRecursive(LOG_FOLDER_PATH)
-    const numberOfFiles = logFilesStats.contains_files.length
+    const fileNames = await getLogFileStats()
+    const numberOfFiles = fileNames.length
     if (numberOfFiles > NUMBER_OF_FILES_MAX) {
-        // Works if logFilesStats.contains_files is always in alphabetical order
-        const deletePath = logFilesStats.contains_files[0].path
+        fileNames.sort((a, b) => {
+            const keyA = new Date(a.created_iso)
+            const keyB = new Date(b.created_iso)
+            if (keyA < keyB) return -1
+            if (keyA > keyB) return 1
+            return 0
+        })
+        const deletePath = fileNames[0].path
         await deleteFile(deletePath)
     }
 }
-async function log(group, message, obj = {}) {
-    const line = formatLine(group, message, obj)
-    const path = formatPath()
+async function log(level, group, message, obj = {}) {
+    const logObj = newLogObj(level, group, message, obj)
+    const path = getPath()
     await makeDir(LOG_FOLDER_PATH)
     await updateLogFileIndex()
-    await appendText(path, line)
+    await appendText(path, JSON.stringify(logObj) + "\n")
     await checkNumberOfLines(path)
     await deleteOldLogs()
+    emitter.emit("log", logObj)
+}
+
+// Class
+class Logger {
+    constructor(group) {
+        this.group = group
+    }
+    async debug(message, obj = {}) {
+        await log("debug", this.group, message, obj)
+    }
+    async info(message, obj = {}) {
+        await log("info", this.group, message, obj)
+    }
+    async error(message, obj = {}) {
+        await log("error", this.group, message, obj)
+    }
 }
 
 // Startup
@@ -73,13 +111,18 @@ deleteOldLogs()
 
 // Exports
 exports.log = log
+exports.Logger = Logger
+exports.emitter = emitter
 
 // Testing
-
-// let val = 0
-// log("log test", LOG_FOLDER_PATH, val)
-
+// const logger = new Logger("logger.js")
+// let counter = 0
 // setInterval(() => {
-//     val++
-//     log("log test", formatPath(), val)
-// }, 1_000)
+//     counter++
+//     logger.debug("counter", counter)
+//     logger.info("counter", counter)
+//     logger.error("counter", counter)
+// }, 1000)
+// emitter.on("log", (logObj) => {
+//     console.log(logObj)
+// })
