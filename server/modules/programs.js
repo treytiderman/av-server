@@ -4,7 +4,7 @@
 // TODO: Check out: https://pm2.keymetrics.io/docs/usage/pm2-api/
 const { spawn } = require('child_process')
 const { getStatsRecursive, readText } = require('./files')
-const Logger = require('./logger')
+const { Logger } = require('./logger')
 const log = new Logger("programs.js")
 
 // Event Emitter

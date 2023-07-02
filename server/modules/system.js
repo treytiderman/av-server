@@ -2,7 +2,8 @@
 const os = require("os")
 const dns = require("dns")
 const exec = require('child_process').exec
-const { log } = require("./logger")
+const { Logger } = require('./logger')
+const log = new Logger("system.js")
 
 const startupTime = Date.now()
 
@@ -81,7 +82,7 @@ function getSystemInfo() {
 }
 
 // Startup
-log("system.js", "startup", getSystemInfo())
+log.info("system.js", "startup", getSystemInfo())
 
 // Exports
 exports.isAdmin = isAdmin

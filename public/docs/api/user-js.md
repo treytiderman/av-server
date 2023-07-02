@@ -10,7 +10,7 @@ const userApi = require("userApi")
 let loginToken
 userApi.loginWithPassword("admin", "admin")
 
-userApi.onloginWithPassword(token, err) => {
+userApi.onloginWithPassword((token, err) => {
 	if (err) {
 		// err = "error username or password incorrect"
 	}

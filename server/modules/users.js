@@ -1,7 +1,8 @@
 // Overview: user managment
 const { hashPassword, isHashedPassword, generateJWT, verifyJWT } = require('./auth')
 const { State } = require('./state')
-const logger = require('./logger')
+const { Logger } = require('./logger')
+const log = new Logger("users.js")
 
 // Variables
 const DEFAULT_GROUPS = ["admins", "users", "guests"]
@@ -17,9 +18,6 @@ const DEFAULT_STATE = {
 const _State = new State('users', DEFAULT_STATE)
 
 // Helper Functions
-function log(message, obj = {}) {
-    logger.log("users.js", message, obj)
-}
 function validUsermame(username) {
     return username &&
         username.length >= 4;
@@ -67,22 +65,25 @@ async function addGroup(groupToAdd) {
     const newGroups = getGroups()
     newGroups.push(groupToAdd)
     await _State.set("groups", newGroups)
-    log(`addGroup("${groupToAdd}")`)
+    log.info(`addGroup("${groupToAdd}")`)
 }
 async function removeGroup(groupToRemove) {
     if (groupToRemove === "admins") {
-        log(`removeGroup("${groupToRemove}")`, "error can not delete admins group")
-        return "error can not delete admins group"
+        const error = "error can not delete admins group"
+        log.error(`removeGroup("${groupToRemove}")`, error)
+        return error
     }
+    // Remove group from list of groups
     const newGroups = getGroups().filter(group => group !== groupToRemove)
     await _State.set("groups", newGroups)
+    // Remove group from all users group lists
     const newUsers = []
     getUsersAndPasswords().forEach(user => {
         user.groups = user.groups.filter(group => group !== groupToRemove)
         newUsers.push(user)
     })
     await _State.set("users", newUsers)
-    log(`removeGroup("${groupToRemove}")`, "ok")
+    log.info(`removeGroup("${groupToRemove}")`, "ok")
 }
 
 function getToken(username, password) {

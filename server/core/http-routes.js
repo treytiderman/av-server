@@ -77,7 +77,7 @@ router.get('/try/:path', async (req, res) => {
 // 404 / Catch All
 const fs = require('fs').promises
 router.get('*', async (req, res) => {
-    const file = await fs.readFile('../core/public/404/index.html', 'utf8')
+    const file = await fs.readFile('../server/core/public/404/index.html', 'utf8')
     res.send(file)
 })
 router.all('*', function (req, res) {

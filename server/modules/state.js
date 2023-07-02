@@ -1,6 +1,6 @@
 // Overview: simple local JSON database to maintain state
 const { readJSON, writeJSON, deleteFile } = require('./files')
-const Logger = require('./logger')
+const { Logger } = require('./logger')
 const log = new Logger("state.js")
 
 // Variables
@@ -37,8 +37,8 @@ class State {
         }
         else {
             this.#saveFile()
-            log.info(`${this.#id}.json not found. default loaded`, this.#defaultState)
-            console.log(`${this.#id}.json not found. default loaded`, this.#defaultState)
+            log.info(`${this.#id}.json not found. default loaded =`, this.#defaultState)
+            console.log(`${this.#id}.json not found. default loaded =`, this.#defaultState)
         }
     }
 
