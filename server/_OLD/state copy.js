@@ -4,10 +4,10 @@ const { Logger } = require('./logger')
 const log = new Logger("state.js")
 
 // Variables
-const BASE_STATE_FILE_PATH = "../private/configs/"
+const BASE_STATE_FILE_PATH = "../database/"
 
 // Class
-class State {
+class StateClass {
     #id
     #defaultState
     #workingState
@@ -33,12 +33,12 @@ class State {
         if (file) {
             this.#workingState = file
             log.debug(`${this.#id}.json =`, file)
-            console.log(`${this.#id}.json =`, file)
+            // console.log(`${this.#id}.json =`, file)
         }
         else {
             this.#saveFile()
             log.info(`${this.#id}.json not found. default loaded =`, this.#defaultState)
-            console.log(`${this.#id}.json not found. default loaded =`, this.#defaultState)
+            // console.log(`${this.#id}.json not found. default loaded =`, this.#defaultState)
         }
     }
 
@@ -63,7 +63,7 @@ class State {
 
     async set(key, value) {
         if (!this.ready) return
-        this.#workingState[key] = value
+        this.#workingState[key] = this.#clone(value)
         await this.#saveFile()
     }
 
@@ -81,7 +81,7 @@ async function runTests(testName) {
     let pass = true
 
     const defaultState = { num: 72, array: [1, 2] }
-    const TestState = new State("test-state", defaultState)
+    const TestState = new StateClass("test-state", defaultState)
     if (TestState.get("num") !== 72) pass = false
 
     const arr = TestState.get("array")
@@ -118,5 +118,5 @@ async function runTests(testName) {
 }
 
 // Export
-exports.State = State
+exports.StateClass = StateClass
 exports.runTests = runTests

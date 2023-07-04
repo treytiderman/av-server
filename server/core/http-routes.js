@@ -7,8 +7,9 @@ const { renderMarkdown } = require("../core/http-markdown")
 router.use(renderMarkdown)
 
 // Public folder, everything in this folder is available to anyone
-router.use("/", express.static("../public"))
 router.use("/", express.static("../server/core/public"))
+router.use("/web", express.static("../web"))
+router.use("/docs", express.static("../docs"))
 router.use("/ui", express.static("../server/frontend"))
 
 // Log HTTP requests (exclude public routes)
@@ -68,7 +69,7 @@ router.post('/try/json', async (req, res) => {
     res.status(200).json(req.body)
 })
 // router.get('/try/download', async (req, res) => {
-//   res.status(200).download('../private/logs/example.log')
+//   res.status(200).download('../logs/example.log')
 // })
 router.get('/try/:path', async (req, res) => {
     res.status(200).send(req.params.path)

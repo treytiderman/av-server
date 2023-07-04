@@ -1,7 +1,7 @@
 // Modules
 // require("../modules/files-ws")
 // require("../modules/logger-ws")
-// require("../modules/programs-ws")
+require("../modules/programs-ws")
 // require("../modules/state-ws")
 require("../modules/system-ws")
 require("../modules/users-ws")

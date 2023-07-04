@@ -17,7 +17,7 @@ const events = require('events')
 const NUMBER_OF_FILES_MAX = 10
 const NUMBER_OF_LINES_MAX = 10_000
 const OBJ_JSON_LENGTH_MAX = 1_000
-const LOG_FOLDER_PATH = "../private/logs/"
+const LOG_FOLDER_PATH = "../logs/"
 const emitter = new events.EventEmitter()
 
 let logFileIndex = 0

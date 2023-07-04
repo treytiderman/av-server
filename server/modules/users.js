@@ -1,10 +1,38 @@
 // Overview: user managment
-const { hashPassword, isHashedPassword, generateJWT, verifyJWT } = require('./auth')
-const { State } = require('./state')
-const { Logger } = require('./logger')
-const log = new Logger("users.js")
 
-// Variables
+// Import
+import { hashPassword, isHashedPassword, generateJWT, verifyJWT } from './auth.js'
+import { getDatabase, saveDatabase, resetDatabase } from './db.js'
+import { Logger } from './logger.js'
+
+// Export
+export {
+    validUsermame,
+    validPassword,
+
+    isUser,
+    getUserAndPassword,
+    getUser,
+    getUsers,
+    resetUsersToDefault,
+
+    getGroups,
+    isGroup,
+    areGroups,
+    addGroup,
+    removeGroup,
+
+    getToken,
+    verifyToken,
+
+    addUser,
+    removeUser,
+    addGroupToUser,
+    removeGroupFromUser,
+    changeUserPassword,
+}
+
+// Constants
 const DEFAULT_GROUPS = ["admins", "users", "guests"]
 const DEFAULT_USER = {
     username: 'admin',
@@ -15,25 +43,25 @@ const DEFAULT_STATE = {
     groups: DEFAULT_GROUPS,
     users: [DEFAULT_USER]
 }
-const _State = new State('users', DEFAULT_STATE)
+
+// Variables
+const log = new Logger("users.js")
+const db = await getDatabase('users', DEFAULT_STATE)
 
 // Helper Functions
 function validUsermame(username) {
-    return username &&
-        username.length >= 4;
+    return username && username.length >= 4
 }
 function validPassword(password) {
-    return password &&
-        password.length >= 4;
+    return password && password.length >= 4
 }
 
 // Functions
 function isUser(username) {
-    return _State.get("users").some(user => user.username === username)
+    return db.data.users.some(user => user.username === username)
 }
 function getUserAndPassword(username) {
-    const user = _State.get("users").find(user => user.username === username)
-    return user
+    return db.data.users.find(user => user.username === username)
 }
 function getUser(username) {
     if (!isUser(username)) return "username doesn't exists"
@@ -42,15 +70,18 @@ function getUser(username) {
 }
 function getUsers() {
     const array = []
-    _State.get("users").forEach(user => array.push(getUser(user.username)))
+    db.data.users.forEach(user => {
+        const userWithoutPassword = getUser(user.username)
+        array.push(userWithoutPassword)
+    })
     return array
 }
 function getUsersAndPasswords() {
-    return _State.get("users")
+    return db.data.users
 }
 
 function getGroups() {
-    return _State.get("groups")
+    return db.data.groups
 }
 function isGroup(groupName) {
     return getGroups().some(group => group === groupName)
@@ -64,158 +95,156 @@ async function addGroup(groupToAdd) {
     if (isGroup(groupToAdd)) return false
     const newGroups = getGroups()
     newGroups.push(groupToAdd)
-    await _State.set("groups", newGroups)
+    await db.set("groups", newGroups)
     log.info(`addGroup("${groupToAdd}")`)
 }
-async function removeGroup(groupToRemove) {
-    if (groupToRemove === "admins") {
-        const error = "error can not delete admins group"
-        log.error(`removeGroup("${groupToRemove}")`, error)
-        return error
-    }
-    // Remove group from list of groups
-    const newGroups = getGroups().filter(group => group !== groupToRemove)
-    await _State.set("groups", newGroups)
-    // Remove group from all users group lists
-    const newUsers = []
-    getUsersAndPasswords().forEach(user => {
-        user.groups = user.groups.filter(group => group !== groupToRemove)
-        newUsers.push(user)
-    })
-    await _State.set("users", newUsers)
-    log.info(`removeGroup("${groupToRemove}")`, "ok")
-}
+// async function removeGroup(groupToRemove) {
+//     if (groupToRemove === "admins") {
+//         const error = "error can not delete admins group"
+//         log.error(`removeGroup("${groupToRemove}")`, error)
+//         return error
+//     }
+//     // Remove group from list of groups
+//     const newGroups = getGroups().filter(group => group !== groupToRemove)
+//     await db.set("groups", newGroups)
+//     // Remove group from all users group lists
+//     const newUsers = []
+//     getUsersAndPasswords().forEach(user => {
+//         user.groups = user.groups.filter(group => group !== groupToRemove)
+//         newUsers.push(user)
+//     })
+//     await db.set("users", newUsers)
+//     log.info(`removeGroup("${groupToRemove}")`, "ok")
+// }
 
-function getToken(username, password) {
-    let result = ""
-    const user = getUserAndPassword(username)
+// function getToken(username, password) {
+//     let result = ""
+//     const user = getUserAndPassword(username)
 
-    if (!isUser(username)) result = "error username doesn't exists"
-    else if (!isHashedPassword(password, user.password.hash, user.password.salt)) result = "error password incorrect"
-    else result = generateJWT({ username: user.username })
+//     if (!isUser(username)) result = "error username doesn't exists"
+//     else if (!isHashedPassword(password, user.password.hash, user.password.salt)) result = "error password incorrect"
+//     else result = generateJWT({ username: user.username })
 
-    // log(`getToken("${username}", "${password}")`, result)
-    log(`getToken("${username}", "********")`, "********")
-    return result
-}
-function verifyToken(token, cb) {
-    let result = ""
+//     // log.debug(`getToken("${username}", "${password}")`, result)
+//     log.debug(`getToken("${username}", "********")`, "********")
+//     return result
+// }
+// function verifyToken(token, cb) {
+//     let result = ""
 
-    verifyJWT(token, (error, jwtJson) => {
-        if (error) result = "error bad token"
-        else result = jwtJson
+//     verifyJWT(token, (error, jwtJson) => {
+//         if (error) result = "error bad token"
+//         else result = jwtJson
 
-        // log(`verifyToken("${token}")`, result)
-        log(`verifyToken("********")`, result)
-        cb(result)
-    })
-}
+//         // log.debug(`verifyToken("${token}")`, result)
+//         log.debug(`verifyToken("********")`, result)
+//         cb(result)
+//     })
+// }
 
-async function addUser(username, password, passwordConfirm, groups = []) {
-    let result = ""
+// async function addUser(username, password, passwordConfirm, groups = []) {
+//     let result = ""
 
-    if (!validUsermame(username)) result = "error username invailed"
-    else if (!validPassword(password)) result = "error password invailed"
-    else if (password !== passwordConfirm) result = "error passwordConfirm does not match password"
-    else if (isUser(username)) result = "error username exists"
-    else if (!areGroups(groups)) result = "error group in groups does not exist"
-    else {
-        const user = {
-            username: username,
-            password: hashPassword(password),
-            groups: groups,
-        }
-        let newUsers = _State.get("users")
-        newUsers.push(user)
-        await _State.set("users", newUsers)
-        result = "ok"
-    }
+//     if (!validUsermame(username)) result = "error username invailed"
+//     else if (!validPassword(password)) result = "error password invailed"
+//     else if (password !== passwordConfirm) result = "error passwordConfirm does not match password"
+//     else if (isUser(username)) result = "error username exists"
+//     else if (!areGroups(groups)) result = "error group in groups does not exist"
+//     else {
+//         const user = {
+//             username: username,
+//             password: hashPassword(password),
+//             groups: groups,
+//         }
+//         let newUsers = db.data.users
+//         newUsers.push(user)
+//         await db.set("users", newUsers)
+//         result = "ok"
+//     }
 
-    // log(`addUser("${username}", "${password}", "${passwordConfirm}", "${groups}")`, result)
-    log(`addUser("${username}", "********", "********", "${groups}")`, result)
-    return result
-}
-async function addGroupToUser(username, groupToAdd) {
-    let result = ""
-    const user = getUser(username)
-    const isUserInGroup = user.groups?.some(group => group === groupToAdd)
+//     // log.info(`addUser("${username}", "${password}", "${passwordConfirm}", "${groups}")`, result)
+//     log.info(`addUser("${username}", "********", "********", "${groups}")`, result)
+//     return result
+// }
+// async function addGroupToUser(username, groupToAdd) {
+//     let result = ""
+//     const user = getUser(username)
+//     const isUserInGroup = user.groups?.some(group => group === groupToAdd)
 
-    if (!isUser(username)) result = "error username doesn't exists"
-    else if (!isGroup(groupToAdd)) result = "error groupToAdd does not exist"
-    else if (isUserInGroup) result = "error user already in groupToAdd"
-    else {
-        const newUsers = _State.get("users")
-        const newUser = newUsers.find(u => u.username === user.username)
-        newUser.groups.push(groupToAdd)
-        await _State.set("users", newUsers)
-        result = "ok"
-    }
+//     if (!isUser(username)) result = "error username doesn't exists"
+//     else if (!isGroup(groupToAdd)) result = "error groupToAdd does not exist"
+//     else if (isUserInGroup) result = "error user already in groupToAdd"
+//     else {
+//         const newUsers = db.data.users
+//         const newUser = newUsers.find(u => u.username === user.username)
+//         newUser.groups.push(groupToAdd)
+//         await db.set("users", newUsers)
+//         result = "ok"
+//     }
 
-    log(`addGroupToUser("${username}", "${groupToAdd}")`, result)
-    return result
-}
-async function removeGroupFromUser(username, groupToRemove) {
-    let result = ""
-    const user = getUser(username)
-    const isUserInGroup = user.groups.some(group => group === groupToRemove)
+//     log.info(`addGroupToUser("${username}", "${groupToAdd}")`, result)
+//     return result
+// }
+// async function removeGroupFromUser(username, groupToRemove) {
+//     let result = ""
+//     const user = getUser(username)
+//     const isUserInGroup = user.groups.some(group => group === groupToRemove)
 
-    if (!isUser(username)) result = "error username doesn't exists"
-    else if (!isGroup(groupToRemove)) result = "error groupToRemove does not exist"
-    else if (!isUserInGroup) result = "error user is not in groupToRemove"
-    else {
-        const newUsers = _State.get("users")
-        const newUser = newUsers.find(u => u.username === user.username)
-        newUser.groups = newUser.groups.filter(group => group !== groupToRemove)
-        await _State.set("users", newUsers)
-        result = "ok"
-    }
+//     if (!isUser(username)) result = "error username doesn't exists"
+//     else if (!isGroup(groupToRemove)) result = "error groupToRemove does not exist"
+//     else if (!isUserInGroup) result = "error user is not in groupToRemove"
+//     else {
+//         const newUsers = db.data.users
+//         const newUser = newUsers.find(u => u.username === user.username)
+//         newUser.groups = newUser.groups.filter(group => group !== groupToRemove)
+//         await db.set("users", newUsers)
+//         result = "ok"
+//     }
 
-    log(`removeGroupFromUser("${username}", "${groupToRemove}")`, result)
-    return result
-}
-async function changeUserPassword(username, newPassword, newPasswordConfirm) {
-    let result = ""
+//     log.info(`removeGroupFromUser("${username}", "${groupToRemove}")`, result)
+//     return result
+// }
+// async function changeUserPassword(username, newPassword, newPasswordConfirm) {
+//     let result = ""
 
-    if (!isUser(username)) result = "error username doesn't exists"
-    else if (!validPassword(newPassword)) result = "error newPassword invailed"
-    else if (newPassword !== newPasswordConfirm) result = "error newPasswordConfirm does not match newPassword"
-    else {
-        const user = getUser(username)
-        const newUsers = _State.get("users")
-        const newUser = newUsers.find(u => u.username === user.username)
-        newUser.password = hashPassword(newPassword)
-        await _State.set("users", newUsers)
-        result = "ok"
-    }
+//     if (!isUser(username)) result = "error username doesn't exists"
+//     else if (!validPassword(newPassword)) result = "error newPassword invailed"
+//     else if (newPassword !== newPasswordConfirm) result = "error newPasswordConfirm does not match newPassword"
+//     else {
+//         const user = getUser(username)
+//         const newUsers = db.data.users
+//         const newUser = newUsers.find(u => u.username === user.username)
+//         newUser.password = hashPassword(newPassword)
+//         await db.set("users", newUsers)
+//         result = "ok"
+//     }
 
-    // log(`changeUserPassword("${username}", "${newPassword}", "${newPasswordConfirm}")`, result)
-    log(`changeUserPassword("${username}", "********", "********")`, result)
-    return result
-}
-async function removeUser(username) {
-    let result = ""
+//     // log.debug(`changeUserPassword("${username}", "${newPassword}", "${newPasswordConfirm}")`, result)
+//     log.debug(`changeUserPassword("${username}", "********", "********")`, result)
+//     return result
+// }
+// async function removeUser(username) {
+//     let result = ""
 
-    if (!isUser(username)) result = "error username doesn't exists"
-    else {
-        let newUsers = _State.get("users")
-        newUsers = newUsers.filter(user => user.username !== username)
-        await _State.set("users", newUsers)
-        result = "ok"
-    }
+//     if (!isUser(username)) result = "error username doesn't exists"
+//     else {
+//         let newUsers = db.data.users
+//         newUsers = newUsers.filter(user => user.username !== username)
+//         await db.set("users", newUsers)
+//         result = "ok"
+//     }
 
-    log(`removeUser("${username}")`, result)
-    return result
-}
+//     log.info(`removeUser("${username}")`, result)
+//     return result
+// }
 
-async function resetUsersToDefault() {
-    await _State.set("users", DEFAULT_USER)
-    await _State.set("groups", DEFAULT_GROUPS)
-}
+// async function resetUsersToDefault() {
+//     await db.set("users", DEFAULT_USER)
+//     await db.set("groups", DEFAULT_GROUPS)
+// }
 
-// Testing
-setTimeout(async () => {
-    if (process.env.RUN_TESTS) runTests("users.js")
-}, 1000)
+// Tests
+// if (process.env.RUN_TESTS) await runTests("users.js")
 async function runTests(testName) {
     let pass = true
 
@@ -298,28 +327,3 @@ async function runTests(testName) {
 
     if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }
-
-// Export
-exports.validUsermame = validUsermame
-exports.validPassword = validPassword
-
-exports.isUser = isUser
-exports.getUserAndPassword = getUserAndPassword
-exports.getUser = getUser
-exports.getUsers = getUsers
-exports.resetUsersToDefault = resetUsersToDefault
-
-exports.getGroups = getGroups
-exports.isGroup = isGroup
-exports.areGroups = areGroups
-exports.addGroup = addGroup
-exports.removeGroup = removeGroup
-
-exports.getToken = getToken
-exports.verifyToken = verifyToken
-
-exports.addUser = addUser
-exports.removeUser = removeUser
-exports.addGroupToUser = addGroupToUser
-exports.removeGroupFromUser = removeGroupFromUser
-exports.changeUserPassword = changeUserPassword

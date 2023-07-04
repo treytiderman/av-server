@@ -66,6 +66,7 @@ function getSystemInfo() {
         time_iso: new Date(),
         uptime_sec: os.uptime(),
         user: os.userInfo(),
+        pwd: process.env.PWD,
         __dirname: __dirname,
         __filename: __filename,
         cpu: {

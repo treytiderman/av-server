@@ -18,12 +18,12 @@ async function getStatsRaw(path) {
 
         // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
-            console.error(`getStatsRaw(${path})`, "error path doesn't exist")
+            // console.error(`getStatsRaw(${path})`, "error path doesn't exist")
             return
         }
 
         // Other Error
-        console.error(`getStatsRaw(${path})`, error)
+        // console.error(`getStatsRaw(${path})`, error)
         return
 
     }
@@ -104,13 +104,13 @@ async function getStats(path) {
 
         // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
-            console.error(`getStats(${path}) ERROR path doesn't exist`)
+            // console.error(`getStats(${path}) ERROR path doesn't exist`)
             return
         }
 
         // Other Error
-        console.error(`getStats(${path}) ERROR`)
-        console.error(error)
+        // console.error(`getStats(${path}) ERROR`)
+        // console.error(error)
         return
 
     }
@@ -170,12 +170,12 @@ async function getStatsRecursive(path) {
 
         // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
-            console.error(`getStatsRecursive(${path})`, "error path doesn't exist")
+            // console.error(`getStatsRecursive(${path})`, "error path doesn't exist")
             return
         }
 
         // Other Error
-        console.error(`getStatsRecursive(${path})`, error)
+        // console.error(`getStatsRecursive(${path})`, error)
         return
 
     }
@@ -195,12 +195,12 @@ async function readText(path) {
 
         // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
-            console.error(`readText(${path})`, "error path doesn't exist")
+            // console.error(`readText(${path})`, "error path doesn't exist")
             return
         }
 
         // Other Error
-        console.error(`readText(${path})`, error)
+        // console.error(`readText(${path})`, error)
         return
 
     }
@@ -217,7 +217,7 @@ async function readJSON(path) {
             return JSON.parse(file)
         }
         catch (error) {
-            return console.error(`readJSON(${path}) ERROR not JSON`)
+            // return console.error(`readJSON(${path}) ERROR not JSON`)
         }
     }
 
@@ -226,12 +226,12 @@ async function readJSON(path) {
 
         // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
-            console.error(`readJSON(${path})`, "error path doesn't exist")
+            // console.error(`readJSON(${path})`, "error path doesn't exist")
             return
         }
 
         // Other Error
-        console.error(`readJSON(${path})`, error)
+        // console.error(`readJSON(${path})`, error)
         return
 
     }
@@ -257,7 +257,7 @@ async function writeText(path, text) {
         }
 
         // Other Error
-        console.error(`writeText(${path}, text...)`, error)
+        // console.error(`writeText(${path}, text...)`, error)
         return
 
     }
@@ -283,8 +283,8 @@ async function appendText(path, text) {
         }
 
         // Other Error
-        console.error(`appendText(${path}, ...) ERROR`)
-        console.error(error)
+        // console.error(`appendText(${path}, ...) ERROR`)
+        // console.error(error)
         return
 
     }
@@ -311,7 +311,7 @@ async function writeJSON(path, obj) {
         }
 
         // Other Error
-        console.error(`writeJSON(${path}, obj...)`, error)
+        // console.error(`writeJSON(${path}, obj...)`, error)
         return
 
     }
@@ -327,7 +327,7 @@ async function makeDir(path) {
 
     // Error
     catch (error) {
-        console.error(`makeDir(${path})`, error)
+        // console.error(`makeDir(${path})`, error)
     }
 
 }
@@ -342,10 +342,10 @@ async function deleteFile(path) {
     // Error
     catch (error) {
         if (error?.code === "ENOENT") {
-            console.error(`deleteFile(${path})`, "error path doesn't exist")
+            // console.error(`deleteFile(${path})`, "error path doesn't exist")
             return
         }
-        console.error(`deleteFile(${path})`, error)
+        // console.error(`deleteFile(${path})`, error)
     }
 
 }
@@ -360,10 +360,10 @@ async function deleteFolder(path) {
     // Error
     catch (error) {
         if (error?.code === "ENOENT") {
-            console.error(`deleteFolder(${path})`, "error path doesn't exist")
+            // console.error(`deleteFolder(${path})`, "error path doesn't exist")
             return
         }
-        console.error(`deleteFolder(${path})`, error)
+        // console.error(`deleteFolder(${path})`, error)
     }
 
 }
@@ -378,15 +378,15 @@ async function rename(oldPath, newPath) {
     // Error
     catch (error) {
         if (error?.code === "ENOENT") {
-            console.error(`rename(${oldPath}, ${newPath})`, "error path doesn't exist")
+            // console.error(`rename(${oldPath}, ${newPath})`, "error path doesn't exist")
             if (await exists(oldPath)) {
                 await makeDir(newPath.slice(0, newPath.lastIndexOf('/')) + "/")
                 await rename(oldPath, newPath)
             }
-            console.error(`rename(${oldPath}, ${newPath})`, error)
+            // console.error(`rename(${oldPath}, ${newPath})`, error)
         }
         else {
-            console.error(`rename(${oldPath}, ${newPath})`, error)
+            // console.error(`rename(${oldPath}, ${newPath})`, error)
         }
     }
 
@@ -402,7 +402,7 @@ async function exists(path) {
 
     // Error
     catch (error) {
-        console.error(`exists(${path})`, error)
+        // console.error(`exists(${path})`, error)
         return false
     }
 

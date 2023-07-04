@@ -1,34 +1,42 @@
 // Overview: create and verify hashed passwords and jsonwebtokens
-const crypto = require('crypto')
-const jwt = require('jsonwebtoken')
 
-// Variables
+// Import
+import { randomBytes, pbkdf2Sync } from 'crypto'
+import { sign, verify } from 'jsonwebtoken'
+
+// Export
+export {
+    hashPassword,
+    isHashedPassword,
+    generateJWT,
+    verifyJWT,
+}
+
+// Constants
 const CRYPTO_KEYSIZE = 64
 const CRYPTO_ITERATIONS = 9999
-const JWT_KEY = process.env.RUN_TESTS ? "test" : crypto.randomBytes(CRYPTO_KEYSIZE).toString('base64')
+const JWT_KEY = process.env.RUN_TESTS ? "test" : randomBytes(CRYPTO_KEYSIZE).toString('base64')
 
 // Functions
 function hashPassword(password) {
-    const salt = crypto.randomBytes(CRYPTO_KEYSIZE).toString('base64')
-    const hash = crypto.pbkdf2Sync(password, salt, CRYPTO_ITERATIONS, CRYPTO_KEYSIZE, 'sha256').toString('base64')
+    const salt = randomBytes(CRYPTO_KEYSIZE).toString('base64')
+    const hash = pbkdf2Sync(password, salt, CRYPTO_ITERATIONS, CRYPTO_KEYSIZE, 'sha256').toString('base64')
     return { salt: salt, hash: hash }
 }
 function isHashedPassword(password, hash, salt) {
-    const hashTesting = crypto.pbkdf2Sync(password, salt, CRYPTO_ITERATIONS, CRYPTO_KEYSIZE, 'sha256').toString('base64')
+    const hashTesting = pbkdf2Sync(password, salt, CRYPTO_ITERATIONS, CRYPTO_KEYSIZE, 'sha256').toString('base64')
     return hash === hashTesting
 }
 function generateJWT(json) {
-    return jwt.sign(json, JWT_KEY)
+    return sign(json, JWT_KEY)
 }
 function verifyJWT(token, cb) {
-    jwt.verify(token, JWT_KEY, (error, json) => cb(error, json))
+    verify(token, JWT_KEY, (error, json) => cb(error, json))
 }
 
 // Testing
-setTimeout(() => {
-    if (process.env.RUN_TESTS) runTests("auth.js")
-}, 1000)
-function runTests(testName) {
+if (process.env.RUN_TESTS) await runTests("auth.js")
+async function runTests(testName) {
     let pass = true
 
     const testPassword = "password"
@@ -47,9 +55,3 @@ function runTests(testName) {
 
     if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }
-
-// Export
-exports.hashPassword = hashPassword
-exports.isHashedPassword = isHashedPassword
-exports.generateJWT = generateJWT
-exports.verifyJWT = verifyJWT

@@ -1,0 +1,12 @@
+{
+    "name": "test",
+    "version": "0.0.1",
+    "description": "",
+    "main": "main.js",
+    "scripts": {
+        "start": "node main.js"
+    },
+    "author": "",
+    "license": "MIT",
+    "dependencies": {}
+}
