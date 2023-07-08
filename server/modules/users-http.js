@@ -92,7 +92,8 @@ function gate(require = {
 }
 
 // Routes
-router.get('/get-token', async (req, res) => {
+router.post('/get-token', async (req, res) => {
+    console.log(req.body);
     const response = getToken(req.body.username, req.body.password)
     if (response === "error password incorrect") res.json("error username or password incorrect")
     else if (response === "error username doesn't exists") res.json("error username or password incorrect")
@@ -106,11 +107,11 @@ router.get('/groups', async (req, res) => {
     const response = await getGroups()
     res.json(response)
 })
-router.get('/add-group', gate({isAdmin: true}), async (req, res) => {
+router.post('/add-group', gate({isAdmin: true}), async (req, res) => {
     const response = await addGroup(req.body.groupToAdd)
     res.json(response)
 })
-router.get('/remove-group', gate({isAdmin: true}), async (req, res) => {
+router.post('/remove-group', gate({isAdmin: true}), async (req, res) => {
     const response = await removeGroup(req.body.groupToRemove)
     res.json(response)
 })
@@ -119,23 +120,23 @@ router.get('/users', async (req, res) => {
     const response = getUsers()
     res.json(response)
 })
-router.get('/add', gate({isAdmin: true}), async (req, res) => {
+router.post('/add', gate({isAdmin: true}), async (req, res) => {
     const response = await addUser(req.body.username, req.body.password, req.body.passwordConfirm, req.body.groups)
     res.json(response)
 })
-router.get('/add-group-to-user', gate({isAdmin: true}), async (req, res) => {
+router.post('/add-group-to-user', gate({isAdmin: true}), async (req, res) => {
     const response = await addGroupToUser(req.body.username, req.body.groupToAdd)
     res.json(response)
 })
-router.get('/remove-group-from-user', gate({isAdmin: true}), async (req, res) => {
+router.post('/remove-group-from-user', gate({isAdmin: true}), async (req, res) => {
     const response = await removeGroupFromUser(req.body.username, req.body.groupToRemove)
     res.json(response)
 })
-router.get('/change-user-password', gate({isAdmin: true}), async (req, res) => {
+router.post('/change-user-password', gate({isAdmin: true}), async (req, res) => {
     const response = await changeUserPassword(req.body.username, req.body.newPassword, req.body.newPasswordConfirm)
     res.json(response)
 })
-router.get('/remove', gate({isAdmin: true}), async (req, res) => {
+router.post('/remove', gate({isAdmin: true}), async (req, res) => {
     const response = await removeUser(req.body.username)
     res.json(response)
 })

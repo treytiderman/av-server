@@ -126,7 +126,7 @@ class Logger {
 await makeDir(PATH_TO_LOG_FOLDER)
 await updateLogFileIndex()
 await deleteOldLogs()
-if (process.env.RUN_TESTS) await deleteAllLogs()
+if (process.env.DEV_MODE) await deleteAllLogs()
 
 // Testing
 // const logger = new Logger("logger.js")

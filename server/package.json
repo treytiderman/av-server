@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "RUN_TESTS=true nodemon server.js",
+    "dev": "DEV_MODE=true nodemon server.js",
     "windows-install-service": "node install.js",
     "windows-uninstall-service": "node uninstall.js"
   },

@@ -2,210 +2,210 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API</title>
-  <style>
-    * {
-      color-scheme: dark;
-      line-height: 1.5;
-      font-family: monospace;
-    }
-
-    body {
-      padding: 1rem;
-      font-size: 16px;
-      background-color: black;
-      color: #CCC;
-    }
-
-    h2 {
-      margin-top: 0;
-    }
-
-    a {
-      color: hsl(200, 99%, 65%);
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    pre {
-      margin: 0;
-      font-size: smaller;
-    }
-  </style>
-  <script>
-
-    // Helper Functions
-    function log(...params) { if (true) console.log(...params) }
-    function err(...params) { if (true) console.error(...params) }
-
-    // Build URL
-    function buildURL(path, options = {}) {
-      const ip = options.ip ?? document.location.hostname
-      const port = options.port ?? document.location.port
-      const protocol = options.protocol ?? document.location.protocol
-      const host = options.protocol === 'https:' ? `${ip}` : `${ip}:${port}`
-      return `${protocol}//${host}${path}`
-    }
-
-    // GET JSON response
-    async function getJSON(path, options = {}) {
-
-      // URL
-      const url = buildURL(path, options)
-      log(`get(${url})`)
-
-      // Fetch options
-      const token = localStorage.getItem('token') ?? ""
-      const fetch_options = {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API</title>
+    <style>
+        * {
+            color-scheme: dark;
+            line-height: 1.5;
+            font-family: monospace;
         }
-      }
 
-      // Fetch
-      try {
-        const response = await fetch(url, fetch_options)
-        log(`get(${url})`, response)
-
-        // Parse JSON
-        try {
-          const json = await response.json()
-          return json
+        body {
+            padding: 1rem;
+            font-size: 16px;
+            background-color: black;
+            color: #CCC;
         }
-        catch (error) {
-          err(`get(${url})`, "response not a json")
-          return "not a json"
+
+        h2 {
+            margin-top: 0;
         }
-      }
 
-      // Errors
-      catch (error) { return err(error) }
-
-    }
-
-    // POST JSON and JSON response
-    async function postJSON(path, body, options = {}) {
-
-      // URL
-      const url = buildURL(path, options)
-      log(`postJSON(${url}, ...)`, body)
-
-      // Fetch options
-      const token = localStorage.getItem('token') ?? ""
-      const fetch_options = {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(body)
-      }
-
-      // Fetch
-      try {
-        const response = await fetch(url, fetch_options)
-        log(`postJSON(${url}, ...)`, response)
-
-        // Parse JSON
-        try {
-          const json = await response.json()
-          return json
+        a {
+            color: hsl(200, 99%, 65%);
+            text-decoration: none;
+            cursor: pointer;
         }
-        catch (error) {
-          err(`postJSON(${url}, ...)`, "response not a json")
-          return "not a json"
+
+        pre {
+            margin: 0;
+            font-size: smaller;
         }
-      }
+    </style>
+    <script>
 
-      // Errors
-      catch (error) { return err(error) }
+        // Helper Functions
+        function log(...params) { if (false) console.log(...params) }
+        function err(...params) { if (true) console.error(...params) }
 
-    }
+        // Build URL
+        function buildURL(path, options = {}) {
+            const ip = options.ip ?? document.location.hostname
+            const port = options.port ?? document.location.port
+            const protocol = options.protocol ?? document.location.protocol
+            const host = options.protocol === 'https:' ? `${ip}` : `${ip}:${port}`
+            return `${protocol}//${host}${path}`
+        }
 
-    // Login
-    async function login(username, password, options = {}) {
+        // GET JSON response
+        async function getJSON(path, options = {}) {
 
-      // Send username and password to login endpoint
-      const token = await postJSON("/api/login/v1", {
-        username: username,
-        password: password
-      }, options)
+            // URL
+            const url = buildURL(path, options)
+            log(`get(${url})`)
 
-      // Password incorrect
-      if (token === "password incorrect") return token
+            // Fetch options
+            const token = localStorage.getItem('token') ?? ""
+            const fetch_options = {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
 
-      // User doesn't exist
-      else if (token === "username doesn't exists") return token
+            // Fetch
+            try {
+                const response = await fetch(url, fetch_options)
+                log(`get(${url})`, response)
 
-      // Save Token to localStorage
-      else {
-        log("token saved")
-        localStorage.setItem("token", token)
-      }
+                // Parse JSON
+                try {
+                    const json = await response.json()
+                    return json
+                }
+                catch (error) {
+                    err(`get(${url})`, "response not a json")
+                    return "not a json"
+                }
+            }
 
-    }
+            // Errors
+            catch (error) { return err(error) }
 
-    // Logout
-    async function logout() {
-      localStorage.removeItem("token")
-    }
+        }
 
-  </script>
+        // POST JSON and JSON response
+        async function postJSON(path, body, options = {}) {
+
+            // URL
+            const url = buildURL(path, options)
+            log(`postJSON(${url}, ...)`, body)
+
+            // Fetch options
+            const token = localStorage.getItem('token') ?? ""
+            const fetch_options = {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(body)
+            }
+
+            // Fetch
+            try {
+                const response = await fetch(url, fetch_options)
+                log(`postJSON(${url}, ...)`, response)
+
+                // Parse JSON
+                try {
+                    const json = await response.json()
+                    return json
+                }
+                catch (error) {
+                    err(`postJSON(${url}, ...)`, "response not a json")
+                    return "not a json"
+                }
+            }
+
+            // Errors
+            catch (error) { return err(error) }
+
+        }
+
+        // Login
+        async function login(username, password, options = {}) {
+
+            // Send username and password to login endpoint
+            const token = await postJSON("/api/user/get-token", {
+                username: username,
+                password: password
+            }, options)
+
+            // error
+            if (token.startsWith("error")) {
+                await logout()
+                return token
+            }
+            
+            // Save Token to localStorage
+            else {
+                log("token saved")
+                await localStorage.setItem("token", token)
+                return token
+            }
+
+        }
+
+        // Logout
+        async function logout() {
+            localStorage.removeItem("token")
+        }
+
+    </script>
 </head>
 
 <body>
-  <p>
-    <a href="/">↪ Return Home</a>
-  </p>
+    <p>
+        <a href="/">↪ Return Home</a>
+    </p>
 
-  <h2>Logs</h2>
-  <p>Refreshes every 5 sec</p>
-  <button onclick="location.reload()">reload</button>
-  <button onclick="getJSON('/api/logger/delete-all-logs'); location.reload()">delete-all-logs</button>
-  <br>
-  <br>
-  <div id="logs"></div>
-  <script>
-    let logFile_last = ""
-    const logElement = document.getElementById('logs')
+    <h2>Logs</h2>
+    <p>Refreshes every 5 sec</p>
+    <button onclick="location.reload()">reload</button>
+    <button onclick="getJSON('/api/logger/delete-all-logs'); location.reload()">delete-all-logs</button>
+    <br>
+    <br>
+    <div id="logs"></div>
 
-    function loadLogs(files) {
-      logElement.innerHTML = ""
-      postJSON("/api/logger/file", { file: files[files.length - 1] }).then(file => {
-        logFile_last = file
-        const split = file.split("\n")
-        split.pop()
-        const logLines = []
-        split.forEach(line => {
-          const obj = JSON.parse(line)
-          try { logLines.push(obj) }
-          catch (error) { console.error("line", line) }
+    <script type="module">
+        const password = prompt("Enter the admin password", "admin")
+        const loginResponse = await login("admin", password)
+        if (loginResponse.startsWith("error")) alert("login failed. reload and try again")
 
-          if (obj.message.includes("api/logger")) { }
-          else if (obj.message.includes("favicon")) { }
-          else {
-            const preElement = document.createElement("pre")
-            const text = `${obj.timestampISO} >> ${obj.level} >> ${obj.group} >> ${obj.message} >> ${JSON.stringify(obj.obj)}`
-            preElement.innerText = text
-            logElement.appendChild(preElement)
-          }
-        })
-        console.log("logLines", logLines)
-      })
-    }
+        const logElement = document.getElementById('logs')
 
-    getJSON("/api/logger/files-available").then(files => {
-      console.log("files", files)
-      loadLogs(files)
-      setInterval(() => loadLogs(files), 5_000);
-    })
+        async function loadLogs(files) {
+            const file = await postJSON("/api/logger/file", { file: files[files.length - 1] })
+            logElement.innerHTML = ""
+            const split = file.split("\n")
+            split.pop()
+            const logLines = []
+            split.forEach(line => {
+                const obj = JSON.parse(line)
+                try { logLines.push(obj) }
+                catch (error) { console.error("line", line) }
 
-  </script>
-  <br>
+                if (obj.message.includes("api/logger")) { }
+                else if (obj.message.includes("favicon")) { }
+                else {
+                    const preElement = document.createElement("pre")
+                    const text = `${obj.timestampISO} >> ${obj.level} >> ${obj.group} >> ${obj.message} >> ${JSON.stringify(obj.obj)}`
+                    preElement.innerText = text
+                    logElement.appendChild(preElement)
+                }
+            })
+        }
+
+        const files = await getJSON("/api/logger/files-available")
+        await loadLogs(files)
+        setInterval(async () => await loadLogs(files), 5_000);
+
+    </script>
+    <br>
 
 </body>
 

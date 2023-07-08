@@ -18,7 +18,7 @@ export {
 // Constants
 const CRYPTO_KEYSIZE = 64
 const CRYPTO_ITERATIONS = 9999
-const JWT_KEY = process.env.RUN_TESTS ? "test" : randomBytes(CRYPTO_KEYSIZE).toString('base64')
+const JWT_KEY = process.env.DEV_MODE ? "test" : randomBytes(CRYPTO_KEYSIZE).toString('base64')
 
 // Functions
 function hashPassword(password) {
@@ -38,7 +38,7 @@ function verifyJWT(token, cb) {
 }
 
 // Tests
-if (process.env.RUN_TESTS) await runTests("auth.js")
+if (process.env.DEV_MODE) await runTests("auth.js")
 async function runTests(testName) {
     let pass = true
 

@@ -328,7 +328,7 @@ async function exists(path) {
 }
 
 // Tests
-if (process.env.RUN_TESTS) await runTests("auth.js")
+if (process.env.DEV_MODE) await runTests("auth.js")
 async function runTests(testName) {
     // getStats("../private/logs/example.log")
     //   .then(stats => console.log(stats))

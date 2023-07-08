@@ -44,9 +44,10 @@ router.use("/ui", express.static("../server/frontend"))
 // Log HTTP requests (exclude public routes)
 function logRequests(req, res, next) {
     const url = `${req.method} ${req.protocol}://${req.headers.host}${req.url}`
-    if (req.body.password) req.body.password = "********"
-    if (req.body.token) req.body.token = "********"
-    log.debug(url, req.body)
+    const bodyCopy = JSON.parse(JSON.stringify(req.body))
+    if (bodyCopy.password) bodyCopy.password = "********"
+    if (bodyCopy.token) bodyCopy.token = "********"
+    log.debug(url, bodyCopy)
     next()
 }
 router.use(logRequests)

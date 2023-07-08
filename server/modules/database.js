@@ -56,7 +56,7 @@ async function resetDatabase(name) {
 // async function getKeyInDatabase(name, key) {}
 
 // Tests
-if (process.env.RUN_TESTS) await runTests("state.js")
+if (process.env.DEV_MODE) await runTests("state.js")
 async function runTests(testName) {
     let pass = true
 

@@ -128,8 +128,9 @@ function getToken(username, password) {
     else if (!isHashedPassword(password, user.password.hash, user.password.salt)) result = "error password incorrect"
     else result = generateJWT({ username: user.username })
 
-    // log.debug(`getToken("${username}", "${password}")`, result)
-    log.debug(`getToken("${username}", "********")`, "********")
+    const passwordToLog = process.env.DEV_MODE ? password : "********"
+    const resultToLog = result.startsWith("error") || process.env.DEV_MODE ? result : "********"
+    log.debug(`getToken("${username}", "${passwordToLog}")`, resultToLog)
     return result
 }
 function verifyToken(token, cb) {
@@ -242,7 +243,7 @@ async function resetUsersToDefault() {
 }
 
 // Tests
-if (process.env.RUN_TESTS) await runTests("users.js")
+if (process.env.DEV_MODE) await runTests("users.js")
 async function runTests(testName) {
     let pass = true
 

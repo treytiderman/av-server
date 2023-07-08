@@ -1,7 +1,6 @@
 // Overview: spawn sub processes / user scripts
 
 // Todos
-// use db.js
 // check out: https://pm2.keymetrics.io/docs/usage/pm2-api/
 
 /* Events example
@@ -48,8 +47,6 @@ const DEFAULT_STATE = { programs: {}, available: {} }
 const db = await getDatabase('programs', DEFAULT_STATE)
 const emitter = new events.EventEmitter()
 const log = new Logger("programs.js")
-let programs = {}
-const available = {}
 const spawnedList = {}
 
 // Helper Functions
@@ -265,13 +262,13 @@ async function killAll() {
     const programs = db.data.programs
     Object.keys(programs).forEach(async name => await kill(name))
 }
-function restart(name) {
+async function restart(name) {
     log.debug(`${name} restarting...`)
     const programs = db.data.programs
     const program = programs[name].program
     const args = programs[name].args
     const env = programs[name].env
-    kill(name)
+    await kill(name)
     setTimeout(async () => {
         await start(name, program, args, env)
     }, RESTART_TIMEOUT_MS)
@@ -285,7 +282,7 @@ setInterval(async () => {
 }, UPDATE_AVAILABLE_MS)
 
 // Testing - takes 1 sec
-if (process.env.RUN_TESTS) await runTests("programs.js")
+if (process.env.DEV_MODE) await runTests("programs.js")
 async function runTests(testName) {
     let pass = true
 

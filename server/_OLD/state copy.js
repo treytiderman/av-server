@@ -75,7 +75,7 @@ class StateClass {
 
 // Testing
 setTimeout(async () => {
-    if (process.env.RUN_TESTS) runTests("state.js")
+    if (process.env.DEV_MODE) runTests("state.js")
 }, 1000)
 async function runTests(testName) {
     let pass = true
