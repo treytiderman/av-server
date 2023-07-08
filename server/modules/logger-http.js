@@ -2,7 +2,7 @@
 
 // Imports
 import express from 'express'
-import { log, PATH_TO_LOG_FOLDER } from '../modules/logger.js'
+import { log, deleteAllLogs, PATH_TO_LOG_FOLDER } from '../modules/logger.js'
 import { gate } from '../modules/users-http.js'
 import { getStats, readText } from '../modules/files.js'
 
@@ -29,4 +29,8 @@ router.post('/', async (req, res) => {
     const response = await log(req.body.group, req.body.message, req.body.obj)
     res.json(response)
 })
-
+// router.post('/', gate({isAdmin: true}), async (req, res) => {
+router.get('/delete-all-logs', async (req, res) => {
+    const response = await deleteAllLogs()
+    res.json(response)
+})

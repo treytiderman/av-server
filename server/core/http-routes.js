@@ -7,10 +7,10 @@ import { Logger } from '../modules/logger.js'
 import { renderMarkdown } from './http-markdown.js'
 
 // Imports - Modules
-// import { router as dbRouter} from '../modules/db-http.js'
-// import { router as filesRouter} from '../modules/files-http.js'
+import { router as dbRouter} from '../modules/database-http.js'
+import { router as filesRouter} from '../modules/files-http.js'
 import { router as loggerRouter} from '../modules/logger-http.js'
-// import { router as programsRouter} from '../modules/programs-http.js'
+import { router as programsRouter} from '../modules/programs-http.js'
 import { router as systemRouter} from '../modules/system-http.js'
 import { router as usersRouter, checkRequest} from '../modules/users-http.js'
 
@@ -44,7 +44,9 @@ router.use("/ui", express.static("../server/frontend"))
 // Log HTTP requests (exclude public routes)
 function logRequests(req, res, next) {
     const url = `${req.method} ${req.protocol}://${req.headers.host}${req.url}`
-    log.debug("server_http", url, req.body)
+    if (req.body.password) req.body.password = "********"
+    if (req.body.token) req.body.token = "********"
+    log.debug(url, req.body)
     next()
 }
 router.use(logRequests)
@@ -61,10 +63,10 @@ router.use(checkRequest)
 router.get('/', (req, res) => res.redirect(302, '/ui'))
 
 // Modules
-// router.use('/api/db', dbRouter)
-// router.use('/api/files', filesRouter)
+router.use('/api/db', dbRouter)
+router.use('/api/files', filesRouter)
 router.use('/api/logger', loggerRouter)
-// router.use('/api/programs', programsRouter)
+router.use('/api/programs', programsRouter)
 router.use('/api/system', systemRouter)
 router.use('/api/user', usersRouter)
 

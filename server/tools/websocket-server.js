@@ -9,7 +9,6 @@
 //   "topic": "string",
 //   "event": "string",
 //   "body": "string" or [] or {}
-//   "error": "string" // only sent on errors
 // }
 
 // Imports

@@ -1,15 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>API</title>
   <style>
-    * { color-scheme: dark; line-height: 1.5; font-family: monospace; }
-    body { padding: 1rem; font-size: 16px; background-color: black; color: #CCC; }
-    h2 { margin-top: 0; }
-    a { color: hsl(200, 99%, 65%); text-decoration: none; cursor: pointer; }
-    /* a:visited { color: hsl(200, 55%, 48%); } */
+    * {
+      color-scheme: dark;
+      line-height: 1.5;
+      font-family: monospace;
+    }
+
+    body {
+      padding: 1rem;
+      font-size: 16px;
+      background-color: black;
+      color: #CCC;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    a {
+      color: hsl(200, 99%, 65%);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    pre {
+      margin: 0;
+      font-size: smaller;
+    }
   </style>
   <script>
 
@@ -57,7 +80,7 @@
           return "not a json"
         }
       }
-      
+
       // Errors
       catch (error) { return err(error) }
 
@@ -97,7 +120,7 @@
           return "not a json"
         }
       }
-      
+
       // Errors
       catch (error) { return err(error) }
 
@@ -133,25 +156,57 @@
 
   </script>
 </head>
+
 <body>
   <p>
     <a href="/">↪ Return Home</a>
   </p>
-  <br>
 
   <h2>Logs</h2>
-  <p id="logs"></p>
+  <p>Refreshes every 5 sec</p>
+  <button onclick="location.reload()">reload</button>
+  <button onclick="getJSON('/api/logger/delete-all-logs'); location.reload()">delete-all-logs</button>
+  <br>
+  <br>
+  <div id="logs"></div>
   <script>
+    let logFile_last = ""
     const logElement = document.getElementById('logs')
-    getJSON("/api/logger/files-available").then(files => {
-      console.log(files)
-      postJSON("/api/logger/file", { file: files[0] }).then(file => {
-        const array = file.split("\n")
-        logElement.innerText = file
+
+    function loadLogs(files) {
+      logElement.innerHTML = ""
+      postJSON("/api/logger/file", { file: files[files.length - 1] }).then(file => {
+        logFile_last = file
+        const split = file.split("\n")
+        split.pop()
+        const logLines = []
+        split.forEach(line => {
+          const obj = JSON.parse(line)
+          try { logLines.push(obj) }
+          catch (error) { console.error("line", line) }
+
+          if (obj.message.includes("api/logger")) { }
+          else if (obj.message.includes("favicon")) { }
+          else {
+            const preElement = document.createElement("pre")
+            const text = `${obj.timestampISO} >> ${obj.level} >> ${obj.group} >> ${obj.message} >> ${JSON.stringify(obj.obj)}`
+            preElement.innerText = text
+            logElement.appendChild(preElement)
+          }
+        })
+        console.log("logLines", logLines)
       })
+    }
+
+    getJSON("/api/logger/files-available").then(files => {
+      console.log("files", files)
+      loadLogs(files)
+      setInterval(() => loadLogs(files), 5_000);
     })
+
   </script>
   <br>
 
 </body>
+
 </html>

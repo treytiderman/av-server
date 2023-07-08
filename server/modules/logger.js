@@ -17,6 +17,7 @@ import { EventEmitter } from 'events'
 // Exports
 export {
     log,
+    deleteAllLogs,
     Logger,
     emitter,
     PATH_TO_LOG_FOLDER,
@@ -97,6 +98,13 @@ async function log(level, group, message, obj = {}) {
     await deleteOldLogs()
     emitter.emit("log", logObj)
 }
+async function deleteAllLogs() {
+    const fileNames = await getLogFileStats()
+    fileNames.forEach(async file => {
+        await deleteFile(file.path)
+    })
+    log("debug", "logger", "deleteAllLogs")
+}
 
 // Class
 class Logger {
@@ -118,6 +126,7 @@ class Logger {
 await makeDir(PATH_TO_LOG_FOLDER)
 await updateLogFileIndex()
 await deleteOldLogs()
+if (process.env.RUN_TESTS) await deleteAllLogs()
 
 // Testing
 // const logger = new Logger("logger.js")

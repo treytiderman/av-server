@@ -2,7 +2,7 @@
 
 // Import
 import { hashPassword, isHashedPassword, generateJWT, verifyJWT } from './auth.js'
-import { getDatabase, resetDatabase } from './db.js'
+import { getDatabase, resetDatabase } from './database.js'
 import { Logger } from './logger.js'
 
 // Export
@@ -242,7 +242,6 @@ async function resetUsersToDefault() {
 }
 
 // Tests
-await runTests("users.js")
 if (process.env.RUN_TESTS) await runTests("users.js")
 async function runTests(testName) {
     let pass = true

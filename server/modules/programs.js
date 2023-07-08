@@ -4,14 +4,23 @@
 // use db.js
 // check out: https://pm2.keymetrics.io/docs/usage/pm2-api/
 
+/* Events example
+    const programs = require('../modules/programs')
+    programs.emitter.on("available", (body) => {})
+    programs.emitter.on("start", (name, body) => {})
+    programs.emitter.on("error", (name, body) => {})
+    programs.emitter.on("exit", (name, body) => {})
+    programs.emitter.on("out", (name, body) => {})
+*/
+
+// Imports
 import { spawn } from 'child_process'
 import { getStatsRecursive, readText } from './files.js'
 import { Logger } from './logger.js'
-import { getDatabase } from './db.js'
+import { getDatabase } from './database.js'
 
 // Event Emitter
 import events from 'events'
-const emitter = new events.EventEmitter()
 
 // Exports
 export {
@@ -29,24 +38,16 @@ export {
     restart,
 }
 
-/* Events example
-    const programs = require('../modules/programs')
-    programs.emitter.on("available", (body) => {})
-    programs.emitter.on("start", (name, body) => {})
-    programs.emitter.on("error", (name, body) => {})
-    programs.emitter.on("exit", (name, body) => {})
-    programs.emitter.on("out", (name, body) => {})
-*/
-
 // Variables
 const PATH_TO_PROGRAMS = "../programs"
 const MAX_HISTORY_LENGTH = 1_000
 const UPDATE_AVAILABLE_MS = 1_000
 const RESTART_TIMEOUT_MS = 1_000
-const DEFAULT_STATE = { programs: {} }
+const DEFAULT_STATE = { programs: {}, available: {} }
 
+const db = await getDatabase('programs', DEFAULT_STATE)
+const emitter = new events.EventEmitter()
 const log = new Logger("programs.js")
-// const State = new StateClass('programs', DEFAULT_STATE)
 let programs = {}
 const available = {}
 const spawnedList = {}
@@ -56,23 +57,23 @@ function splitByWhitespace(string) {
     return string.trim().split(/\s+/)
 }
 async function checkAvailablePrograms() {
-    const availableAsJSON_prev = JSON.stringify(available)
+    const availableAsJSON_prev = JSON.stringify(db.data.available)
     const stats = await getStatsRecursive(PATH_TO_PROGRAMS)
     for (const folder of stats.contains_folders) {
         const folderName = folder.folder_name.replace("/", "")
-        available[folderName] = {
+        db.data.available[folderName] = {
             directory: `${PATH_TO_PROGRAMS}/${folderName}`,
             command: "echo hi",
             env: {},
             files: [],
         }
         for (const file of folder.contains_files) {
-            available[folderName].files.push(file.file_name)
+            db.data.available[folderName].files.push(file.file_name)
             if (file.file_name.endsWith(".js")) {
-                available[folderName].command = "node " + file.file_name
+                db.data.available[folderName].command = "node " + file.file_name
             }
             else if (file.file_name.endsWith(".py")) {
-                available[folderName].command = "python " + file.file_name
+                db.data.available[folderName].command = "python " + file.file_name
             }
             else if (file.file_name.endsWith(".env")) {
                 const envFile = await readText(file.path)
@@ -80,49 +81,50 @@ async function checkAvailablePrograms() {
                 envFileLines.forEach(line => {
                     const key = line.split("=")[0].trim()
                     const value = line.split("=")[1].trim()
-                    available[folderName].env[key] = value
+                    db.data.available[folderName].env[key] = value
                 });
             }
         }
     }
-    const availableAsJSON = JSON.stringify(available)
+    const availableAsJSON = JSON.stringify(db.data.available)
     if (availableAsJSON !== availableAsJSON_prev) {
-        emitter.emit('available', available)
+        emitter.emit('available', db.data.available)
+        await db.write()
     }
-    return available
+    return db.data.available
 }
 
 // Functions
 function getAvailable() {
-    return available
+    return db.data.available
 }
 function getProgram(name) {
-    // const programs = State.get("programs")
-    if (programs[name]) {
+    const program = db.data.programs[name]
+    if (program) {
         return {
-            command: programs[name].command,
-            env: programs[name].env,
-            pid: programs[name].pid,
-            running: programs[name].running,
+            command: program.command,
+            env: program.env,
+            pid: program.pid,
+            running: program.running,
         }
     }
     return { error: name + " doesn't exist"}
 }
 function getProgramWithHistory(name) {
-    // const programs = State.get("programs")
-    if (programs[name]) {
+    const program = db.data.programs[name]
+    if (program) {
         return {
-            command: programs[name].command,
-            env: programs[name].env,
-            pid: programs[name].pid,
-            running: programs[name].running,
-            out: programs[name].out,
+            command: program.command,
+            env: program.env,
+            pid: program.pid,
+            running: program.running,
+            out: program.out,
         }
     }
     return { error: name + "program doesn't exist"}
 }
 function getPrograms() {
-    // const programs = State.get("programs")
+    const programs = db.data.programs
     const array = []
     Object.keys(programs).forEach(name => {
         array.push(getProgram(name))
@@ -130,11 +132,12 @@ function getPrograms() {
     return array
 }
 async function clearPrograms() {
-    // await State.set("programs", {})
-    programs = {}
+    await killAll()
+    db.data.programs = {}
+    await db.write()
 }
-async function start(name, directory, command, env = {}) {
-    // const programs = State.get("programs")
+async function start(name, directory, command, startOnBoot = false, env = {}) {
+    const programs = db.data.programs
 
     // Already running
     if (programs[name]?.running === true) {
@@ -159,7 +162,7 @@ async function start(name, directory, command, env = {}) {
     spawnedList[name] = spawned
     programs[name] = {
         running: false,
-        startOnBoot: false,
+        startOnBoot: startOnBoot,
         pid: spawned.pid,
         directory: directory,
         command: command,
@@ -176,13 +179,13 @@ async function start(name, directory, command, env = {}) {
         log.debug(`start(${name}, ${directory}, ${command}, ${JSON.stringify(env)})`, "ok")
         programs[name].running = true
         emitter.emit('start', name, "ok")
-        // await State.set("programs", programs)
+        await db.write()
     })
     spawned.on('exit', async (code, signal) => {
         log.debug(`${name} exit`)
         programs[name].running = false
         emitter.emit('exit', name, "ok")
-        // await State.set("programs", programs)
+        await db.write()
     })
     spawned.stdout.on('data', async (data) => {
         const dataObj = {
@@ -196,7 +199,7 @@ async function start(name, directory, command, env = {}) {
         if (programs[name].out.length > MAX_HISTORY_LENGTH) {
             programs[name].out.shift()
         }
-        // await State.set("programs", programs)
+        await db.write()
     })
     spawned.stderr.on('data', async (data) => {
         const dataObj = {
@@ -210,46 +213,61 @@ async function start(name, directory, command, env = {}) {
         if (programs[name].out.length > MAX_HISTORY_LENGTH) {
             programs[name].out.shift()
         }
-        // await State.set("programs", programs)
+        await db.write()
     })
 
-    // await State.set("programs", programs)
+    await db.write()
     return programs[name]
 }
-async function startAvailable(folderName, name, env = {}) {
-    const directory = available[folderName].directory
-    const command = available[folderName].command
-    const program = await start(name, directory, command, env)
-    return program
+async function startAvailable(name, folderName, env = {}) {
+    const available = db.data.available
+    if (available[folderName]) {
+        const directory = available[folderName].directory
+        const command = available[folderName].command
+        const program = await start(name, directory, command, env)
+        return program
+    }
+    const error = "error folderName doesn't exist"
+    log.debug(`startAvailable(${folderName}, ${name}, ${JSON.stringify(env)})`, error)
+    emitter.emit('start', name, error)
+    return "error program doesn't exist"
 }
 async function startExisting(name) {
-    const programs = State.get("programs")
-    const directory = programs[name].directory
-    const command = programs[name].command
-    const env = programs[name].env
-    const program = await start(name, directory, command, env)
-    return program
+    const programs = db.data.programs
+    if (programs[name]) {
+        const directory = programs[name].directory
+        const command = programs[name].command
+        const env = programs[name].env
+        const program = await start(name, directory, command, env)
+        return program
+    }
+    const error = "error program doesn't exist"
+    log.debug(`startExisting(${name})`, error)
+    emitter.emit('start', name, error)
+    return error
 }
-function kill(name) {
-    const programs = State.get("programs")
+async function kill(name) {
+    const programs = db.data.programs
     if (programs[name].running) {
+        programs[name].running = false
         try {
-            spawnedList[name].spawn.kill()
+            spawnedList[name].kill()
             log.debug(`${name} killed`)
         } catch (error) {
             log.error(`${name} could not be killed`)            
         }
+        await db.write()
     } else {
         log.debug(`${name} could not be killed because it wasn't running`)
     }
 }
-function killAll() {
-    const programs = State.get("programs")
-    Object.keys(programs).forEach(name => kill(name))
+async function killAll() {
+    const programs = db.data.programs
+    Object.keys(programs).forEach(async name => await kill(name))
 }
 function restart(name) {
     log.debug(`${name} restarting...`)
-    const programs = State.get("programs")
+    const programs = db.data.programs
     const program = programs[name].program
     const args = programs[name].args
     const env = programs[name].env
@@ -258,17 +276,15 @@ function restart(name) {
         await start(name, program, args, env)
     }, RESTART_TIMEOUT_MS)
 }
-function restartRunningStatus() {
-    // const programs = State.get("programs")
-    // Object.keys(programs).forEach(name => programs[name].running = false)
-}
 
 // Startup
+await killAll()
+await checkAvailablePrograms()
 setInterval(async () => {
     await checkAvailablePrograms()
 }, UPDATE_AVAILABLE_MS)
 
-// Testing
+// Testing - takes 1 sec
 if (process.env.RUN_TESTS) await runTests("programs.js")
 async function runTests(testName) {
     let pass = true
@@ -277,11 +293,42 @@ async function runTests(testName) {
     if (test1[2] !== "ef") pass = false
     const test2 = splitByWhitespace("one")
     if (test2[0] !== "one" || test2.length !== 1) pass = false
-    
-    // const p1 = await start("p1", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node main.js")
-    // if (p1.command !== "node main.js") pass = false
-    // // console.log(p1)
-    
+
+    emitter.on("available", (body) => {
+        // console.log("available", body)
+    })
+
+    emitter.on("start", (name, body) => {
+        // console.log("start", name, body)
+        if (name === "p72" && body.startsWith("error") === false) pass = false
+    })
+
+    emitter.on("out", (name, body) => {
+        // console.log("out", name, body)
+        if (name === "p1" && body.ascii.includes("NodeJS") === false) pass = false
+        if (name === "p3" && body.ascii.includes("Python") === false) pass = false
+    })
+
+    emitter.on("error", (name, body) => {
+        // console.log("error", name, body)
+    })
+
+    emitter.on("exit", async (name, body) => {
+        // console.log("exit", name, body)
+        if (name === "p1" && body !== "ok") pass = false
+    })
+
+    await start("p1", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node log.js")
+    await start("p2", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node interval.js")
+
+    await startAvailable("p3", "test-python-log")
+
+    setTimeout(async () => await startExisting("p1"), 200)
+
+    setTimeout(async () => {
+        await startExisting("p72") // doesn't exist
+    }, 400)
+
     // setTimeout(async () => {
     //     const p2 = await start("p2", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node main.js")
     //     if (p2.command !== "node main.js") pass = false
@@ -295,21 +342,12 @@ async function runTests(testName) {
     // const test6 = await start("p4-install", `${PATH_TO_PROGRAMS}/test-nodejs-nodemon`, "npm install")
 
     // await start("program2", "node", "../private/programs/test-nodejs-express/main.js", { port: 2005 })
-
-    // setTimeout(() => killAll(), 1000)
-
-    // emitter.on("out", (name, body) => {
-    //     console.log(name, body)
-    // })
-
-    // emitter.on("available", (body) => {})
-    // emitter.on("start", (name, body) => {})
-    // emitter.on("error", (name, body) => {})
-    // emitter.on("exit", (name, body) => {})
-
     
     // await clearPrograms()
-    if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
+    setTimeout(async () => {
+        await clearPrograms()
+        if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
+    }, 1_000);
 }
 
 // start("program1", "node", "../private/programs/nodejs-log-test/main.js")
