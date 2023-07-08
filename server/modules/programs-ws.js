@@ -1,5 +1,10 @@
 // Overview: websocket routes for the programs.js module
-const {
+// wss = websocket server
+// ws  = websocket client
+
+// Imports
+import { receiveEvent, subscribe, sendEvent, unsubscribe } from '../tools/websocket-server.js'
+import { 
     // getAvailable,
     // getDataHistory,
     // getProgram,
@@ -9,15 +14,11 @@ const {
     // restart,
     // start,
     // startAvailable
-} = require('./programs')
-
-// wss = websocket server
-// ws  = websocket client
-const wss = require('../tools/websocket-server')
+} from '../modules/programs.js'
 
 // Events
-// wss.receiveEvent("system/time", "get", async (ws, body) => {
-//     wss.subscribe(ws, "system/time")
-//     wss.sendEvent(ws, "system/time", "update", getTimeAsISO())
-//     wss.unsubscribe(ws, "system/time")
+// receiveEvent("system/time", "get", async (ws, body) => {
+//     subscribe(ws, "system/time")
+//     sendEvent(ws, "system/time", "update", getTimeAsISO())
+//     unsubscribe(ws, "system/time")
 // })

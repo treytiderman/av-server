@@ -1,4 +1,5 @@
-const {
+import { verifyJWT } from './auth.js'
+import {
     getUser,
     getUsers,
     resetUsersToDefault,
@@ -11,12 +12,14 @@ const {
     addGroupToUser,
     removeGroupFromUser,
     changeUserPassword
-} = require('./users')
-const { verifyJWT } = require('./auth')
+} from './users.js'
 
 // Create Express router
-const express = require('express')
+import express from 'express'
 const router = express.Router()
+
+// Export
+export { router, checkRequest, gate }
 
 // Functions
 function checkReqIsLocalhost(req) {
@@ -141,8 +144,3 @@ router.get('/reset-users-to-default', gate({isAdmin: true}), async (req, res) =>
     await resetUsersToDefault()
     res.json("ok")
 })
-
-// Export
-exports.router = router
-exports.checkRequest = checkRequest
-exports.gate = gate

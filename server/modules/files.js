@@ -1,41 +1,53 @@
 // Overview: os file operations
 // Don't require logger.js since it requires this file
-// TODO: tests
-const fs = require('fs').promises
+
+// Todos
+// Add tests
+
+// Imports
+import fs from 'fs/promises'
+
+// Exports
+export {
+    getStatsRaw,
+    getStats,
+    getStatsRecursive,
+
+    readText,
+    readJSON,
+    writeText,
+    appendText,
+    writeJSON,
+
+    makeDir,
+    deleteFile,
+    deleteFolder,
+    rename,
+    exists,
+}
 
 // Functions
 async function getStatsRaw(path) {
-
-    // Write
     try {
         const statsRaw = await fs.stat(path)
         // console.debug(`getStatsRaw(${path})`, statsRaw)
         return statsRaw
     }
-
-    // Error
     catch (error) {
-
-        // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
             // console.error(`getStatsRaw(${path})`, "error path doesn't exist")
             return
         }
-
-        // Other Error
         // console.error(`getStatsRaw(${path})`, error)
         return
-
     }
-
 }
 async function getStats(path) {
-
-    // Write
     try {
         const statsRaw = await fs.stat(path)
         // console.debug(`getStats(${path})`)
 
+        // Create stats object
         if (statsRaw.isDirectory() && path.slice(-1) !== "/") path += "/"
         const path_folder = path.slice(0, path.lastIndexOf('/')) + "/"
         const path_up = path_folder.slice(0, path_folder.slice(0, -1).lastIndexOf('/')) + "/"
@@ -58,6 +70,7 @@ async function getStats(path) {
             contains_folders: []
         }
 
+        // Add files and folders if path was a folder
         if (stats.isFolder) {
             const files = await fs.readdir(path)
             for (const file of files) {
@@ -98,31 +111,21 @@ async function getStats(path) {
 
         return stats
     }
-
-    // Error
     catch (error) {
-
-        // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
             // console.error(`getStats(${path}) ERROR path doesn't exist`)
             return
         }
-
-        // Other Error
         // console.error(`getStats(${path}) ERROR`)
-        // console.error(error)
         return
-
     }
-
 }
 async function getStatsRecursive(path) {
-
-    // Write
     try {
         const statsRaw = await fs.stat(path)
         // console.debug(`getStats(${path})`)
 
+        // Create stats object
         if (statsRaw.isDirectory() && path.slice(-1) !== "/") path += "/"
         const path_folder = path.slice(0, path.lastIndexOf('/')) + "/"
         const path_up = path_folder.slice(0, path_folder.slice(0, -1).lastIndexOf('/')) + "/"
@@ -145,6 +148,7 @@ async function getStatsRecursive(path) {
             contains_folders: []
         }
 
+        // Add files and folders if path was a folder recursively 
         if (stats.isFolder) {
             const files = await fs.readdir(path)
             for (const file of files) {
@@ -164,55 +168,34 @@ async function getStatsRecursive(path) {
 
         return stats
     }
-
-    // Error
     catch (error) {
-
-        // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
             // console.error(`getStatsRecursive(${path})`, "error path doesn't exist")
             return
         }
-
-        // Other Error
         // console.error(`getStatsRecursive(${path})`, error)
         return
-
     }
-
 }
 async function readText(path) {
-
-    // Write
     try {
         const file = await fs.readFile(path, 'utf-8')
         // console.debug(`readText(${path})`)
         return file
     }
-
-    // Error
     catch (error) {
-
-        // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
             // console.error(`readText(${path})`, "error path doesn't exist")
             return
         }
-
-        // Other Error
         // console.error(`readText(${path})`, error)
         return
-
     }
-
 }
 async function readJSON(path) {
-
-    // Write
     try {
         const file = await fs.readFile(path)
         // console.debug(`readJSON(${path})`)
-
         try {
             return JSON.parse(file)
         }
@@ -220,126 +203,78 @@ async function readJSON(path) {
             // return console.error(`readJSON(${path}) ERROR not JSON`)
         }
     }
-
-    // Error
     catch (error) {
-
-        // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
             // console.error(`readJSON(${path})`, "error path doesn't exist")
             return
         }
-
-        // Other Error
         // console.error(`readJSON(${path})`, error)
         return
-
     }
-
 }
 async function writeText(path, text) {
-
-    // Write
     try {
         await fs.writeFile(path, text)
         // console.debug(`writeText(${path}, text...)`, text)
     }
-
-    // Error
     catch (error) {
-
-        // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
             console.info(`writeText(${path}, text...)`, "path doesn't exist. creating path...")
             await makeDir(path.slice(0, path.lastIndexOf('/')) + "/")
             await writeText(path, text)
             return
         }
-
-        // Other Error
         // console.error(`writeText(${path}, text...)`, error)
         return
-
     }
-
 }
 async function appendText(path, text) {
-
-    // Write
     try {
         await fs.appendFile(path, text)
         // console.debug(`appendText(${path}, text...)`, text)
     }
-
-    // Error
     catch (error) {
-
-        // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
             console.info(`appendText(${path}, text...)`, "path doesn't exist. creating path...")
             await makeDir(path.slice(0, path.lastIndexOf('/')) + "/")
             await appendText(path, text)
             return
         }
-
-        // Other Error
         // console.error(`appendText(${path}, ...) ERROR`)
-        // console.error(error)
         return
-
     }
-
 }
 async function writeJSON(path, obj) {
-
-    // Write
     try {
         const json = JSON.stringify(obj, null, 2)
         await fs.writeFile(path, json)
         // console.debug(`writeJSON(${path}, obj...)`, obj)
     }
-
-    // Error
     catch (error) {
-
-        // Path didn't exist, Create it then write the file
         if (error?.code === "ENOENT") {
             console.info(`writeJSON(${path}, obj...)`, "path doesn't exist. creating path...")
             await makeDir(path.slice(0, path.lastIndexOf('/')) + "/")
             await writeJSON(path, obj)
             return
         }
-
-        // Other Error
         // console.error(`writeJSON(${path}, obj...)`, error)
         return
-
     }
-
 }
 async function makeDir(path) {
-
-    // Make Directory
     try {
         await fs.mkdir(path, { recursive: true })
         // console.debug(`makeDir(${path})`)
     }
-
-    // Error
     catch (error) {
         // console.error(`makeDir(${path})`, error)
     }
-
 }
 async function deleteFile(path) {
-
-    // Make Directory
     try {
         await fs.rm(path)
         // console.debug(`deleteFile(${path})`)
     }
-
-    // Error
     catch (error) {
         if (error?.code === "ENOENT") {
             // console.error(`deleteFile(${path})`, "error path doesn't exist")
@@ -347,17 +282,12 @@ async function deleteFile(path) {
         }
         // console.error(`deleteFile(${path})`, error)
     }
-
 }
 async function deleteFolder(path) {
-
-    // Make Directory
     try {
         await fs.rmdir(path, { recursive: true })
         // console.debug(`deleteFolder(${path})`)
     }
-
-    // Error
     catch (error) {
         if (error?.code === "ENOENT") {
             // console.error(`deleteFolder(${path})`, "error path doesn't exist")
@@ -365,17 +295,12 @@ async function deleteFolder(path) {
         }
         // console.error(`deleteFolder(${path})`, error)
     }
-
 }
 async function rename(oldPath, newPath) {
-
-    // Make Directory
     try {
         await fs.rename(oldPath, newPath)
         // console.debug(`rename(${oldPath}, ${newPath})`)
     }
-
-    // Error
     catch (error) {
         if (error?.code === "ENOENT") {
             // console.error(`rename(${oldPath}, ${newPath})`, "error path doesn't exist")
@@ -389,87 +314,68 @@ async function rename(oldPath, newPath) {
             // console.error(`rename(${oldPath}, ${newPath})`, error)
         }
     }
-
 }
 async function exists(path) {
-
-    // Make Directory
     try {
         const stat = await fs.stat(path)
         // console.debug(`exists(${path})`)
         return true
     }
-
-    // Error
     catch (error) {
         // console.error(`exists(${path})`, error)
         return false
     }
-
 }
 
-// Export
-exports.getStatsRaw = getStatsRaw
-exports.getStats = getStats
-exports.getStatsRecursive = getStatsRecursive
-exports.readText = readText
-exports.readJSON = readJSON
-exports.writeText = writeText
-exports.appendText = appendText
-exports.writeJSON = writeJSON
-exports.makeDir = makeDir
-exports.deleteFile = deleteFile
-exports.deleteFolder = deleteFolder
-exports.rename = rename
-exports.exists = exists
-
-// Testing
-
-// getStats("../private/logs/example.log")
-//   .then(stats => console.log(stats))
-
-// getStats("../private/docs")
-//   .then(stats => writeJSON("../private/DELETE_ME/test.json", stats))
-
-// getStatsRecursive("../private/docs")
-//   .then(stats => writeJSON("../private/DELETE_ME/test.json", stats))
-
-// writeJSON("../private/DELETE_ME/test.json", { 
-//   name: 'Mike',
-//   age: 24, 
-//   gender: 'Male',
-//   department: 'English',
-//   car: 'Honda' 
-// })
-
-// readJSON("../private/DELETE_ME/test.json")
-//   .then(json => console.log(json))
-
-// appendText("../private/DELETE_ME/go/ddd/example.log", "test other \n")
-
-// readText("../private/logs/example.log").then(async text => {
-//   log(text)
-//   await writeText("../private/DELETE_ME/example.log", text)
-//   await appendText("../private/DELETE_ME/example.log", "test others \n")
-// })
-
-// writeJSON("../private/DELETE_ME/1/2/test.json", { 
-//   name: 'John',
-//   age: 29, 
-//   gender: 'Male',
-//   department: 'English',
-//   car: 'Honda' 
-// })
-
-// makeDir("../private/DELETE_ME/super/path/")
-// makeDir("../private/DELETE_ME/super/path2")
-
-// exists("../private/DELETE_ME/1/2/test.json")
-//   .then(bool => console.log(bool))
-
-// rename("../private/DELETE_ME/1/2/test.json", "../private/DELETE_ME/1/test.json")
-// rename("../private/DELETE_ME/1/2/test.json", "../private/DELETE_ME/1/3/test.json")
-
-// deleteFile("../private/DELETE_ME/example.log")
-
-// deleteFolder("../private/DELETE_ME/")
+// Tests
+if (process.env.RUN_TESTS) await runTests("auth.js")
+async function runTests(testName) {
+    // getStats("../private/logs/example.log")
+    //   .then(stats => console.log(stats))
+    
+    // getStats("../private/docs")
+    //   .then(stats => writeJSON("../private/DELETE_ME/test.json", stats))
+    
+    // getStatsRecursive("../private/docs")
+    //   .then(stats => writeJSON("../private/DELETE_ME/test.json", stats))
+    
+    // writeJSON("../private/DELETE_ME/test.json", { 
+    //   name: 'Mike',
+    //   age: 24, 
+    //   gender: 'Male',
+    //   department: 'English',
+    //   car: 'Honda' 
+    // })
+    
+    // readJSON("../private/DELETE_ME/test.json")
+    //   .then(json => console.log(json))
+    
+    // appendText("../private/DELETE_ME/go/ddd/example.log", "test other \n")
+    
+    // readText("../private/logs/example.log").then(async text => {
+    //   log(text)
+    //   await writeText("../private/DELETE_ME/example.log", text)
+    //   await appendText("../private/DELETE_ME/example.log", "test others \n")
+    // })
+    
+    // writeJSON("../private/DELETE_ME/1/2/test.json", { 
+    //   name: 'John',
+    //   age: 29, 
+    //   gender: 'Male',
+    //   department: 'English',
+    //   car: 'Honda' 
+    // })
+    
+    // makeDir("../private/DELETE_ME/super/path/")
+    // makeDir("../private/DELETE_ME/super/path2")
+    
+    // exists("../private/DELETE_ME/1/2/test.json")
+    //   .then(bool => console.log(bool))
+    
+    // rename("../private/DELETE_ME/1/2/test.json", "../private/DELETE_ME/1/test.json")
+    // rename("../private/DELETE_ME/1/2/test.json", "../private/DELETE_ME/1/3/test.json")
+    
+    // deleteFile("../private/DELETE_ME/example.log")
+    
+    // deleteFolder("../private/DELETE_ME/")
+}

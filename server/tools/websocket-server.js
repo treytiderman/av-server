@@ -1,25 +1,49 @@
-const WebSocket = require('ws')
-const events = require('events')
-let wsServer
+// Overview: websocket server for events
+
+// Todos
+// Change for multiple servers
+// Use db.js
 
 // Structure
 // {
 //   "topic": "string",
 //   "event": "string",
 //   "body": "string" or [] or {}
+//   "error": "string" // only sent on errors
 // }
 
+// Imports
+import { WebSocketServer } from 'ws'
+import { EventEmitter } from 'events'
+import { createServer as createHttpServer } from 'http'
+
+// import { getDatabase, saveDatabase, resetDatabase } from '../modules/db.js'
+import { Logger } from '../modules/logger.js'
+
+// Export
+export {
+    emitter,
+    create,
+    send,
+    sendJSON,
+    sendEvent,
+    sendEventAll,
+    receiveTopic,
+    receiveEvent,
+    subscribe,
+    subscriptions,
+    unsubscribe,
+}
+
 // Variables
-const emitter = new events.EventEmitter()
+const log = new Logger("websocket-server.js")
+const emitter = new EventEmitter()
 emitter.setMaxListeners(100) // number of receiveTopic() and receiveEvent() uses
+let wsServer
+// const DEFAULT_STATE = { wsServers: {} }
+// const db = await getDatabase('websocket-server', DEFAULT_STATE)
 
 // Helper Functions
-const logInConsole = false
-const logger = require('../modules/logger')
-function log(text, obj = {}) {
-    logger.log("websocket-server.js", text, obj)
-    if (logInConsole) { console.log("websocket", text, obj) }
-}
 function isJSON(text) {
     try { JSON.parse(text) }
     catch (error) { return false }
@@ -28,8 +52,8 @@ function isJSON(text) {
 
 // Functions
 function create(app) {
-    const server = require('http').createServer(app)
-    wsServer = new WebSocket.Server({ server: server })
+    const server = createHttpServer(app)
+    wsServer = new WebSocketServer({ server: server })
 
     // Events
     wsServer.on('connection', newConnection)
@@ -46,9 +70,6 @@ function create(app) {
         })
     }, 30 * 1000)
 
-    // API Routes
-    require('../core/websocket-routes')
-
     // Return
     return server
 }
@@ -58,7 +79,7 @@ function newConnection(ws, req) {
     ws.ip = req.socket.remoteAddress.split('f:')[1]
     ws.subs = []
     ws.auth = false
-    log(`new connection ${ws.ip}`, { "clients": wsServer.clients.size })
+    log.debug(`new connection ${ws.ip}`, { "clients": wsServer.clients.size })
 
     // Listen for pong
     ws.isAlive = true
@@ -71,7 +92,7 @@ function newConnection(ws, req) {
     // Client is no longer connected
     ws.on('close', () => {
         ws.auth = false
-        log(`closed connection ${ws.ip}`, { "clients": wsServer.clients.size })
+        log.debug(`closed connection ${ws.ip}`, { "clients": wsServer.clients.size })
     })
 
 }
@@ -81,7 +102,7 @@ function receive(ws, data) {
     }
     else {
         const response = "invalid JSON"
-        log(`receive ${ws.ip}`, response)
+        log.debug(`receive ${ws.ip}`, response)
         sendJSON(ws, response)
     }
 }
@@ -91,7 +112,7 @@ function receiveJSON(ws, rx) {
     else if (rx.event === "unsubscribe") unsubscribe(ws, topic)
     else {
         emitter.emit(rx.topic, ws, rx.event, rx.body)
-        log(`receive ${ws.ip}`, rx)
+        log.debug(`receive ${ws.ip}`, rx)
     }
 }
 function receiveTopic(topic, cb) {
@@ -107,12 +128,12 @@ function receiveEvent(topic, event, cb) {
 function send(ws, payload) {
     if (ws.readyState === WebSocket.OPEN) {
         ws.send(payload)
-        // log(`send ${ws.ip}`, payload)
+        // log.debug(`send ${ws.ip}`, payload)
     }
 }
 function sendJSON(ws, obj) {
     ws.send(JSON.stringify(obj))
-    log(`sendJSON ${ws.ip}`, JSON.stringify(obj))
+    log.debug(`sendJSON ${ws.ip}`, JSON.stringify(obj))
 }
 function sendEvent(ws, topic, event, body) {
     if (ws.subs.includes(topic)) {
@@ -138,30 +159,17 @@ function sendEventAll(topic, event, body) {
 }
 function subscriptions(ws) {
     sendEvent(ws, "client", "subscriptions", ws.subs)
-    // log(`subscriptions ${ws.ip}`, ws.subs)
+    // log.debug(`subscriptions ${ws.ip}`, ws.subs)
 }
 function subscribe(ws, topic) {
     if (ws.subs.indexOf(topic) !== -1) return "already subscribed"
     ws.subs.push(topic)
     subscriptions(ws)
-    log(`subscribe ${ws.ip}`, topic)
+    log.debug(`subscribe ${ws.ip}`, topic)
 }
 function unsubscribe(ws, topic) {
     if (topic === "*") ws.subs = []
     else ws.subs = ws.subs.filter(sub => sub !== topic)
     subscriptions(ws)
-    log(`unsubscribe ${ws.ip}`, topic)
+    log.debug(`unsubscribe ${ws.ip}`, topic)
 }
-
-// Export
-exports.emitter = emitter
-exports.create = create
-exports.send = send
-exports.sendJSON = sendJSON
-exports.sendEvent = sendEvent
-exports.sendEventAll = sendEventAll
-exports.receiveTopic = receiveTopic
-exports.receiveEvent = receiveEvent
-exports.subscribe = subscribe
-exports.subscriptions = subscriptions
-exports.unsubscribe = unsubscribe

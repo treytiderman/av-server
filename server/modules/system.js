@@ -1,17 +1,31 @@
 // Overview: system info, time, uptime
-const os = require("os")
-const dns = require("dns")
-const exec = require('child_process').exec
-const { Logger } = require('./logger')
-const log = new Logger("system.js")
 
+// Imports
+import os from 'os'
+import dns from 'dns'
+import { exec } from 'child_process'
+import { Logger } from './logger.js'
+
+// Exports
+export {
+    isAdmin,
+    getTime,
+    getTimeAsISO,
+    getUptime,
+    getNICs,
+    getOS,
+    getSystemInfo
+}
+
+// Variables
+const log = new Logger("system.js")
 const startupTime = Date.now()
 
 // Functions
 function isAdmin() {
     if (os.type() === "Windows_NT") {
-        exec('NET SESSION', function (err, so, se) {
-            if (se.length === 0) return true
+        exec('NET SESSION', function (error, stdout, stderror) {
+            if (stderror.length === 0) return true
             else return false
         })
         return false
@@ -67,8 +81,6 @@ function getSystemInfo() {
         uptime_sec: os.uptime(),
         user: os.userInfo(),
         pwd: process.env.PWD,
-        __dirname: __dirname,
-        __filename: __filename,
         cpu: {
             cores: os.cpus().length,
         },
@@ -84,15 +96,6 @@ function getSystemInfo() {
 
 // Startup
 log.info("system.js", "startup", getSystemInfo())
-
-// Exports
-exports.isAdmin = isAdmin
-exports.getTime = getTime
-exports.getTimeAsISO = getTimeAsISO
-exports.getUptime = getUptime
-exports.getNICs = getNICs
-exports.getOS = getOS
-exports.getSystemInfo = getSystemInfo
 
 // Testing
 // console.log(getSystemInfo())

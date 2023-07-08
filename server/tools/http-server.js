@@ -1,10 +1,17 @@
-// express - Web server
-const express = require('express')
-const cors = require('cors')
+// Overview: express web server
 
-// Require
-const { router } = require('../core/http-routes')
-const { getSystemInfo } = require("../modules/system")
+// Impots
+import express from 'express'
+import cors from 'cors'
+
+import { router } from '../core/http-routes.js'
+import { getSystemInfo } from '../modules/system.js'
+
+// Exports
+export {
+    create,
+    startupConsoleLog,
+}
 
 // Functions
 function create() {
@@ -34,7 +41,3 @@ function startupConsoleLog(port) {
     console.log(`- http://${systemInfo.hostname}:${port}`)
     console.log("")
 }
-
-// Export
-exports.create = create
-exports.startupConsoleLog = startupConsoleLog

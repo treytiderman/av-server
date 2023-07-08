@@ -1,8 +1,7 @@
-// Overview: Standard way to create log files
-const { appendText, readText, makeDir, getStatsRecursive, deleteFile } = require('./files')
-const events = require('events')
-
-// Location: /private/logs/log_date.log
+// Overview: standard way to create log files
+// Location: /logs/log_date.log
+// Files: One file per day, No more than <NUMBER_OF_FILES_MAX> files
+// File: Is split into a new file if files lines greater than <NUMBER_OF_LINES_MAX>
 // Log Object: {
 //     "timestampISO": timestampISO,
 //     "level": level,
@@ -10,16 +9,27 @@ const events = require('events')
 //     "message": message,
 //     "obj": obj,
 // }
-// Files: One file per day, No more than <NUMBER_OF_FILES_MAX> files
-// File: Is split into a new file if files lines greater than <NUMBER_OF_LINES_MAX>
 
-// Variables
+// Imports
+import { appendText, readText, makeDir, getStatsRecursive, deleteFile } from './files.js'
+import { EventEmitter } from 'events'
+
+// Exports
+export {
+    log,
+    Logger,
+    emitter,
+    PATH_TO_LOG_FOLDER,
+}
+
+// Constants
 const NUMBER_OF_FILES_MAX = 10
 const NUMBER_OF_LINES_MAX = 10_000
 const OBJ_JSON_LENGTH_MAX = 1_000
-const LOG_FOLDER_PATH = "../logs/"
-const emitter = new events.EventEmitter()
+const PATH_TO_LOG_FOLDER = "../logs/"
 
+// Variables
+const emitter = new EventEmitter()
 let logFileIndex = 0
 
 // Functions
@@ -38,10 +48,10 @@ function newLogObj(level, group, message, obj) {
 function getPath() {
     const timeDate = new Date(Date.now()).toISOString()
     const date = timeDate.split('T')[0]
-    return LOG_FOLDER_PATH + date + `_${logFileIndex}.log`
-} 
+    return PATH_TO_LOG_FOLDER + date + `_${logFileIndex}.log`
+}
 async function getLogFileStats() {
-    const logFilesStats = await getStatsRecursive(LOG_FOLDER_PATH)
+    const logFilesStats = await getStatsRecursive(PATH_TO_LOG_FOLDER)
     return logFilesStats.contains_files
 }
 async function updateLogFileIndex() {
@@ -80,7 +90,7 @@ async function deleteOldLogs() {
 async function log(level, group, message, obj = {}) {
     const logObj = newLogObj(level, group, message, obj)
     const path = getPath()
-    await makeDir(LOG_FOLDER_PATH)
+    await makeDir(PATH_TO_LOG_FOLDER)
     await updateLogFileIndex()
     await appendText(path, JSON.stringify(logObj) + "\n")
     await checkNumberOfLines(path)
@@ -105,14 +115,9 @@ class Logger {
 }
 
 // Startup
-makeDir(LOG_FOLDER_PATH)
-updateLogFileIndex()
-deleteOldLogs()
-
-// Exports
-exports.log = log
-exports.Logger = Logger
-exports.emitter = emitter
+await makeDir(PATH_TO_LOG_FOLDER)
+await updateLogFileIndex()
+await deleteOldLogs()
 
 // Testing
 // const logger = new Logger("logger.js")

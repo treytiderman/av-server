@@ -1,18 +1,18 @@
 // Modules
-// require("../modules/files-ws")
-// require("../modules/logger-ws")
-require("../modules/programs-ws")
-// require("../modules/state-ws")
-require("../modules/system-ws")
-require("../modules/users-ws")
+// impot "../modules/db-ws.js"
+// impot "../modules/files-ws.js"
+// impot "../modules/logger-ws.js"
+import "../modules/programs-ws.js"
+import "../modules/system-ws.js"
+import "../modules/users-ws.js"
 
 // Tools
-// require("../tools/http-client-ws")
-// require("../tools/http-server-ws")
-// require("../tools/serial-ws")
-// require("../tools/tcp-client-ws")
-// require("../tools/tcp-server-ws")
-// require("../tools/udp-client-ws")
-// require("../tools/udp-server-ws")
-// require("../tools/websocket-client-ws")
-// require("../tools/websocket-server-ws")
+// impot "../tools/http-client-ws.js"
+// impot "../tools/http-server-ws.js"
+// impot "../tools/serial-ws.js"
+// impot "../tools/tcp-client-ws.js"
+// impot "../tools/tcp-server-ws.js"
+// impot "../tools/udp-client-ws.js"
+// impot "../tools/udp-server-ws.js"
+// impot "../tools/websocket-client-ws.js"
+// impot "../tools/websocket-server-ws.js"

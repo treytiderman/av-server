@@ -1,6 +1,6 @@
 // Overview: simple local JSON database to maintain state
 
-// TODO
+// Todos
 // Add function setKeyInDatabase
 // Add function getKeyInDatabase
 

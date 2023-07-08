@@ -1,5 +1,8 @@
 // Overview: http routes for the files.js module
-const {
+
+// Imports
+import express from 'express'
+import {
     // appendText,
     // deleteFile,
     // deleteFolder,
@@ -13,10 +16,12 @@ const {
     // rename,
     // writeJSON,
     // writeText
-} = require('./files')
+} from '../modules/files.js'
 
-// Create Express router
-const express = require('express')
+// Exports
+export { router }
+
+// Variables
 const router = express.Router()
 
 // Routes
@@ -24,6 +29,3 @@ const router = express.Router()
 //     const response = await getGroups()
 //     res.json(response)
 // })
-
-// Export
-exports.router = router

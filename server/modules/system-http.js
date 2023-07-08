@@ -1,5 +1,8 @@
 // Overview: http routes for the system.js module
-const {
+
+// Imports
+import express from 'express'
+import {
     // isAdmin,
     // getTime,
     getTimeAsISO,
@@ -7,10 +10,12 @@ const {
     // getNICs,
     // getOS,
     getSystemInfo
-} = require('./system')
+} from './system.js'
+
+// Export
+export { router }
 
 // Create Express router
-const express = require('express')
 const router = express.Router()
 
 // Routes
@@ -26,6 +31,3 @@ router.get('/info', async (req, res) => {
     const response = getSystemInfo()
     res.json(response)
 })
-
-// Export
-exports.router = router

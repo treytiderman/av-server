@@ -1,5 +1,8 @@
 // Overview: http routes for the programs.js module
-const {
+
+// Imports
+import express from 'express'
+import {
     // getAvailable,
     // getDataHistory,
     // getProgram,
@@ -9,10 +12,12 @@ const {
     // restart,
     // start,
     // startAvailable
-} = require('./programs')
+} from '../modules/programs.js'
 
-// Create Express router
-const express = require('express')
+// Exports
+export { router }
+
+// Variables
 const router = express.Router()
 
 // Routes
@@ -20,6 +25,3 @@ const router = express.Router()
 //     const response = await getGroups()
 //     res.json(response)
 // })
-
-// Export
-exports.router = router

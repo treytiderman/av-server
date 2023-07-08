@@ -1,10 +1,13 @@
 // Overview: create and verify hashed passwords and jsonwebtokens
 
-// Import
-import { randomBytes, pbkdf2Sync } from 'crypto'
-import { sign, verify } from 'jsonwebtoken'
+// Todos
+// Change to async hashing and jwt generation
 
-// Export
+// Imports
+import { randomBytes, pbkdf2Sync } from 'crypto'
+import jwt from 'jsonwebtoken'
+
+// Exports
 export {
     hashPassword,
     isHashedPassword,
@@ -28,13 +31,13 @@ function isHashedPassword(password, hash, salt) {
     return hash === hashTesting
 }
 function generateJWT(json) {
-    return sign(json, JWT_KEY)
+    return jwt.sign(json, JWT_KEY)
 }
 function verifyJWT(token, cb) {
-    verify(token, JWT_KEY, (error, json) => cb(error, json))
+    jwt.verify(token, JWT_KEY, (error, json) => cb(error, json))
 }
 
-// Testing
+// Tests
 if (process.env.RUN_TESTS) await runTests("auth.js")
 async function runTests(testName) {
     let pass = true

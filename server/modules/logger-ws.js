@@ -1,50 +1,51 @@
 // Overview: websocket routes for the logger.js module
-const { log, emitter } = require('./logger')
-const { getStats, readText } = require('./files')
-
 // wss = websocket server
 // ws  = websocket client
-const wss = require('../tools/websocket-server')
+
+// Imports
+import { receiveEvent, sendEvent, subscribe, unsubscribe, sendEventAll } from '../tools/websocket-server.js'
+import { log, emitter } from '../modules/logger.js'
+import { getStats, readText } from '../modules/files.js'
 
 // Events
-wss.receiveEvent("logger/files-available", "get", async (ws, body) => {
-    if (!ws.auth) wss.sendEvent(ws, "logger/files-available", "get", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) wss.sendEvent(ws, "logger/files-available", "get", "error not in group admins")
+receiveEvent("logger/files-available", "get", async (ws, body) => {
+    if (!ws.auth) sendEvent(ws, "logger/files-available", "get", "error login first")
+    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "logger/files-available", "get", "error not in group admins")
     else {
         const response = await getStats("../private/logs")
-        wss.subscribe(ws, "logger/files-available")
-        wss.sendEvent(ws, "logger/files-available", "get", response)
-        wss.unsubscribe(ws, "logger/files-available")
+        subscribe(ws, "logger/files-available")
+        sendEvent(ws, "logger/files-available", "get", response)
+        unsubscribe(ws, "logger/files-available")
     }
 })
-wss.receiveEvent("logger/file", "get", async (ws, body) => {
-    if (!ws.auth) wss.sendEvent(ws, "logger/file", "get", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) wss.sendEvent(ws, "logger/file", "get", "error not in group admins")
+receiveEvent("logger/file", "get", async (ws, body) => {
+    if (!ws.auth) sendEvent(ws, "logger/file", "get", "error login first")
+    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "logger/file", "get", "error not in group admins")
     else {
         const response = await readText("../private/logs/" + body.file)
-        wss.subscribe(ws, "logger/file")
-        wss.sendEvent(ws, "logger/file", "get", response)
-        wss.unsubscribe(ws, "logger/file")
+        subscribe(ws, "logger/file")
+        sendEvent(ws, "logger/file", "get", response)
+        unsubscribe(ws, "logger/file")
     }
 })
 
-wss.receiveEvent("logger", "new", async (ws, body) => {
-    if (!ws.auth) wss.sendEvent(ws, "logger", "new", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) wss.sendEvent(ws, "logger", "new", "error not in group admins")
+receiveEvent("logger", "new", async (ws, body) => {
+    if (!ws.auth) sendEvent(ws, "logger", "new", "error login first")
+    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "logger", "new", "error not in group admins")
     else {
         await log(body.group, body.message, body.obj)
-        wss.subscribe(ws, "logger")
-        wss.sendEvent(ws, "logger", "new", "ok")
+        subscribe(ws, "logger")
+        sendEvent(ws, "logger", "new", "ok")
     }
 })
-wss.receiveEvent("logger", "sub", async (ws, body) => {
-    if (!ws.auth) wss.sendEvent(ws, "logger", "sub", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) wss.sendEvent(ws, "logger", "sub", "error not in group admins")
+receiveEvent("logger", "sub", async (ws, body) => {
+    if (!ws.auth) sendEvent(ws, "logger", "sub", "error login first")
+    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "logger", "sub", "error not in group admins")
     else {
-        wss.subscribe(ws, "logger")
-        wss.sendEvent(ws, "logger", "sub", "ok")
+        subscribe(ws, "logger")
+        sendEvent(ws, "logger", "sub", "ok")
     }
 })
 emitter.on("log", (logObj) => {
-    wss.sendEventAll("logger", "pub", logObj)
+    sendEventAll("logger", "pub", logObj)
 })

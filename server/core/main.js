@@ -1,17 +1,14 @@
-// // HTTP Server
-// const http = require('../tools/http-server')
-// const http_server = http.create()
+// HTTP Server
+import { create as createHttpServer, startupConsoleLog } from '../tools/http-server.js'
+const httpServer = createHttpServer()
 
-// // WebSocket Server
-// const ws = require('../tools/websocket-server')
-// const server = ws.create(http_server)
+// WebSocket Server
+import { create as createWsServer } from '../tools/websocket-server.js'
+const server = createWsServer(httpServer)
 
-// // Start Server
-// const port = process.env.PORT || 4620
-// server.listen(port, () => {
-//     console.log(`av-server is up and running`)
-//     http.startupConsoleLog(port)
-// })
-
-import "../modules/state.js"
-import "../modules/users.js"
+// Start Server
+const port = process.env.PORT || 4620
+server.listen(port, () => {
+    console.log(`av-server is up and running`)
+    startupConsoleLog(port)
+})

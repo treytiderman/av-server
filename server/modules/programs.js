@@ -1,28 +1,46 @@
 // Overview: spawn sub processes / user scripts
-// TODO: use state.js
-// TODO: Check out: https://pm2.keymetrics.io/docs/usage/pm2-api/
-const { spawn } = require('child_process')
-const { getStatsRecursive, readText } = require('./files')
-const { Logger } = require('./logger')
-const { StateClass } = require('./state')
+
+// Todos
+// use db.js
+// check out: https://pm2.keymetrics.io/docs/usage/pm2-api/
+
+import { spawn } from 'child_process'
+import { getStatsRecursive, readText } from './files.js'
+import { Logger } from './logger.js'
+import { getDatabase } from './db.js'
 
 // Event Emitter
-const events = require('events')
+import events from 'events'
 const emitter = new events.EventEmitter()
 
+// Exports
+export {
+    emitter,
+    getAvailable,
+    getProgram,
+    getPrograms,
+    getProgramWithHistory,
+    clearPrograms,
+    start,
+    startExisting,
+    startAvailable,
+    kill,
+    killAll,
+    restart,
+}
+
 /* Events example
-const programs = require('../modules/programs')
-programs.emitter.on("available", (body) => {})
-programs.emitter.on("start", (name, body) => {})
-programs.emitter.on("error", (name, body) => {})
-programs.emitter.on("exit", (name, body) => {})
-programs.emitter.on("out", (name, body) => {})
+    const programs = require('../modules/programs')
+    programs.emitter.on("available", (body) => {})
+    programs.emitter.on("start", (name, body) => {})
+    programs.emitter.on("error", (name, body) => {})
+    programs.emitter.on("exit", (name, body) => {})
+    programs.emitter.on("out", (name, body) => {})
 */
 
 // Variables
 const PATH_TO_PROGRAMS = "../programs"
-// const MAX_HISTORY_LENGTH = 1_000
-const MAX_HISTORY_LENGTH = 6
+const MAX_HISTORY_LENGTH = 1_000
 const UPDATE_AVAILABLE_MS = 1_000
 const RESTART_TIMEOUT_MS = 1_000
 const DEFAULT_STATE = { programs: {} }
@@ -241,8 +259,8 @@ function restart(name) {
     }, RESTART_TIMEOUT_MS)
 }
 function restartRunningStatus() {
-    const programs = State.get("programs")
-    Object.keys(programs).forEach(name => programs[name].running = false)
+    // const programs = State.get("programs")
+    // Object.keys(programs).forEach(name => programs[name].running = false)
 }
 
 // Startup
@@ -250,28 +268,12 @@ setInterval(async () => {
     await checkAvailablePrograms()
 }, UPDATE_AVAILABLE_MS)
 
-// Export
-exports.emitter = emitter
-exports.getAvailable = getAvailable
-exports.getProgram = getProgram
-exports.getPrograms = getPrograms
-exports.getProgramWithHistory = getProgramWithHistory
-exports.clearPrograms = clearPrograms
-exports.start = start
-exports.startExisting = startExisting
-exports.startAvailable = startAvailable
-exports.kill = kill
-exports.killAll = killAll
-exports.restart = restart
-
 // Testing
-setTimeout(async () => {
-    if (process.env.RUN_TESTS) runTests("programs.js")
-}, 1000)
+if (process.env.RUN_TESTS) await runTests("programs.js")
 async function runTests(testName) {
     let pass = true
 
-    const test1 = splitByWhitespace("1   jkhgakfger ef       whfiwheifhbwe fwef")
+    const test1 = splitByWhitespace("1  jkhgakfger-=[];,/.,/`163-9 ef   whfiwheifhbwe fwef")
     if (test1[2] !== "ef") pass = false
     const test2 = splitByWhitespace("one")
     if (test2[0] !== "one" || test2.length !== 1) pass = false
@@ -306,10 +308,8 @@ async function runTests(testName) {
     // emitter.on("exit", (name, body) => {})
 
     
-    setTimeout(async () => {
-        // await clearPrograms()
-        if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
-    }, 10_000)
+    // await clearPrograms()
+    if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }
 
 // start("program1", "node", "../private/programs/nodejs-log-test/main.js")
