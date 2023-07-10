@@ -9,12 +9,12 @@ import {
     getUsers,
     resetUsersToDefault,
     getGroups,
-    addGroup,
-    removeGroup,
+    createGroup,
+    deleteGroup,
     getToken,
     verifyToken,
     addUser,
-    removeUser,
+    deleteUser,
     addGroupToUser,
     removeGroupFromUser,
     changeUserPassword
@@ -40,6 +40,7 @@ receiveEvent("user", "login-with-token", async (ws, body) => {
     verifyToken(body.token, (response) => {
         if (response === "error bad token") sendEvent(ws, "user", "login-with-token", response)
         else {
+            // const user = getUser(response)
             const user = getUser(body.username)
             ws.auth = true
             ws.user = user
@@ -65,23 +66,23 @@ receiveEvent("user", "groups", async (ws, body) => {
     subscribe(ws, "user")
     sendEvent(ws, "user", "groups", getGroups())
 })
-receiveEvent("user", "add-group", async (ws, body) => {
+receiveEvent("user", "create-group", async (ws, body) => {
     subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "add-group", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "add-group", "error not in group admins")
+    if (!ws.auth) sendEvent(ws, "user", "create-group", "error login first")
+    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "create-group", "error not in group admins")
     else {
-        await addGroup(body)
-        sendEvent(ws, "user", "add-group", "ok")
+        await createGroup(body)
+        sendEvent(ws, "user", "create-group", "ok")
         sendEventAll("user", "groups", getGroups())
     }
 })
-receiveEvent("user", "remove-group", async (ws, body) => {
+receiveEvent("user", "delete-group", async (ws, body) => {
     subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "remove-group", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "remove-group", "error not in group admins")
+    if (!ws.auth) sendEvent(ws, "user", "delete-group", "error login first")
+    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "delete-group", "error not in group admins")
     else {
-        await removeGroup(body)
-        sendEvent(ws, "user", "remove-group", "ok")
+        await deleteGroup(body)
+        sendEvent(ws, "user", "delete-group", "ok")
         sendEventAll("user", "groups", getGroups())
         sendEventAll("user", "users", getUsers())
     }
@@ -89,7 +90,11 @@ receiveEvent("user", "remove-group", async (ws, body) => {
 
 receiveEvent("user", "users", async (ws, body) => {
     subscribe(ws, "user")
-    sendEvent(ws, "user", "users", getUsers())
+    if (!ws.auth) sendEvent(ws, "user", "reset-users-to-default", "error login first")
+    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "users", "reset-users-to-default", "error not in group admins")
+    else {
+        sendEvent(ws, "user", "users", getUsers())
+    }
 })
 receiveEvent("user", "reset-users-to-default", async (ws, body) => {
     subscribe(ws, "user")
@@ -164,14 +169,14 @@ receiveEvent("user", "change-user-password", async (ws, body) => {
         }
     }
 })
-receiveEvent("user", "remove", async (ws, body) => {
+receiveEvent("user", "delete", async (ws, body) => {
     subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "remove", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "remove", "error not in group admins")
+    if (!ws.auth) sendEvent(ws, "user", "delete", "error login first")
+    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "delete", "error not in group admins")
     else {
         const isSelf = ws.user.username === body.username
-        const response = await removeUser(body.username)
-        if (response.startsWith("error")) sendEvent(ws, "user", "remove", response)
+        const response = await deleteUser(body.username)
+        if (response.startsWith("error")) sendEvent(ws, "user", "delete", response)
         else {
             sendEvent(ws, "user", "remove", response)
             sendEventAll("user", "users", getUsers())

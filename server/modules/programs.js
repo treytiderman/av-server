@@ -16,7 +16,7 @@
 import { spawn } from 'child_process'
 import { getStatsRecursive, readText } from './files.js'
 import { Logger } from './logger.js'
-import { getDatabase } from './database.js'
+import { createDatabase } from './database.js'
 
 // Event Emitter
 import events from 'events'
@@ -44,7 +44,7 @@ const UPDATE_AVAILABLE_MS = 1_000
 const RESTART_TIMEOUT_MS = 1_000
 const DEFAULT_STATE = { programs: {}, available: {} }
 
-const db = await getDatabase('programs', DEFAULT_STATE)
+const db = await createDatabase('programs', DEFAULT_STATE)
 const emitter = new events.EventEmitter()
 const log = new Logger("programs.js")
 const spawnedList = {}
@@ -101,8 +101,9 @@ function getProgram(name) {
         return {
             command: program.command,
             env: program.env,
-            pid: program.pid,
+            startOnBoot: program.startOnBoot,
             running: program.running,
+            pid: program.pid,
         }
     }
     return { error: name + " doesn't exist"}
@@ -113,8 +114,9 @@ function getProgramWithHistory(name) {
         return {
             command: program.command,
             env: program.env,
-            pid: program.pid,
+            startOnBoot: program.startOnBoot,
             running: program.running,
+            pid: program.pid,
             out: program.out,
         }
     }
@@ -216,12 +218,12 @@ async function start(name, directory, command, startOnBoot = false, env = {}) {
     await db.write()
     return programs[name]
 }
-async function startAvailable(name, folderName, env = {}) {
+async function startAvailable(name, folderName, startOnBoot = false, env = {}) {
     const available = db.data.available
     if (available[folderName]) {
         const directory = available[folderName].directory
         const command = available[folderName].command
-        const program = await start(name, directory, command, env)
+        const program = await start(name, directory, command, startOnBoot, env)
         return program
     }
     const error = "error folderName doesn't exist"

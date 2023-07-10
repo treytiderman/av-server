@@ -95,7 +95,7 @@ function getSystemInfo() {
 }
 
 // Startup
-log.info("system.js", "startup", getSystemInfo())
+log.info("startup", getSystemInfo())
 
 // Testing
 // console.log(getSystemInfo())

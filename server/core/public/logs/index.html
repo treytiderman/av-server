@@ -6,17 +6,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API</title>
     <style>
-        * {
+        *, *::before, *::after {
             color-scheme: dark;
             line-height: 1.5;
+            box-sizing: border-box;
+            font: inherit;
             font-family: monospace;
+            color: inherit;
+            border: none;
+            outline: none;
+            line-height: inherit;
+        }
+
+        html {
+            height: 100%;
+            width: 100%;
+            color-scheme: dark;
+            /* Prevent scroll for mobile */
+            overflow: hidden;
+            position: fixed;
         }
 
         body {
             padding: 1rem;
-            font-size: 16px;
+            font-size: 14px;
             background-color: black;
             color: #CCC;
+        }
+        button,
+        input {
+            padding: .5rem;
+            border-radius: .25rem;
+            background-color: #333;
+            color: #CCC;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        main {
+            flex-grow: 1;
+            overflow: auto;
+            border: 1px solid #333;
+            padding: .5rem;
         }
 
         h2 {
@@ -31,8 +64,14 @@
 
         pre {
             margin: 0;
+            padding: .2rem;
             font-size: smaller;
         }
+        pre:hover {
+            background-color: #333;
+            color: #eee;
+        }
+
     </style>
     <script>
 
@@ -140,7 +179,7 @@
                 await logout()
                 return token
             }
-            
+
             // Save Token to localStorage
             else {
                 log("token saved")
@@ -159,53 +198,97 @@
 </head>
 
 <body>
-    <p>
-        <a href="/">↪ Return Home</a>
-    </p>
-
-    <h2>Logs</h2>
-    <p>Refreshes every 5 sec</p>
-    <button onclick="location.reload()">reload</button>
-    <button onclick="getJSON('/api/logger/delete-all-logs'); location.reload()">delete-all-logs</button>
-    <br>
-    <br>
-    <div id="logs"></div>
-
-    <script type="module">
-        const password = prompt("Enter the admin password", "admin")
-        const loginResponse = await login("admin", password)
-        if (loginResponse.startsWith("error")) alert("login failed. reload and try again")
-
-        const logElement = document.getElementById('logs')
-
-        async function loadLogs(files) {
-            const file = await postJSON("/api/logger/file", { file: files[files.length - 1] })
-            logElement.innerHTML = ""
-            const split = file.split("\n")
-            split.pop()
-            const logLines = []
-            split.forEach(line => {
-                const obj = JSON.parse(line)
-                try { logLines.push(obj) }
-                catch (error) { console.error("line", line) }
-
-                if (obj.message.includes("api/logger")) { }
-                else if (obj.message.includes("favicon")) { }
-                else {
-                    const preElement = document.createElement("pre")
-                    const text = `${obj.timestampISO} >> ${obj.level} >> ${obj.group} >> ${obj.message} >> ${JSON.stringify(obj.obj)}`
-                    preElement.innerText = text
-                    logElement.appendChild(preElement)
+    <header>
+        <p>
+            <a href="/">↪ Return Home</a>
+        </p>
+    
+        <h2>Logs</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; white-space: nowrap;">
+                Refreshes every 2 sec |
+            </div>
+            <label style="display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; white-space: nowrap;">
+                <input type="checkbox" id="prettify">
+                prettify json
+            </label>
+            <label style="display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;">
+                <input type="checkbox" id="debug">
+                debug
+            </label>
+            <label style="display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;">
+                <input type="checkbox" id="info">
+                info
+            </label>
+            <label style="display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;">
+                <input type="text" name="filter" id="filter" placeholder="filter...">
+            </label>
+        </div>
+        <br>
+        <div style="display: flex; gap: 2rem;">
+            <button onclick="location.reload()">reload</button>
+            <button onclick="getJSON('/api/logger/delete-all-logs'); location.reload()">delete-all-logs</button>
+        </div>
+        <br>
+        <span>timestampISO >> group >> level >> message >> obj</span>
+        <br><br>
+    </header>
+    <main>
+        <div id="logs">
+            <script type="module">
+                const password = prompt("Enter the admin password", "admin")
+                const loginResponse = await login("admin", password)
+                if (loginResponse.startsWith("error")) alert("login failed. reload and try again")
+    
+                const logElement = document.getElementById('logs')
+                const prettifyElement = document.getElementById("prettify")
+                const debugElement = document.getElementById("debug")
+                const infoElement = document.getElementById("info")
+                const filterElement = document.getElementById("filter")
+    
+                async function loadLogs(files) {
+                    const file = await postJSON("/api/logger/file", { file: files[files.length - 1] })
+                    logElement.innerHTML = ""
+                    const split = file.split("\n")
+                    split.pop()
+                    const logLines = []
+                    for (let i = 0; i < split.length; i++) {
+                        const line = split[split.length - 1 - i]
+                        const obj = JSON.parse(line)
+                        try { logLines.push(obj) }
+                        catch (error) { console.error("line", line) }
+    
+                        if (obj.message.includes("api/logger")) { }
+                        else if (filterElement.value && !(
+                            obj.group.includes(filterElement.value) ||
+                            obj.message.includes(filterElement.value) ||
+                            JSON.stringify(obj.obj).includes(filterElement.value)
+                        )) { }
+                        else if (obj.message.includes("favicon")) { }
+                        else {
+                            const preElement = document.createElement("pre")
+                            let text = ""
+                            if (debugElement.checked && obj.level === "debug") {}
+                            else if (infoElement.checked && obj.level === "info") {}
+                            else if (prettifyElement.checked) {
+                                text = `${obj.timestampISO} >> ${obj.level} >> ${obj.group} >> ${obj.message} >> ${JSON.stringify(obj.obj, true, 2)}`
+                            } else {
+                                text = `${obj.timestampISO} >> ${obj.level} >> ${obj.group} >> ${obj.message} >> ${JSON.stringify(obj.obj)}`
+                            }
+                            preElement.innerText = text
+                            logElement.appendChild(preElement)
+                        }
+                    }
+                    split.forEach(line => {
+                    })
                 }
-            })
-        }
-
-        const files = await getJSON("/api/logger/files-available")
-        await loadLogs(files)
-        setInterval(async () => await loadLogs(files), 5_000);
-
-    </script>
-    <br>
+    
+                const files = await getJSON("/api/logger/files-available")
+                await loadLogs(files)
+                setInterval(async () => await loadLogs(files), 2_000);
+            </script>
+        </div>
+    </main>
 
 </body>
 

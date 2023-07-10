@@ -17,6 +17,8 @@ import { EventEmitter } from 'events'
 // Exports
 export {
     log,
+    // getLogFile,
+    // getLogFilesAvailable,
     deleteAllLogs,
     Logger,
     emitter,

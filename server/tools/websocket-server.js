@@ -16,7 +16,7 @@ import { WebSocketServer } from 'ws'
 import { EventEmitter } from 'events'
 import { createServer as createHttpServer } from 'http'
 
-// import { getDatabase, saveDatabase, resetDatabase } from '../modules/db.js'
+// import { createDatabase, writeDatabase, resetDatabase } from '../modules/db.js'
 import { Logger } from '../modules/logger.js'
 
 // Export
@@ -40,7 +40,7 @@ const emitter = new EventEmitter()
 emitter.setMaxListeners(100) // number of receiveTopic() and receiveEvent() uses
 let wsServer
 // const DEFAULT_STATE = { wsServers: {} }
-// const db = await getDatabase('websocket-server', DEFAULT_STATE)
+// const db = await createDatabase('websocket-server', DEFAULT_STATE)
 
 // Helper Functions
 function isJSON(text) {

@@ -2,7 +2,7 @@
 
 // Import
 import { hashPassword, isHashedPassword, generateJWT, verifyJWT } from './auth.js'
-import { getDatabase, resetDatabase } from './database.js'
+import { createDatabase, resetDatabase } from './database.js'
 import { Logger } from './logger.js'
 
 // Export
@@ -47,7 +47,7 @@ const DEFAULT_STATE = {
 
 // Variables
 const log = new Logger("users.js")
-let db = await getDatabase('users', DEFAULT_STATE)
+let db = await createDatabase('users', DEFAULT_STATE)
 
 // Helper Functions
 function validUsermame(username) {

@@ -4,7 +4,7 @@
 import express from 'express'
 import {
     // isAdmin,
-    // getTime,
+    getTime,
     getTimeAsISO,
     getUptime,
     // getNICs,
@@ -20,6 +20,10 @@ const router = express.Router()
 
 // Routes
 router.get('/time', async (req, res) => {
+    const response = getTime()
+    res.json(response)
+})
+router.get('/time-as-iso', async (req, res) => {
     const response = getTimeAsISO()
     res.json(response)
 })

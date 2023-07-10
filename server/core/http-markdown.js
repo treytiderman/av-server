@@ -10,7 +10,10 @@ export {
 }
 
 // Variables
-const converter = new showdown.Converter()
+const converter = new showdown.Converter({tables: true, tasklists: true})
+const PATH_TO_FILE = "../"
+const PATH_TO_CSS = "../server/core/public/other/markdown.css"
+converter.setFlavor('github');
 
 // Functions
 function markdown2html(markdown) {
@@ -37,8 +40,8 @@ async function markdown2htmlPage(markdown, css, title = "markdown") {
 }
 async function renderMarkdown(req, res, next) {
     if (req.url.endsWith(".md")) {
-        const text = await readText(`../public${req.url}`)
-        const css = await readText(`../server/core/public/other/markdown.css`)
+        const text = await readText(PATH_TO_FILE + req.url)
+        const css = await readText(PATH_TO_CSS)
         const html = await markdown2htmlPage(text, css, req.url)
         res.send(html)
     }

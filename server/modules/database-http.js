@@ -1,7 +1,7 @@
 // Overview: http routes for the state.js module
 
 // Imports
-import { getDatabase, saveDatabase, resetDatabase, deleteDatabase } from './database.js'
+import { createDatabase, writeDatabase, resetDatabase, deleteDatabase } from './database.js'
 import { Router } from 'express'
 
 // Exports

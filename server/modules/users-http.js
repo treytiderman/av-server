@@ -93,7 +93,6 @@ function gate(require = {
 
 // Routes
 router.post('/get-token', async (req, res) => {
-    console.log(req.body);
     const response = getToken(req.body.username, req.body.password)
     if (response === "error password incorrect") res.json("error username or password incorrect")
     else if (response === "error username doesn't exists") res.json("error username or password incorrect")
