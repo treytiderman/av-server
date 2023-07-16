@@ -32,67 +32,66 @@
 | TX/RX		| Topic		| Event		| Body 					|
 | --------- | --------- | --------- | --------------------- |
 | send		| any		| sub		|  						|
-| send		| any		| unsub		|  						|
 | recieve	| client	| subs		| subscriptionsArray	|
+| send		| any		| unsub		|  						|
 
 # Module: /database
 
-| TX/RX		| Topic						| Event				| Body 					|
-| ---		| ---						| ---				| ---					|
-| send		| /database/{name}			| create			| {defaultData} 		|
-| recieve	| /database/{name}			| create			| "ok" or "error..." 	|
-| send		| /database/{name}			| read				| 				 		|
-| recieve	| /database/{name}			| read				| "ok" or "error..." 	|
-| send		| /database/{name}			| write				| 				 		|
-| recieve	| /database/{name}			| write				| "ok" or "error..." 	|
-| send		| /database/{name}			| delete			| 				 		|
-| recieve	| /database/{name}			| delete			| "ok" or "error..." 	|
-| send		| /database/{name}			| reset-to-default	| 				 		|
-| recieve	| /database/{name}			| reset-to-default	| "ok" or "error..." 	|
-| recieve	| /database/{name}			| pub				| databaseJsonObject	|
-| send		| /database/{name}/{value}	| sub				| 				 		|
-| recieve	| /database/{name}/{value}	| sub				| "ok" or "error..." 	|
-| send		| /database/{name}/{value}	| get				| 				 		|
-| recieve	| /database/{name}/{value}	| get				| "ok" or "error..." 	|
-| send		| /database/{name}/{value}	| set				| 				 		|
-| recieve	| /database/{name}/{value}	| set				| "ok" or "error..." 	|
-| recieve	| /database/{name}/{value}	| pub				| value					|
-| send		| /database					| delete-all		| 				 		|
-| recieve	| /database					| delete-all		| "ok" or "error..." 	|
+| TX/RX		| Admin	| Topic						| Event				| Body 					|
+| ---		| ---	| ---						| ---				| ---					|
+| send		|	y	| /database/{name}			| get or sub		| 				 		|
+| recieve	|	y	| /database/{name}			| get or sub		| "ok" or "error..." 	|
+| recieve	|	y	| /database/{name}			| pub				| {jsonObject}			|
+| send		|	y	| /database/{name}			| create			| {?defaultJsonObject}	|
+| recieve	|	y	| /database/{name}			| create			| "ok" or "error..." 	|
+| send		|	y	| /database/{name}			| write-to-file		| 				 		|
+| recieve	|	y	| /database/{name}			| write-to-file		| "ok" or "error..." 	|
+| send		|	y	| /database/{name}			| delete			| 				 		|
+| recieve	|	y	| /database/{name}			| delete			| "ok" or "error..." 	|
+| send		|	y	| /database/{name}			| reset-to-default	| 				 		|
+| recieve	|	y	| /database/{name}			| reset-to-default	| "ok" or "error..." 	|
+| send		|	y	| /database/{name}/{key}	| get or sub		| 				 		|
+| recieve	|	y	| /database/{name}/{key}	| get or sub		| "ok" or "error..." 	|
+| recieve	|	y	| /database/{name}/{key}	| pub				| value					|
+| send		|	y	| /database/{name}/{key}	| set				| value					|
+| recieve	|	y	| /database/{name}/{key}	| set				| "ok" or "error..." 	|
+| send		|	y	| /database/all				| get or sub		| 				 		|
+| recieve	|	y	| /database/all				| get or sub		| "ok" or "error..." 	|
+| send		|	y	| /database/all				| delete			| 				 		|
+| recieve	|	y	| /database/all				| delete			| "ok" or "error..." 	|
+| recieve	|	y	| /database/all				| pub				| [name]				|
 
 More details: [datebase-js](./datebase-js.md) or [datebase-json](./datebase-json.md)
 
-# Module: /file
+# Module: /file-system
 
-| TX/RX		| Topic			| Event				| Body 						|
-| ---		| ---			| ---				| ---						|
-| send		| /file/{path}	| exists			| 				 			|
-| recieve	| /file/{path}	| exists			| true or false		 		|
-| send		| /file/{path}	| create-file		| 				 			|
-| recieve	| /file/{path}	| create-file		| "ok" or "error..."		|
-| send		| /file/{path}	| delete-file		| 				 			|
-| recieve	| /file/{path}	| delete-file		| "ok" or "error..."		|
-| send		| /file/{path}	| read-text-file	| 				 			|
-| recieve	| /file/{path}	| read-text-file	| "ok" or "error..."		|
-| send		| /file/{path}	| read-json-file	| 				 			|
-| recieve	| /file/{path}	| read-json-file	| "ok" or "error..."		|
-| send		| /file/{path}	| write-text-file	| text			 			|
-| recieve	| /file/{path}	| write-text-file	| "ok" or "error..."		|
-| send		| /file/{path}	| write-json-file	| json			 			|
-| recieve	| /file/{path}	| write-json-file	| "ok" or "error..."		|
-| send		| /file/{path}	| append-text-file	| text			 			|
-| recieve	| /file/{path}	| append-text-file	| "ok" or "error..."		|
-| send		| /file/{path}	| get-tree			| 				 			|
-| recieve	| /file/{path}	| get-tree			| "ok" or "error..."		|
-| send		| /file/{path}	| create-folder		| 				 			|
-| recieve	| /file/{path}	| create-folder		| "ok" or "error..."		|
-| send		| /file/{path}	| delete-folder		| 				 			|
-| recieve	| /file/{path}	| delete-folder		| "ok" or "error..."		|
-| send		| /file/{path}	| rename			| newPath					|
-| recieve	| /file/{path}	| rename			| "ok" or "error..."		|
-| recieve	| /file/{path}	| update-tree		| *PATH_TREE*				|
-| recieve	| /file/{path}	| update-text		| text						|
-| recieve	| /file/{path}	| update-json		| json						|
+| TX/RX		| Admin	| Topic							| Event				| Body 						|
+| ---		| ---	| ---							| ---				| ---						|
+| send		|	y	| /file-system/{path}			| get				| 				 			|
+| recieve	|	y	| /file-system/{path}			| get				| "ok" or "error..."		|
+| recieve	|	y	| /file-system/{path}			| pub				| *PATH_TREE*				|
+| send		|	y	| /file-system/{path}			| exists			| 				 			|
+| recieve	|	y	| /file-system/{path}			| exists			| true or false		 		|
+| send		|	y	| /file-system/{path}			| rename			| newPath		 			|
+| recieve	|	y	| /file-system/{path}			| rename			| "ok" or "error..."		|
+| send		|	y	| /file-system/text-file/{path}	| get				| 				 			|
+| recieve	|	y	| /file-system/text-file/{path}	| get				| "ok" or "error..."		|
+| recieve	|	y	| /file-system/text-file/{path}	| pub				| text						|
+| send		|	y	| /file-system/text-file/{path}	| create			| 				 			|
+| recieve	|	y	| /file-system/text-file/{path}	| create			| "ok" or "error..."		|
+| send		|	y	| /file-system/text-file/{path}	| set				| text			 			|
+| recieve	|	y	| /file-system/text-file/{path}	| set				| "ok" or "error..."		|
+| send		|	y	| /file-system/text-file/{path}	| append			| text			 			|
+| recieve	|	y	| /file-system/text-file/{path}	| append			| "ok" or "error..."		|
+| send		|	y	| /file-system/text-file/{path}	| delete			| 				 			|
+| recieve	|	y	| /file-system/text-file/{path}	| delete			| "ok" or "error..."		|
+| send		|	y	| /file-system/folder/{path}	| get				| 				 			|
+| recieve	|	y	| /file-system/folder/{path}	| get				| "ok" or "error..."		|
+| recieve	|	y	| /file-system/folder/{path}	| pub				| *PATH_TREE*				|
+| send		|	y	| /file-system/folder/{path}	| create			| 				 			|
+| recieve	|	y	| /file-system/folder/{path}	| create			| "ok" or "error..."		|
+| send		|	y	| /file-system/folder/{path}	| delete			| 				 			|
+| recieve	|	y	| /file-system/folder/{path}	| delete			| "ok" or "error..."		|
 
 ```json
 // Structures
@@ -118,206 +117,198 @@ More details: [file-js](./file-js.md) or [file-json](./file-json.md)
 
 # Module: /logger
 		
-| TX/RX		| Topic					| Event						| Body 											|
-| ---		| ---					| ---						| ---											|
-| send		| /logger/				| log						| {group, level, message, obj}					|
-| recieve	| /logger/				| log						| "ok" or "error..." 							|
-| send		| /logger/{group}		| history					| 												|
-| recieve	| /logger/{group}		| history					| "ok" or "error..." 							|
-| recieve	| /logger/{group}		| update-log				| {timestampISO, level, message, obj}			|
-| recieve	| /logger/{group}		| update-history			| [{timestampISO, level, message, obj}]			|
-| send		| /logger/logs			| get						|  												|
-| recieve	| /logger/logs			| get						| "ok" or "error..."					 		|
-| send		| /logger/logs			| sub						|  												|
-| recieve	| /logger/logs			| sub						| "ok" or "error..."					 		|
-| send		| /logger/logs			| delete-all-permanently	| 												|
-| recieve	| /logger/logs			| delete-all-permanently	| "ok" or "error..."					 		|
-| recieve	| /logger/logs			| pub						| [fileName]							 		|
-| send		| /logger/{fileName}	| get						| 												|
-| recieve	| /logger/{fileName}	| get						| "ok" or "error..."					 		|
-| send		| /logger/{fileName}	| sub						| 												|
-| recieve	| /logger/{fileName}	| sub						| "ok" or "error..."					 		|
-| send		| /logger/{fileName}	| history					| 												|
-| recieve	| /logger/{fileName}	| history					| "ok" or "error..."					 		|
-| recieve	| /logger/{fileName}	| pub-log					| [fileName]							 		|
-| recieve	| /logger/{fileName}	| history					| "ok" or "error..."					 		|
-| recieve	| /logger				| update-log				| {timestampISO, group, level, message, obj}	|
-| recieve	| /logger				| update-file				| [{timestampISO, group, level, message, obj}]	|
-| recieve	| /logger				| update-files-available	| fileNamesArray								|
-
+| TX/RX		| Admin	| Topic						| Event						| Body 											|
+| ---		| ---	| ---						| ---						| ---											|
+| send		|	y	| /logger/log				| get or sub				| 												|
+| recieve	|	y	| /logger/log				| get or sub				| "ok" or "error..."							|
+| recieve	|	y	| /logger/log				| pub						| {timestampISO, group, level, message, obj}	|
+| send		|	y	| /logger/log				| set						| {group, level, message, obj}					|
+| recieve	|	y	| /logger/log				| set						| "ok" or "error..."							|
+| send		|	y	| /logger/log/history		| get or sub				| historyLength									|
+| recieve	|	y	| /logger/log/history		| get or sub				| "ok" or "error..."							|
+| recieve	|	y	| /logger/log/history		| pub						| [{timestampISO, group, level, message, obj}]	|
+| send		|	y	| /logger/{group}			| get or sub				| 												|
+| recieve	|	y	| /logger/{group}			| get or sub				| "ok" or "error..."							|
+| recieve	|	y	| /logger/{group}			| pub						| {timestampISO, level, message, obj}			|
+| send		|	y	| /logger/{group}			| set						| {level, message, obj}							|
+| recieve	|	y	| /logger/{group}			| set						| "ok" or "error..."							|
+| send		|	y	| /logger/{group}/history	| get or sub				| historyLength									|
+| recieve	|	y	| /logger/{group}/history	| get or sub				| "ok" or "error..."							|
+| recieve	|	y	| /logger/{group}/history	| pub						| [{timestampISO, level, message, obj}]			|
+ 
 More details: [logger-js](./logger-js.md) or [logger-json](./logger-json.md)
-
-# Module: /system
-
-| TX/RX		| Topic					| Event		| Body 					|
-| ---		| ---					| ---		| ---					|
-| send		| /system/time			| get		| 						|
-| recieve	| /system/time			| get		| "ok" or "error..."	|
-| send		| /system/time			| sub		|  						|
-| recieve	| /system/time			| sub		| "ok" or "error..."	|
-| recieve	| /system/time			| pub		| value					|
-| send		| /system/time-as-iso	| get		| 						|
-| recieve	| /system/time-as-iso	| get		| "ok" or "error..."	|
-| send		| /system/time-as-iso	| sub		|  						|
-| recieve	| /system/time-as-iso	| sub		| "ok" or "error..."	|
-| recieve	| /system/time-as-iso	| pub		| value					|
-| send		| /system/uptime		| get		| 						|
-| recieve	| /system/uptime		| get		| "ok" or "error..."	|
-| send		| /system/uptime		| sub		|  						|
-| recieve	| /system/uptime		| sub		| "ok" or "error..."	|
-| recieve	| /system/uptime		| pub		| value					|
-| send		| /system/info			| get		| 						|
-| recieve	| /system/info			| get		| "ok" or "error..."	|
-| send		| /system/info			| sub		|  						|
-| recieve	| /system/info			| sub		| "ok" or "error..."	|
-| recieve	| /system/info			| pub		| value					|
-
-More details: [system-js](./system-js.md) or [system-json](./system-json.md)
 
 # Module: /program
 
-| TX/RX		| Topic					| Event				| Body 											|
-| ---		| ---					| ---				| ---											|
-| send		| /program/avalable		| get				| 												|
-| recieve	| /program/avalable		| get				| "ok" or "error..."							|
-| send		| /program/avalable		| sub				| 												|
-| recieve	| /program/avalable		| sub				| "ok" or "error..."							|
-| recieve	| /program/avalable		| pub				| value											|
-| send		| /program/{name}		| start				| {directory, command, startOnBoot, env}		|
-| recieve	| /program/{name}		| start				| "ok" or "error..." 							|
-| send		| /program/{name}		| start-avaiable	| {folderName, startOnBoot, env}				|
-| recieve	| /program/{name}		| start-avaiable	| "ok" or "error..." 							|
-| send		| /program/{name}		| start-existing	| 												|
-| recieve	| /program/{name}		| start-existing	| "ok" or "error..." 							|
-| send		| /program/{name}		| start-on-boot		| isStartOnBoot									|
-| recieve	| /program/{name}		| start-on-boot		| "ok" or "error..." 							|
-| send		| /program/{name}		| history			| 												|
-| recieve	| /program/{name}		| history			| "ok" or "error..." 							|
-| send		| /program/{name}		| restart			| 												|
-| recieve	| /program/{name}		| restart			| "ok" or "error..." 							|
-| send		| /program/{name}		| kill				| 												|
-| recieve	| /program/{name}		| kill				| "ok" or "error..." 							|
-| send		| /program/{name}		| status			| 					 							|
-| recieve	| /program/{name}		| status			| "ok" or "error..." 							|
-| recieve	| /program/{name}		| pub-out			| {from, timestampISO, ascii}					|
-| recieve	| /program/{name}		| pub-status		| {command, env, startOnBoot, running, pid}		|
-| recieve	| /program/{name}		| pub-history		| [{from, timestampISO, ascii}]					|
-| send		| /program				| status			| 					 							|
-| recieve	| /program				| status			| "ok" or "error..." 							|
-| send		| /program				| kill				| 					 							|
-| recieve	| /program				| kill				| "ok" or "error..." 							|
-| recieve	| /program				| pub-status		| [{command, env, startOnBoot, running, pid}]	|
+| TX/RX		| Admin	| Topic						| Event				| Body 											|
+| ---		| ---	| ---						| ---				| ---											|
+| send		|	y	| /program/avalable			| get or sub		| 												|
+| recieve	|	y	| /program/avalable			| get or sub		| "ok" or "error..."							|
+| recieve	|	y	| /program/avalable			| pub				| [{path, files, program, args, env}]			|
+| send		|	y	| /program/{name}			| get or sub		| 												|
+| recieve	|	y	| /program/{name}			| get or sub		| "ok" or "error..." 							|
+| recieve	|	y	| /program/{name}			| pub				| {command, env, startOnBoot, running, pid}		|
+| send		|	y	| /program/{name}			| create			| {directory, command, startOnBoot, env}		|
+| recieve	|	y	| /program/{name}			| create			| "ok" or "error..." 							|
+| send		|	y	| /program/{name}			| create-and-start	| {directory, command, startOnBoot, env}		|
+| recieve	|	y	| /program/{name}			| create-and-start	| "ok" or "error..." 							|
+| send		|	y	| /program/{name}			| create-avaiable	| {folderName, startOnBoot, env}				|
+| recieve	|	y	| /program/{name}			| create-avaiable	| "ok" or "error..." 							|
+| send		|	y	| /program/{name}			| set-startOnBoot	| true or false									|
+| recieve	|	y	| /program/{name}			| set-startOnBoot	| "ok" or "error..." 							|
+| send		|	y	| /program/{name}			| start				| 												|
+| recieve	|	y	| /program/{name}			| start				| "ok" or "error..." 							|
+| send		|	y	| /program/{name}			| kill				| 												|
+| recieve	|	y	| /program/{name}			| kill				| "ok" or "error..." 							|
+| send		|	y	| /program/{name}			| restart			| 												|
+| recieve	|	y	| /program/{name}			| restart			| "ok" or "error..." 							|
+| send		|	y	| /program/{name}			| delete			| 												|
+| recieve	|	y	| /program/{name}			| delete			| "ok" or "error..." 							|
+| send		|	y	| /program/{name}/data		| get or sub		| 												|
+| recieve	|	y	| /program/{name}/data		| get or sub		| "ok" or "error..." 							|
+| send		|	y	| /program/{name}/data		| send				| text											|
+| recieve	|	y	| /program/{name}/data		| send				| "ok" or "error..." 							|
+| recieve	|	y	| /program/{name}/data		| pub				| {from, timestampISO, ascii}					|
+| send		|	y	| /program/{name}/history	| get or sub		| historyLength									|
+| recieve	|	y	| /program/{name}/history	| get or sub		| "ok" or "error..." 							|
+| recieve	|	y	| /program/{name}/history	| pub				| [{from, timestampISO, ascii}]					|
+| send		|	y	| /program/all				| get or sub		| 					 							|
+| recieve	|	y	| /program/all				| get or sub		| "ok" or "error..." 							|
+| recieve	|	y	| /program/all				| pub				| [{command, env, startOnBoot, running, pid}]	|
+| send		|	y	| /program/all				| kill				| 					 							|
+| recieve	|	y	| /program/all				| kill				| "ok" or "error..." 							|
+| send		|	y	| /program/all				| delete			| 					 							|
+| recieve	|	y	| /program/all				| delete			| "ok" or "error..." 							|
 
 More details: [program-js](./program-js.md) or [program-json](./program-json.md)
 
+# Module: /system
+
+| TX/RX		| Admin	| Topic					| Event			| Body 					|
+| ---		| ---	| ---					| ---			| ---					|
+| send		|		| /system/time			| get or sub	| 						|
+| recieve	|		| /system/time			| get or sub	| "ok" or "error..."	|
+| recieve	|		| /system/time			| pub			| value					|
+| send		|		| /system/time-as-iso	| get or sub	| 						|
+| recieve	|		| /system/time-as-iso	| get or sub	| "ok" or "error..."	|
+| recieve	|		| /system/time-as-iso	| pub			| value					|
+| send		|		| /system/uptime		| get or sub	| 						|
+| recieve	|		| /system/uptime		| get or sub	| "ok" or "error..."	|
+| recieve	|		| /system/uptime		| pub			| value					|
+| send		|	y	| /system/info			| get or sub	| 						|
+| recieve	|	y	| /system/info			| get or sub	| "ok" or "error..."	|
+| recieve	|	y	| /system/info			| pub			| value					|
+
+More details: [system-js](./system-js.md) or [system-json](./system-json.md)
+
 # Module: /user
 
-| TX/RX		| Topic				| Event						| Body 									|
-| ---		| ---				| ---						| ---									|
-| send		| /user/token		| get						| {username, password}					|
-| recieve	| /user/token		| get						| "ok" or "error..."					|
-| send		| /user/token		| sub						| 										|
-| recieve	| /user/token		| sub						| "ok" or "error..."					|
-| recieve	| /user/token		| pub						| token									|
-| send		| /user/{username}	| login-with-token			| token									|
-| recieve	| /user/{username}	| login-with-token			| "ok" or "error..."					|
-| send		| /user/{username}	| logout					| 										|
-| recieve	| /user/{username}	| logout					| "ok" or "error..."					|
-| send		| /user/{username}	| create					| {password, passwordConfirm, groups}	|
-| recieve	| /user/{username}	| create					| "ok" or "error..."					|
-| send		| /user/{username}	| delete					| {password, passwordConfirm, groups}	|
-| recieve	| /user/{username}	| delete					| "ok" or "error..."					|
-| send		| /user/{username}	| add-group					| {groupToAdd}							|
-| recieve	| /user/{username}	| add-group					| "ok" or "error..."					|
-| send		| /user/{username}	| remove-group				| {groupToRemove}						|
-| recieve	| /user/{username}	| remove-group				| "ok" or "error..."					|
-| send		| /user/{username}	| change-password			| {newPassword, newPasswordConfirm}		|
-| recieve	| /user/{username}	| change-password			| "ok" or "error..."					|
-| recieve	| /user/{username}	| pub						| {username, [groups]}					|
-| send		| /user/who-am-i	| get						| 										|
-| recieve	| /user/who-am-i	| get						| "ok" or "error..."					|
-| send		| /user/who-am-i	| sub						| 										|
-| recieve	| /user/who-am-i	| sub						| "ok" or "error..."					|
-| recieve	| /user/who-am-i	| pub						| {username, [groups]}					|
-| send		| /user/users		| get						| 										|
-| recieve	| /user/users		| get						| "ok" or "error..."					|
-| send		| /user/users		| sub						| 										|
-| recieve	| /user/users		| sub						| "ok" or "error..."					|
-| recieve	| /user/users		| pub						| [{username, [groups]}]				|
-| send		| /user/users		| reset-to-default			| 										|
-| recieve	| /user/users		| reset-to-default			| "ok" or "error..."					|
-| send		| /user/groups		| get						| 										|
-| recieve	| /user/groups		| get						| "ok" or "error..."					|
-| send		| /user/groups		| sub						| 										|
-| recieve	| /user/groups		| sub						| "ok" or "error..."					|
-| send		| /user/groups		| create					| groupToAdd							|
-| recieve	| /user/groups		| create					| "ok" or "error..."					|
-| send		| /user/groups		| delete					| groupToDelete							|
-| recieve	| /user/groups		| delete					| "ok" or "error..."					|
-| recieve	| /user/groups		| pub						| value									|
+| TX/RX		| Admin	| Topic				| Event						| Body 									|
+| ---		| ---	| ---				| ---						| ---									|
+| send		|		| /user/token		| get or sub				| 										|
+| recieve	|		| /user/token		| get or sub				| "ok" or "error..."					|
+| recieve	|		| /user/token		| pub						| token									|
+| send		|		| /user/token		| login						| {username, password}					|
+| recieve	|		| /user/token		| login						| "ok" or "error..."					|
+| send		|		| /user/{username}	| get or sub				| 										|
+| recieve	|		| /user/{username}	| get or sub				| "ok" or "error..."					|
+| recieve	|		| /user/{username}	| pub						| {username, [groups]}					|
+| send		|		| /user/{username}	| login-with-token			| token									|
+| recieve	|		| /user/{username}	| login-with-token			| "ok" or "error..."					|
+| send		|		| /user/{username}	| logout					| 										|
+| recieve	|		| /user/{username}	| logout					| "ok" or "error..."					|
+| send		|	y	| /user/{username}	| create					| {password, passwordConfirm, groups}	|
+| recieve	|	y	| /user/{username}	| create					| "ok" or "error..."					|
+| send		|	y	| /user/{username}	| delete					| {password, passwordConfirm, groups}	|
+| recieve	|	y	| /user/{username}	| delete					| "ok" or "error..."					|
+| send		|	y	| /user/{username}	| add-group					| {groupToAdd}							|
+| recieve	|	y	| /user/{username}	| add-group					| "ok" or "error..."					|
+| send		|	y	| /user/{username}	| remove-group				| {groupToRemove}						|
+| recieve	|	y	| /user/{username}	| remove-group				| "ok" or "error..."					|
+| send		|	y	| /user/{username}	| change-password			| {newPassword, newPasswordConfirm}		|
+| recieve	|	y	| /user/{username}	| change-password			| "ok" or "error..."					|
+| send		|		| /user/who-am-i	| get or sub				| 										|
+| recieve	|		| /user/who-am-i	| get or sub				| "ok" or "error..."					|
+| recieve	|		| /user/who-am-i	| pub						| {username, [groups]}					|
+| send		|		| /user/users		| get or sub				| 										|
+| recieve	|		| /user/users		| get or sub				| "ok" or "error..."					|
+| recieve	|		| /user/users		| pub						| [{username, [groups]}]				|
+| send		|	y	| /user/users		| reset-to-default			| 										|
+| recieve	|	y	| /user/users		| reset-to-default			| "ok" or "error..."					|
+| send		|		| /user/groups		| get or sub				| 										|
+| recieve	|		| /user/groups		| get or sub				| "ok" or "error..."					|
+| recieve	|		| /user/groups		| pub						| value									|
+| send		|	y	| /user/groups		| create					| groupToAdd							|
+| recieve	|	y	| /user/groups		| create					| "ok" or "error..."					|
+| send		|	y	| /user/groups		| delete					| groupToDelete							|
+| recieve	|	y	| /user/groups		| delete					| "ok" or "error..."					|
 
 More details: [user-js](./user-js.md) or [user-json](./user-json.md)
 
-# Tool: /tcp-server
+# Tool: /tcp-client
 
-/tcp-server/start
-/tcp-server/stop
-/tcp-server/send
-/tcp-server/get-clients
-
-| TX/RX		| Topic							| Event				| Body 										|
-| ---		| ---							| ---				| ---										|
-| send		| /tcp-client/{ip/host}:{port}	| open				| {expectedDelimiter} 						|
-| recieve	| /tcp-client/{ip/host}:{port}	| open				| "ok" or "error..." 						|
-| send		| /tcp-client/{ip/host}:{port}	| close				|  											|
-| recieve	| /tcp-client/{ip/host}:{port}	| close				| "ok" or "error..." 						|
-| send		| /tcp-client/{ip/host}:{port}	| send				| {data, encoding, ?cr, ?lf} 				|
-| recieve	| /tcp-client/{ip/host}:{port}	| send				| "ok" or "error..." 						|
-| send		| /tcp-client/{ip/host}:{port}	| history			|  											|
-| recieve	| /tcp-client/{ip/host}:{port}	| history			| "ok" or "error..."						|
-| send		| /tcp-client/{ip/host}:{port}	| status			|  											|
-| recieve	| /tcp-client/{ip/host}:{port}	| status			| "ok" or "error..."					 	|
-| recieve	| /tcp-client/{ip/host}:{port}	| update-data		| {wasReceived, hex, ascii, timestampISO} 	|
-| recieve	| /tcp-client/{ip/host}:{port}	| update-status 	| {ip, port, isOpen, expectedDelimiter} 	|
-| recieve	| /tcp-client/{ip/host}:{port}	| update-history	| [{wasReceived, hex, ascii, timestampISO}] |
-| send		| /tcp-client					| status-all		|  											|
-| recieve	| /tcp-client					| status-all		| "ok" or "error..."					 	|
-| recieve	| /tcp-client					| update-status-all | [{ip, port, isOpen, expectedDelimiter}] 	|
+| TX/RX		| Admin	| Topic								| Event				| Body 										|
+| ---		| ---	| ---								| ---				| ---										|
+| send		|	y	| /tcp-client/{ip}:{port}			| get or sub		| 											|
+| recieve	|	y	| /tcp-client/{ip}:{port}			| get or sub		| "ok" or "error..."						|
+| recieve	|	y	| /tcp-client/{ip}:{port}			| pub				| {ip, port, isOpen, ?expectedDelimiter}	|
+| send		|	y	| /tcp-client/{ip}:{port}			| open				| {?expectedDelimiter} 						|
+| recieve	|	y	| /tcp-client/{ip}:{port}			| open				| "ok" or "error..." 						|
+| send		|	y	| /tcp-client/{ip}:{port}			| close				|  											|
+| recieve	|	y	| /tcp-client/{ip}:{port}			| close				| "ok" or "error..." 						|
+| send		|	y	| /tcp-client/{ip}:{port}			| delete			|  											|
+| recieve	|	y	| /tcp-client/{ip}:{port}			| delete			| "ok" or "error..." 						|
+| send		|	y	| /tcp-client/{ip}:{port}/data		| get or sub		| 											|
+| recieve	|	y	| /tcp-client/{ip}:{port}/data		| get or sub		| "ok" or "error..."						|
+| recieve	|	y	| /tcp-client/{ip}:{port}/data		| pub				| {wasReceived, hex, ascii, timestampISO} 	|
+| send		|	y	| /tcp-client/{ip}:{port}/data		| send				| {data, encoding, ?cr, ?lf}				|
+| recieve	|	y	| /tcp-client/{ip}:{port}/data		| send				| "ok" or "error..."						|
+| send		|	y	| /tcp-client/{ip}:{port}/history	| get				| historyLength								|
+| recieve	|	y	| /tcp-client/{ip}:{port}/history	| get				| "ok" or "error..."						|
+| recieve	|	y	| /tcp-client/{ip}:{port}/history	| pub				| [{wasReceived, hex, ascii, timestampISO}]	|
+| send		|	y	| /tcp-client/all					| get or sub		| 											|
+| recieve	|	y	| /tcp-client/all					| get or sub		| "ok" or "error..."						|
+| recieve	|	y	| /tcp-client/all					| pub				| [{ip, port, isOpen, ?expectedDelimiter}] 	|
+| send		|	y	| /tcp-client/all					| open				| 											|
+| recieve	|	y	| /tcp-client/all					| open				| "ok" or "error..."						|
+| send		|	y	| /tcp-client/all					| close				| 											|
+| recieve	|	y	| /tcp-client/all					| close				| "ok" or "error..."						|
+| send		|	y	| /tcp-client/all					| delete			| 											|
+| recieve	|	y	| /tcp-client/all					| delete			| "ok" or "error..."						|
 
 More details: [tcp-client-js](./tcp-client-js.md) or [tcp-client-json](./tcp-client-json.md)
 
-# Tool: /tcp-client
+# Tool: /serial-port
 
-| TX/RX		| Topic								| Event				| Body 										|
-| ---		| ---								| ---				| ---										|
-| send		| /tcp-client/{ip}:{port}			| open				| {expectedDelimiter} 						|
-| recieve	| /tcp-client/{ip}:{port}			| open				| "ok" or "error..." 						|
-| send		| /tcp-client/{ip}:{port}			| close				|  											|
-| recieve	| /tcp-client/{ip}:{port}			| close				| "ok" or "error..." 						|
-| send		| /tcp-client/{ip}:{port}			| get				| 											|
-| recieve	| /tcp-client/{ip}:{port}			| get				| "ok" or "error..."						|
-| send		| /tcp-client/{ip}:{port}			| sub				| 											|
-| recieve	| /tcp-client/{ip}:{port}			| sub				| "ok" or "error..."						|
-| recieve	| /tcp-client/{ip}:{port}			| pub				| {ip, port, isOpen, expectedDelimiter}		|
-| send		| /tcp-client/{ip}:{port}/data		| get				| 											|
-| recieve	| /tcp-client/{ip}:{port}/data		| get				| "ok" or "error..."						|
-| send		| /tcp-client/{ip}:{port}/data		| send				| {data, encoding, ?cr, ?lf}				|
-| recieve	| /tcp-client/{ip}:{port}/data		| send				| "ok" or "error..."						|
-| send		| /tcp-client/{ip}:{port}/data		| sub				| 											|
-| recieve	| /tcp-client/{ip}:{port}/data		| sub				| "ok" or "error..."						|
-| recieve	| /tcp-client/{ip}:{port}/data		| pub				| {wasReceived, hex, ascii, timestampISO} 	|
-| send		| /tcp-client/{ip}:{port}/history	| get				| 											|
-| recieve	| /tcp-client/{ip}:{port}/history	| get				| "ok" or "error..."						|
-| recieve	| /tcp-client/{ip}:{port}/history	| pub				| [{wasReceived, hex, ascii, timestampISO}]	|
-| send		| /tcp-client						| get				| 											|
-| recieve	| /tcp-client						| get				| "ok" or "error..."						|
-| send		| /tcp-client						| sub				| 											|
-| recieve	| /tcp-client						| sub				| "ok" or "error..."						|
-| send		| /tcp-client						| close-all			| 											|
-| recieve	| /tcp-client						| close-all			| "ok" or "error..."						|
-| send		| /tcp-client						| delete-all		| 											|
-| recieve	| /tcp-client						| delete-all		| "ok" or "error..."						|
-| recieve	| /tcp-client						| pub				| [{ip, port, isOpen, expectedDelimiter}] 	|
+| TX/RX		| Admin	| Topic								| Event				| Body 										|
+| ---		| ---	| ---								| ---				| ---										|
+| send		|	y	| /serial-port/avalable				| get or sub		| 											|
+| recieve	|	y	| /serial-port/avalable				| get or sub		| "ok" or "error..."						|
+| recieve	|	y	| /serial-port/avalable				| pub				| value										|
+| send		|	y	| /serial-port/{port}				| get or sub		| 											|
+| recieve	|	y	| /serial-port/{port}				| get or sub		| "ok" or "error..."						|
+| recieve	|	y	| /serial-port/{port}				| pub				| {ip, port, isOpen, expectedDelimiter}		|
+| send		|	y	| /serial-port/{port}				| open				| {baudRate, delimiter} 					|
+| recieve	|	y	| /serial-port/{port}				| open				| "ok" or "error..." 						|
+| send		|	y	| /serial-port/{port}				| close				|  											|
+| recieve	|	y	| /serial-port/{port}				| close				| "ok" or "error..." 						|
+| send		|	y	| /serial-port/{port}				| delete			|  											|
+| recieve	|	y	| /serial-port/{port}				| delete			| "ok" or "error..." 						|
+| send		|	y	| /serial-port/{port}/data			| get or sub		| 											|
+| recieve	|	y	| /serial-port/{port}/data			| get or sub		| "ok" or "error..."						|
+| recieve	|	y	| /serial-port/{port}/data			| pub				| {wasReceived, hex, ascii, timestampISO} 	|
+| send		|	y	| /serial-port/{port}/data			| send				| {data, encoding, ?cr, ?lf}				|
+| recieve	|	y	| /serial-port/{port}/data			| send				| "ok" or "error..."						|
+| send		|	y	| /serial-port/{port}/history		| get				| historyLength								|
+| recieve	|	y	| /serial-port/{port}/history		| get				| "ok" or "error..."						|
+| recieve	|	y	| /serial-port/{port}/history		| pub				| [{wasReceived, hex, ascii, timestampISO}]	|
+| send		|	y	| /serial-port/all					| get or sub		| 											|
+| recieve	|	y	| /serial-port/all					| get or sub		| "ok" or "error..."						|
+| recieve	|	y	| /serial-port/all					| pub				| [{ip, port, isOpen, expectedDelimiter}] 	|
+| send		|	y	| /serial-port/all					| close				| 											|
+| recieve	|	y	| /serial-port/all					| close				| "ok" or "error..."						|
+| send		|	y	| /serial-port/all					| delete			| 											|
+| recieve	|	y	| /serial-port/all					| delete			| "ok" or "error..."						|
 
 More details: [tcp-client-js](./tcp-client-js.md) or [tcp-client-json](./tcp-client-json.md)
 

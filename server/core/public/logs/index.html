@@ -264,13 +264,13 @@
                             obj.message.includes(filterElement.value) ||
                             JSON.stringify(obj.obj).includes(filterElement.value)
                         )) { }
+                        else if (debugElement.checked && obj.level === "debug") {}
+                        else if (infoElement.checked && obj.level === "info") {}
                         else if (obj.message.includes("favicon")) { }
                         else {
                             const preElement = document.createElement("pre")
                             let text = ""
-                            if (debugElement.checked && obj.level === "debug") {}
-                            else if (infoElement.checked && obj.level === "info") {}
-                            else if (prettifyElement.checked) {
+                            if (prettifyElement.checked) {
                                 text = `${obj.timestampISO} >> ${obj.level} >> ${obj.group} >> ${obj.message} >> ${JSON.stringify(obj.obj, true, 2)}`
                             } else {
                                 text = `${obj.timestampISO} >> ${obj.level} >> ${obj.group} >> ${obj.message} >> ${JSON.stringify(obj.obj)}`

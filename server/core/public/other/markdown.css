@@ -120,11 +120,14 @@ html {
   color-scheme: dark;
 
   /* Text */
-  --font-size: 16px;
+  --font-size: 14px;
   --font-text: 'Open Sans', helvetica, arial, sans-serif;
   --font-mono: 'Fira Code', Menlo, Consolas, monospace;
   --line-height: 1.5;
   --char-width: 80ch;
+  
+  /* DELETE ??? */
+  --font-text: 'Fira Code', Menlo, Consolas, monospace;
 
   /* Margin, Padding, Gap */ 
   --pad: 0.4rem;
@@ -132,17 +135,17 @@ html {
   --pad-input: var(--pad) calc(1.2*var(--pad));
 
   /* Colors */
-  --color-bg: var(--color-grey-50);
-  --color-bg-header: var(--color-grey-100);
+  --color-bg: var(--color-grey-200);
+  --color-bg-header: var(--color-grey-300);
   --color-bg-section: var(--color-grey-100);
   --color-bg-dim: var(--color-grey-200);
 
   --color-text: var(--color-grey-700);
-  --color-text-bright: var(--color-grey-950);
+  --color-text-bright: var(--color-grey-800);
   --color-text-dim: var(--color-grey-500);
   --color-text-link: var(--color-blue-600);
   
-  --color-bg-input: var(--color-grey-300);
+  --color-bg-input: var(--color-grey-400);
   --color-text-input: var(--color-text-bright);
   
   --color-bg-highlight: var(--color-purple-500);
@@ -154,12 +157,12 @@ html {
   --color-shadow: #00000099;
 
   /* Filters for hover, disable, active */
-  --filter-brightness-hover: brightness(125%);
+  --filter-brightness-hover: brightness(150%);
   --filter-brightness-disable: brightness(60%);
   --filter-brightness-active: brightness(75%);
   
   /*  Border, Border Radius, Outline */
-  --border-thickness: 0.125rem;
+  --border-thickness: 1px;
   --border: var(--border-thickness) solid var(--color-border);
   --radius: 0.4rem;
   --radius-lg: 0.8rem;
@@ -223,7 +226,8 @@ main {
   gap: var(--gap);
   overflow: auto;
   margin: auto;
-  max-width: 60rem;
+  /* max-width: 60rem; */
+  max-width: 120rem;
 }
 
 /* Horizontal Rule | Divider Line */
@@ -301,7 +305,7 @@ code {
   padding: calc(var(--pad)/2);
   border-radius: var(--radius);
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   line-height: 1;
 }
 
@@ -366,11 +370,16 @@ table {
   overflow-x: auto;
 }
 th {
-  border-bottom: var(--border);
+  /* border-bottom: var(--border); */
   font-weight: bold;
+  line-height: 1.5;
   text-align: left;
+  background-color: var(--color-bg-header);
 }
-th, td { padding: var(--pad-input); }
+th, td { 
+  padding: var(--pad-input);
+  border: var(--border);
+}
 
 /* Inputs + Buttons + Links */
 
@@ -586,7 +595,7 @@ details summary::-webkit-details-marker { display: none; }
     filter: var(--filter-brightness-hover);
   }
 }
-tr:hover {
+tr:hover td {
   filter: var(--filter-brightness-hover);
   background-color: var(--color-bg-section);
 }

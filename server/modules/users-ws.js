@@ -20,6 +20,19 @@ import {
     changeUserPassword
 } from './users.js'
 
+// Helper Functions
+function isAdmin(ws, name) {
+    if (!ws.auth) {
+        sendEvent(ws, "user", name, "error login first")
+        return false
+    } else if (!ws.user.groups.some(group => group === "admins")) {
+        sendEvent(ws, "user", name, "error not in group admins")
+        return false
+    } else {
+        return true
+    }
+}
+
 // Receive
 receiveEvent("user", "login-with-password", async (ws, body) => {
     subscribe(ws, "user")
@@ -68,9 +81,7 @@ receiveEvent("user", "groups", async (ws, body) => {
 })
 receiveEvent("user", "create-group", async (ws, body) => {
     subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "create-group", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "create-group", "error not in group admins")
-    else {
+    if (isAdmin(ws, "create-group")) {
         await createGroup(body)
         sendEvent(ws, "user", "create-group", "ok")
         sendEventAll("user", "groups", getGroups())
@@ -78,9 +89,7 @@ receiveEvent("user", "create-group", async (ws, body) => {
 })
 receiveEvent("user", "delete-group", async (ws, body) => {
     subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "delete-group", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "delete-group", "error not in group admins")
-    else {
+    if (isAdmin(ws, "delete-group")) {
         await deleteGroup(body)
         sendEvent(ws, "user", "delete-group", "ok")
         sendEventAll("user", "groups", getGroups())
@@ -90,17 +99,13 @@ receiveEvent("user", "delete-group", async (ws, body) => {
 
 receiveEvent("user", "users", async (ws, body) => {
     subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "reset-users-to-default", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "users", "reset-users-to-default", "error not in group admins")
-    else {
+    if (isAdmin(ws, "users")) {
         sendEvent(ws, "user", "users", getUsers())
     }
 })
 receiveEvent("user", "reset-users-to-default", async (ws, body) => {
     subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "reset-users-to-default", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "users", "reset-users-to-default", "error not in group admins")
-    else {
+    if (isAdmin(ws, "reset-users-to-default")) {
         await resetUsersToDefault()
         sendEvent(ws, "user", "users", getUsers())
     }
