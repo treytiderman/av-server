@@ -5,6 +5,7 @@ const httpServer = createHttpServer()
 // WebSocket Server
 import { create as createWsServer } from '../tools/websocket-server.js'
 const server = createWsServer(httpServer)
+import "./websocket-routes.js"
 
 // Start Server
 const port = process.env.PORT || 4620

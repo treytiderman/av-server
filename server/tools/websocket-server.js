@@ -27,6 +27,7 @@ export {
     sendJSON,
     sendEvent,
     sendEventAll,
+    receiveAny,
     receiveTopic,
     receiveEvent,
     subscribe,
@@ -106,22 +107,31 @@ function receive(ws, data) {
     }
 }
 function receiveJSON(ws, rx) {
-    if (rx.event === "subscribe") subscribe(ws, rx.topic)
-    else if (rx.event === "subscriptions") subscriptions(ws)
-    else if (rx.event === "unsubscribe") unsubscribe(ws, topic)
+    if (rx.event === "sub") subscribe(ws, rx.topic)
+    else if (rx.event === "subs") subscriptions(ws)
+    else if (rx.event === "unsub") unsubscribe(ws, rx.topic)
     else {
-        emitter.emit(rx.topic, ws, rx.event, rx.body)
+        emitter.emit("recieve", ws, rx.topic, rx.event, rx.body)
         log.debug(`receive ${ws.ip}`, rx)
     }
 }
-function receiveTopic(topic, cb) {
-    emitter.on(topic, async (ws, event, body) => {
-        cb(ws, event, body)
+function receiveAny(cb) {
+    emitter.on("recieve", async (ws, topic, event, body) => {
+        cb(ws, topic, event, body)
     })
 }
-function receiveEvent(topic, event, cb) {
-    emitter.on(topic, async (ws, eventEmitted, body) => {
-        if (event === eventEmitted) cb(ws, body)
+function receiveTopic(topicWanted, cb) {
+    emitter.on("recieve", async (ws, topic, event, body) => {
+        if (topic === topicWanted) {
+            cb(ws, event, body)
+        }
+    })
+}
+function receiveEvent(topicWanted, eventWanted, cb) {
+    emitter.on("recieve", async (ws, topic, event, body) => {
+        if (topic === topicWanted && event === eventWanted) {
+            cb(ws, body)
+        }
     })
 }
 function send(ws, payload) {
@@ -158,7 +168,7 @@ function sendEventAll(topic, event, body) {
 }
 function subscriptions(ws) {
     sendEvent(ws, "client", "subscriptions", ws.subs)
-    // log.debug(`subscriptions ${ws.ip}`, ws.subs)
+    log.debug(`subscriptions ${ws.ip}`, ws.subs)
 }
 function subscribe(ws, topic) {
     if (ws.subs.indexOf(topic) !== -1) return "already subscribed"

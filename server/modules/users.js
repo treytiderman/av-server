@@ -18,8 +18,8 @@ export {
     getGroups,
     isGroup,
     areGroups,
-    addGroup,
-    removeGroup,
+    createGroup,
+    deleteGroup,
     
     getToken,
     verifyToken,
@@ -92,16 +92,16 @@ function areGroups(groupsArray) {
     if (groupsArray.length < 1) return false
     return groupsArray.every(group => isGroup(group))
 }
-async function addGroup(groupToAdd) {
+async function createGroup(groupToAdd) {
     if (isGroup(groupToAdd)) return false
     db.data.groups.push(groupToAdd)
-    log.info(`addGroup("${groupToAdd}")`)
+    log.info(`createGroup("${groupToAdd}")`)
     await db.write()
 }
-async function removeGroup(groupToRemove) {
+async function deleteGroup(groupToRemove) {
     if (groupToRemove === "admins") {
         const error = "error can not delete admins group"
-        log.error(`removeGroup("${groupToRemove}")`, error)
+        log.error(`deleteGroup("${groupToRemove}")`, error)
         return error
     }
 
@@ -116,7 +116,7 @@ async function removeGroup(groupToRemove) {
     })
     db.data.users = newUsers
 
-    log.info(`removeGroup("${groupToRemove}")`, "ok")
+    log.info(`deleteGroup("${groupToRemove}")`, "ok")
     await db.write()
 }
 
@@ -286,13 +286,13 @@ async function runTests(testName) {
     const groups = getGroups()
     if (!groups.some(group => group === "admins")) pass = false
 
-    await addGroup("testGroup")
-    await addGroup("testGroup")
+    await createGroup("testGroup")
+    await createGroup("testGroup")
     if (!isGroup("testGroup")) pass = false
-    await removeGroup("testGroup")
+    await deleteGroup("testGroup")
     if (isGroup("testGroup")) pass = false
 
-    const removeGroupResponse = await removeGroup("admins")
+    const removeGroupResponse = await deleteGroup("admins")
     if (removeGroupResponse !== "error can not delete admins group") pass = false
     if (!isGroup("admins")) pass = false
 

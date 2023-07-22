@@ -64,7 +64,7 @@ router.use(checkRequest)
 router.get('/', (req, res) => res.redirect(302, '/ui'))
 
 // Modules
-router.use('/api/db', dbRouter)
+router.use('/api/database', dbRouter)
 router.use('/api/files', filesRouter)
 router.use('/api/logger', loggerRouter)
 router.use('/api/programs', programsRouter)

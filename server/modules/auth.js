@@ -27,6 +27,7 @@ function hashPassword(password) {
     return { salt: salt, hash: hash }
 }
 function isHashedPassword(password, hash, salt) {
+    if (!password) return false
     const hashTesting = pbkdf2Sync(password, salt, CRYPTO_ITERATIONS, CRYPTO_KEYSIZE, 'sha256').toString('base64')
     return hash === hashTesting
 }
