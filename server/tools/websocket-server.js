@@ -142,7 +142,7 @@ function send(ws, payload) {
 }
 function sendJSON(ws, obj) {
     ws.send(JSON.stringify(obj))
-    log.debug(`sendJSON ${ws.ip}`, JSON.stringify(obj))
+    log.debug(`sendJSON ${ws.ip}`, obj)
 }
 function sendEvent(ws, topic, event, body) {
     if (ws.subs.includes(topic)) {

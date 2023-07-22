@@ -49,10 +49,40 @@ function help(ws) {
             {
                 "topic": "database/example-name",
                 "event": "create",
-                body: { "key": "value" },
+                "body": { "default": "values" },
             },
             {
                 "topic": "database/example-name",
+                "event": "write-to-file"
+            },
+            {
+                "topic": "database/example-name",
+                "event": "delete"
+            },
+            {
+                "topic": "database/example-name",
+                "event": "reset-to-default"
+            },
+            {
+                "topic": "database/example-name/example-key",
+                "event": "get"
+            },
+            {
+                "topic": "database/example-name/example-key",
+                "event": "sub"
+            },
+            {
+                "topic": "database/example-name/example-key",
+                "event": "set",
+                "body": "value"
+            },
+            {
+                "topic": "database/example-name/example-key",
+                "event": "set-and-write",
+                "body": "value"
+            },
+            {
+                "topic": "database/example-name/example-key",
                 "event": "delete"
             },
         ]
@@ -147,9 +177,8 @@ emitter.on("recieve", async (ws, topic, event, body) => {
         else if (event === "delete") {
             try {
                 await deleteDatabase(name)
-                const databaseData = getDatabase(name)
                 sendEvent(ws, `database/${name}`, "delete", "ok")
-                sendEventAll(`database/${name}`, "pub", databaseData)
+                sendEventAll(`database/${name}`, "pub", {})
             } catch (error) {
                 sendEvent(ws, `database/${name}`, "delete", error.message)
             }

@@ -28,7 +28,7 @@ export {
 // Constants
 const NUMBER_OF_FILES_MAX = 10
 const NUMBER_OF_LINES_MAX = 10_000
-const OBJ_JSON_LENGTH_MAX = 1_000
+const OBJ_JSON_LENGTH_MAX = 10_000
 const PATH_TO_LOG_FOLDER = "../logs/"
 
 // Variables
@@ -38,7 +38,7 @@ let logFileIndex = 0
 // Functions
 function newLogObj(level, group, message, obj) {
     const timestampISO = new Date(Date.now()).toISOString()
-    if (JSON.stringify(obj).length > OBJ_JSON_LENGTH_MAX) obj = `length greater than ${OBJ_JSON_LENGTH_MAX} characters`
+    if (JSON.stringify(obj).length > OBJ_JSON_LENGTH_MAX) obj = `VALUE NOT SHOWN length greater than ${OBJ_JSON_LENGTH_MAX} characters`
     const lineObj = {
         "timestampISO": timestampISO,
         "level": level,
