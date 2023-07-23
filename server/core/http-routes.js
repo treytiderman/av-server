@@ -10,7 +10,7 @@ import { renderMarkdown } from './http-markdown.js'
 import { router as dbRouter} from '../modules/database-http.js'
 import { router as filesRouter} from '../modules/files-http.js'
 import { router as loggerRouter} from '../modules/logger-http.js'
-import { router as programsRouter} from '../modules/programs-http.js'
+// import { router as programsRouter} from '../modules/programs-http.js'
 import { router as systemRouter} from '../modules/system-http.js'
 import { router as usersRouter, checkRequest} from '../modules/users-http.js'
 
@@ -67,7 +67,7 @@ router.get('/', (req, res) => res.redirect(302, '/ui'))
 router.use('/api/database', dbRouter)
 router.use('/api/files', filesRouter)
 router.use('/api/logger', loggerRouter)
-router.use('/api/programs', programsRouter)
+// router.use('/api/programs', programsRouter)
 router.use('/api/system', systemRouter)
 router.use('/api/user', usersRouter)
 

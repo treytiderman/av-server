@@ -1,14 +1,11 @@
 // Overview: simple local JSON database to maintain state
 
-// Todos
-// Add function setKeyInDatabase
-// Add function getKeyInDatabase
-
 // Imports
 import { Low } from 'lowdb'
 import { JSONFile } from 'lowdb/node'
 import fs from 'fs/promises'
 import { Logger } from './logger.js'
+import { getStats, makeDir } from "./files.js";
 
 // Exports
 export {
@@ -28,7 +25,7 @@ export {
 }
 
 // Constants
-const PATH_TO_DATABASE_FOLDER = "../database" // ~/av-server/database
+const PATH_TO_DATABASE_FOLDER = "../databases" // ~/av-server/database
 
 // Variables
 const log = new Logger("database.js")
@@ -135,6 +132,18 @@ async function deleteDatabases() {
         await deleteDatabase(name)
     }
 }
+async function getDatabaseFiles() {
+    const files = await getStats(PATH_TO_DATABASE_FOLDER)
+    if (!files) return []
+    const fileNames = files.contains_files.map(file => { return file.file_name })
+    log.debug(`getDatabaseFiles()`, fileNames)
+    return fileNames
+}
+
+// Startup
+await makeDir(PATH_TO_DATABASE_FOLDER)
+const fileNames = await getDatabaseFiles()
+fileNames.forEach(fileName => createDatabase(fileName.replace(".json", "")))
 
 // Tests
 if (process.env.DEV_MODE) await runTests("state.js")

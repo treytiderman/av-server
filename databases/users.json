@@ -1,0 +1,19 @@
+{
+  "groups": [
+    "admins",
+    "users",
+    "guests"
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "password": {
+        "salt": "WkZVgnLLbVIYwV6MI6Yca+whRQX9dGcAb2mHmGt7eJXDHOhVodRi7ht97fR0Qpb0xqFAv+SSPSRQ7et+vCy7/g==",
+        "hash": "XEIZPXw1eRJrX927A0/EvxjmknGq0Fnre/Jjhm2GV1ya0o/OYQnB+yaeJtw1K7GN9ug0J8ob55DucvUdKehDuw=="
+      },
+      "groups": [
+        "admins"
+      ]
+    }
+  ]
+}

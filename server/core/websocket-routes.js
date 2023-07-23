@@ -2,9 +2,11 @@
 import "../modules/database-ws.js"
 import "../modules/files-ws.js"
 import "../modules/logger-ws.js"
-import "../modules/programs-ws.js"
+// import "../modules/programs-ws.js"
 import "../modules/system-ws.js"
 import "../modules/users-ws.js"
+
+import "../modules/programs.js"
 
 // Tools
 // import "../tools/http-client-ws.js"

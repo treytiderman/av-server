@@ -163,7 +163,7 @@ More details: [logger-js](./logger-js.md) or [logger-json](./logger-json.md)
 | recieve	|	y	| program/{name}			| create			| "ok" or "error..." 							|
 | send		|	y	| program/{name}			| create-and-start	| {directory, command, startOnBoot, env}		|
 | recieve	|	y	| program/{name}			| create-and-start	| "ok" or "error..." 							|
-| send		|	y	| program/{name}			| create-avaiable	| {folderName, startOnBoot, env}				|
+| send		|	y	| program/{name}			| create-avaiable	| {directory, startOnBoot, env}					|
 | recieve	|	y	| program/{name}			| create-avaiable	| "ok" or "error..." 							|
 | send		|	y	| program/{name}			| set-startOnBoot	| true or false									|
 | recieve	|	y	| program/{name}			| set-startOnBoot	| "ok" or "error..." 							|

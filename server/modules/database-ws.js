@@ -92,12 +92,11 @@ function help(ws) {
 // Events
 emitter.on("recieve", async (ws, topic, event, body) => {
     const topicSplit = topic?.split("/")
-    console.log("database-ws.js", topic, event, body)
 
     // database/all
     if (topic && topic === "database/all") {
         subscribe(ws, "database/all")
-        if (event === "get" || event === "sub") {
+        if (event === "get") {
             try {
                 const databaseList = getDatabaseNames()
                 sendEvent(ws, "database/all", "get", "ok")
