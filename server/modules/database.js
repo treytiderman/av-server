@@ -63,7 +63,7 @@ async function writeDatabase(name) {
 }
 async function deleteDatabase(name) {
     if (!databaseList[name]) {
-        log.error(`deleteDatabase("${name}")`, "error database doesn't exist")
+        log.error(`getDatabase("${name}")`, "error database doesn't exist")
         throw new Error("error database doesn't exist")
     }
     const path = databaseList[name].path
@@ -122,7 +122,7 @@ function deleteKeyInDatabase(name, key) {
 }
 
 function getDatabaseNames() {
-    log.debug(`getDatabaseNames("${name}", "${key}")`, Object.keys(databaseList))
+    log.debug(`getDatabaseNames()`, Object.keys(databaseList))
     return Object.keys(databaseList)
 }
 async function deleteDatabases() {
@@ -143,7 +143,7 @@ async function getDatabaseFiles() {
 // Startup
 await makeDir(PATH_TO_DATABASE_FOLDER)
 const fileNames = await getDatabaseFiles()
-fileNames.forEach(fileName => createDatabase(fileName.replace(".json", "")))
+// fileNames.forEach(fileName => createDatabase(fileName.replace(".json", "")))
 
 // Tests
 if (process.env.DEV_MODE) await runTests("state.js")
@@ -154,7 +154,6 @@ async function runTests(testName) {
     db1.data.list = []
     db1.data.list.push("apple")
     db1.data.list.push("banana")
-    await writeDatabase("test-database-1")
     await deleteDatabase("test-database-1")
     
     const defaultState = { num: 72, array: [1, 2] }

@@ -12,7 +12,7 @@
 // }
 
 // Imports
-import { WebSocketServer } from 'ws'
+import { WebSocketServer, WebSocket } from 'ws'
 import { EventEmitter } from 'events'
 import { createServer as createHttpServer } from 'http'
 
@@ -26,6 +26,7 @@ export {
     send,
     sendJSON,
     sendEvent,
+    sendAll,
     sendEventAll,
     receiveAny,
     receiveTopic,
@@ -136,13 +137,13 @@ function receiveEvent(topicWanted, eventWanted, cb) {
 }
 function send(ws, payload) {
     if (ws.readyState === WebSocket.OPEN) {
-        ws.send(payload)
         // log.debug(`send ${ws.ip}`, payload)
+        ws.send(payload)
     }
 }
 function sendJSON(ws, obj) {
-    ws.send(JSON.stringify(obj))
     log.debug(`sendJSON ${ws.ip}`, obj)
+    ws.send(JSON.stringify(obj))
 }
 function sendEvent(ws, topic, event, body) {
     if (ws.subs.includes(topic)) {
@@ -153,6 +154,14 @@ function sendEvent(ws, topic, event, body) {
         }
         sendJSON(ws, tx)
     }
+}
+function sendAll(payload) {
+    wsServer.clients.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+            // log.debug(`send ${ws.ip}`, payload)
+            ws.send(payload)
+        }
+    })
 }
 function sendEventAll(topic, event, body) {
     wsServer.clients.forEach(ws => {

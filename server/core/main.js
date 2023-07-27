@@ -1,6 +1,8 @@
 // HTTP Server
 import { create as createHttpServer, startupConsoleLog } from '../tools/http-server.js'
 const httpServer = createHttpServer()
+// import { router } from './http-routes.js'
+// httpServer.use(router)
 
 // WebSocket Server
 import { create as createWsServer } from '../tools/websocket-server.js'

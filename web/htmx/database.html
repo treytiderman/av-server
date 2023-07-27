@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/web/js/htmx.js"></script>
+    <script src="/web/js/htmx-ws.js"></script>
+    <style>
+        * {
+            color-scheme: dark;
+            font: unset;
+            font-family: monospace;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding: 1rem;
+            font-size: 16px;
+            background-color: black;
+            color: #CCC;
+        }
+
+        select {
+            appearance: none;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+        }
+
+        input[type=submit],
+        button,
+        select {
+            background-color: #555;
+            border-radius: .4rem;
+            border: 0px solid #CCC;
+            padding: .5rem .7rem;
+            line-height: 1.2;
+        }
+
+        select {
+            line-height: 1.2;
+            padding-right: 2.2rem;
+            background-image:
+                linear-gradient(45deg, transparent 50%, currentColor 50%),
+                linear-gradient(135deg, currentColor 50%, transparent 50%);
+            background-position:
+                calc(100% - (.6rem + 6px)) 1.1rem,
+                calc(100% - .6rem) 1.1rem;
+            background-size:
+                6px 6px,
+                6px 6px;
+            background-repeat: no-repeat;
+        }
+
+        pre {
+            border: 1px solid #CCC;
+            background-color: #222;
+            border-radius: .4rem;
+            padding: .5rem;
+            line-height: 1.2;
+        }
+
+        .flex {
+            display: flex;
+            align-items: flex-start;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 1rem;
+        }
+    </style>
+</head>
+
+<body class="grid">
+    <!-- <div hx-ext="ws" ws-connect="/"> -->
+    <!-- <form hx-ws="send">
+            <input name="topic" placeholder="topic">
+            <input name="event" placeholder="event">
+            <input name="body" placeholder="body">
+            <input type="submit">
+        </form> -->
+    <!-- <div id="groups"></div> -->
+    <!-- </div> -->
+    
+    <div class="flex">
+        <label for="database">databaseNames:</label>
+        <select hx-get="/htmx/database/names" hx-trigger="load" hx-target="this" name="database" id="database_selected">
+            <option value="users">users</option>
+        </select>
+        <button hx-get="/htmx/database/names" hx-target="#database_selected">getDatabaseNames()</button>
+    </div>
+
+    <div hx-include="#database_selected" hx-target="#response">
+        <button hx-get="/htmx/database">getDatabase()</button>
+        <button hx-delete="/htmx/database">deleteDatabase()</button>
+        <button hx-post="/htmx/database/write">writeDatabase()</button>
+        <button hx-put="/htmx/database/reset">resetDatabase()</button>
+    </div>
+    <pre id="response" class="flex">response...</pre>
+</body>
+
+</html>

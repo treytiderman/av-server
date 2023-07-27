@@ -3,7 +3,7 @@
 // ws  = websocket client
 
 // Imports
-import { receiveEvent, subscribe, sendEvent, sendEventAll, unsubscribe } from '../tools/websocket-server.js'
+import { receiveEvent, subscribe, sendEvent, sendEventAll, unsubscribe, send, sendAll } from '../tools/websocket-server.js'
 import {
     // isAdmin,
     getTime,

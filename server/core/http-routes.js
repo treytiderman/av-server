@@ -14,6 +14,8 @@ import { router as loggerRouter} from '../modules/logger-http.js'
 import { router as systemRouter} from '../modules/system-http.js'
 import { router as usersRouter, checkRequest} from '../modules/users-http.js'
 
+import { router as dbHtmxRouter} from '../modules/database-htmx.js'
+
 // Imports - Tools
 // import { router as httpClientRouter} from '../tools/http-client-http.js'
 // import { router as httpServerRouter} from '../tools/http-server-http.js'
@@ -34,20 +36,30 @@ const log = new Logger("http-routes.js")
 
 // Render Markdown Files
 router.use(renderMarkdown)
+router.use("/docs", express.static("../docs"))
+router.get('/docs', (req, res) => res.redirect(302, '/README.md'))
+router.get('/README.md', async (req, res) => {
+    console.log("boom")
+    const file = await fs.readFile('../../README.md', 'utf8')
+    console.log(file)
+    res.send(file)
+})
 
 // Public folder, everything in this folder is available to anyone
 router.use("/", express.static("../server/core/public"))
 router.use("/web", express.static("../web"))
-router.use("/docs", express.static("../docs"))
 router.use("/ui", express.static("../server/frontend"))
 
 // Log HTTP requests (exclude public routes)
 function logRequests(req, res, next) {
     const url = `${req.method} ${req.protocol}://${req.headers.host}${req.url}`
-    const bodyCopy = JSON.parse(JSON.stringify(req.body))
-    if (bodyCopy.password) bodyCopy.password = "********"
-    if (bodyCopy.token) bodyCopy.token = "********"
-    log.debug(url, bodyCopy)
+    const reqCopy = JSON.parse(JSON.stringify({
+        body: req.body,
+        headers: req.headers
+    }))
+    if (reqCopy.body.password) reqCopy.body.password = "********"
+    if (reqCopy.body.token) reqCopy.body.token = "********"
+    log.debug(url, reqCopy)
     next()
 }
 router.use(logRequests)
@@ -60,7 +72,7 @@ router.use(logRequests)
 // Is self? req.isSelf = true || false
 router.use(checkRequest)
 
-// Default route
+// Default routes
 router.get('/', (req, res) => res.redirect(302, '/ui'))
 
 // Modules
@@ -70,6 +82,8 @@ router.use('/api/logger', loggerRouter)
 // router.use('/api/programs', programsRouter)
 router.use('/api/system', systemRouter)
 router.use('/api/user', usersRouter)
+
+router.use('/htmx/database', dbHtmxRouter)
 
 // Tools
 // router.use('/api/http-client', httpClientRouter)
