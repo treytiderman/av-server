@@ -55,10 +55,13 @@ function logRequests(req, res, next) {
     const url = `${req.method} ${req.protocol}://${req.headers.host}${req.url}`
     const reqCopy = JSON.parse(JSON.stringify({
         body: req.body,
-        headers: req.headers
+        query: req.query,
+        params: req.params,
+        headers: req.headers,
     }))
     if (reqCopy.body.password) reqCopy.body.password = "********"
     if (reqCopy.body.token) reqCopy.body.token = "********"
+    if (reqCopy.headers.authorization) reqCopy.headers.authorization = "********"
     log.debug(url, reqCopy)
     next()
 }

@@ -28,23 +28,23 @@ export {
     getAvailablePrograms,
     // createAvailableProgram,
     
-    // getProgram,
-    // getProgramWithHistory,
-    // createProgram,
-    // startProgram,
-    // killProgram,
-    // restartProgram,
-    // deleteProgram,
+    getProgram,
+    getProgramWithHistory,
+    createProgram,
+    startProgram,
+    killProgram,
+    restartProgram,
+    deleteProgram,
     
-    // setDirectory,
-    // setCommand,
-    // setStartOnBoot,
-    // setEnviromentVariables,
+    setDirectory,
+    setCommand,
+    setStartOnBoot,
+    setEnviromentVariables,
     
-    // getPrograms,
-    // killPrograms,
-    // restartPrograms,
-    // deletePrograms,
+    getPrograms,
+    killPrograms,
+    restartPrograms,
+    deletePrograms,
 }
 
 // Variables
@@ -394,72 +394,72 @@ setInterval(async () => {
 // Testing - takes 1 sec
 if (process.env.DEV_MODE) await runTests("programs.js")
 async function runTests(testName) {
-    // let pass = true
+    let pass = true
 
-    // const test1 = splitByWhitespace("1  jkhgakfger-=[];,/.,/`163-9 ef   whfiwheifhbwe fwef")
-    // if (test1[2] !== "ef") pass = false
-    // const test2 = splitByWhitespace("one")
-    // if (test2[0] !== "one" || test2.length !== 1) pass = false
+    const test1 = splitByWhitespace("1  jkhgakfger-=[];,/.,/`163-9 ef   whfiwheifhbwe fwef")
+    if (test1[2] !== "ef") pass = false
+    const test2 = splitByWhitespace("one")
+    if (test2[0] !== "one" || test2.length !== 1) pass = false
 
-    // emitter.on("available", (body) => {
-    //     // console.log("available", body)
-    // })
+    emitter.on("available", (body) => {
+        // console.log("available", body)
+    })
 
-    // emitter.on("start", (name, body) => {
-    //     // console.log("start", name, body)
-    //     if (name === "p72" && body.startsWith("error") === false) pass = false
-    // })
+    emitter.on("start", (name, body) => {
+        // console.log("start", name, body)
+        if (name === "p72" && body.startsWith("error") === false) pass = false
+    })
 
-    // emitter.on("data", (name, body) => {
-    //     // console.log("data", name, body)
-    //     if (name === "p1" && body.ascii.includes("NodeJS") === false) pass = false
-    //     if (name === "p3" && body.ascii.includes("Python") === false) pass = false
-    // })
+    emitter.on("data", (name, body) => {
+        // console.log("data", name, body)
+        if (name === "p1" && body.ascii.includes("NodeJS") === false) pass = false
+        if (name === "p3" && body.ascii.includes("Python") === false) pass = false
+    })
 
-    // emitter.on("error", (name, body) => {
-    //     // console.log("error", name, body)
-    // })
+    emitter.on("error", (name, body) => {
+        // console.log("error", name, body)
+    })
 
-    // emitter.on("exit", async (name, body) => {
-    //     // console.log("exit", name, body)
-    //     if (name === "p1" && body.running === true) pass = false
-    // })
+    emitter.on("exit", async (name, body) => {
+        // console.log("exit", name, body)
+        if (name === "p1" && body.running === true) pass = false
+    })
 
-    // await createProgram("p1", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node log.js")
-    // await startProgram("p1")
+    await createProgram("p1", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node log.js")
+    await startProgram("p1")
     
-    // await createProgram("p2", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node interval.js")
-    // await startProgram("p2")
+    await createProgram("p2", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node interval.js")
+    await startProgram("p2")
     
-    // const p3_obj = getAvailablePrograms()["test-python-log"]
-    // await createProgram("p3", p3_obj.directory, p3_obj.command)
-    // await startProgram("p3")
+    const p3_obj = getAvailablePrograms()["test-python-log"]
+    await createProgram("p3", p3_obj.directory, p3_obj.command)
+    await startProgram("p3")
 
-    // setTimeout(async () => await startProgram("p1"), 200)
+    setTimeout(async () => await startProgram("p1"), 200)
 
-    // setTimeout(async () => {
-    //     try {
-    //         await startProgram("p72") // will throw since program doesn't exist
-    //         pass = false // if it doesn't throw
-    //     } catch (error) {}
-    // }, 400)
+    setTimeout(async () => {
+        try {
+            await startProgram("p72") // will throw since program doesn't exist
+            pass = false // if it doesn't throw
+        } catch (error) {}
+    }, 400)
 
-    // setTimeout(async () => {
-    //     try {
-    //         await startProgram("p2") // will throw since program is running
-    //         pass = false // if it doesn't throw
-    //     } catch (error) {}
-    // }, 500)
+    setTimeout(async () => {
+        try {
+            await startProgram("p2") // will throw since program is running
+            pass = false // if it doesn't throw
+        } catch (error) {}
+    }, 500)
 
-    // const p4 = await createProgram("p4", `${PATH_TO_PROGRAMS}/test-nodejs-nodemon`, "nodemon main.js")
-    // if (p4.command !== "nodemon main.js") pass = false
-    // await startProgram("p4")
+    const p4 = await createProgram("p4", `${PATH_TO_PROGRAMS}/test-nodejs-nodemon`, "nodemon main.js")
+    if (p4.command !== "nodemon main.js") pass = false
+    await startProgram("p4")
 
-    // setTimeout(async () => {
-    //     try {
-    //         // await killPrograms()
-    //         await deletePrograms()
-    //     } catch (error) {}
-    //     if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
-    // }, 1_500);
+    setTimeout(async () => {
+        try {
+            // await killPrograms()
+            await deletePrograms()
+        } catch (error) {}
+        if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
+    }, 1_500);
 }

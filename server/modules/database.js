@@ -154,8 +154,40 @@ async function runTests(testName) {
     db1.data.list = []
     db1.data.list.push("apple")
     db1.data.list.push("banana")
-    await deleteDatabase("test-database-1")
-    
+
+    try {
+        getDatabase()
+        pass = false
+    } catch (error) {
+        if (!error.message.startsWith("error")) pass = false
+    }
+
+    try {
+        getDatabase("taco")
+        pass = false
+    } catch (error) {
+        if (!error.message.startsWith("error")) pass = false
+    }
+
+    try {
+        const db3 = getDatabase("test-database-1")
+        if (db3.list.length !== 2) pass = false
+    } catch (error) {
+        if (error.message.startsWith("error")) pass = false
+    }
+
+    try {
+        await deleteDatabase("test-database-1")
+    } catch (error) {
+        if (error.message.startsWith("error")) pass = false
+    }
+
+    try {
+        await deleteDatabase("test-database-1")
+    } catch (error) {
+        if (!error.message.startsWith("error")) pass = false
+    }
+
     const defaultState = { num: 72, array: [1, 2] }
     let db2 = await createDatabase("test-database-2", defaultState)
     

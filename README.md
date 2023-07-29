@@ -28,46 +28,46 @@
     - Provide easy access to the API
     - See source code at [here](https://github.com/TreyTiderman/av-server-ui)
 - Api
-    - [Docs](./public/docs/api/api.md)
-    - Intercat with the API in the following ways
-        - 13% websocket
-        - 13% http
-        - [ ] tcp
-        - [ ] ipc / cli
+    - [Api Documentation](./docs/api/api.md)
+    - Interact with the API in the following ways
+        - websocket
+        - http
+        - tcp
+        - ipc / cli / sockets?
     - Api modules (system managment)
-        - [ ] files
-        - [ ] logger
-        - [ ] programs
-        - [ ] state
-        - [ ] system
-        - [ ] users
+        - files
+        - logger
+        - programs
+        - state
+        - system
+        - users
     - Api tools
-        - [ ] http-client
-        - [ ] http-server
-        - [ ] serial (com ports, rs232, rs485 / dmx)
-        - [ ] tcp-client
-        - [ ] tcp-server
-        - [ ] udp-client
-        - [ ] udp-server
-        - [ ] websocket-client
-        - [ ] websocket-server
+        - http-client
+        - http-server
+        - serial (com ports, rs232, rs485 / dmx)
+        - tcp-client
+        - tcp-server
+        - udp-client
+        - udp-server
+        - websocket-client
+        - websocket-server
     - Api extentions (ideas for add on modules)
-        - [ ] netsh (set Network info on windows)
-        - [ ] av-touch-panel (https://github.com/treytiderman/av-touchpanel)
-        - [ ] dhcp-server
-        - [ ] ssh-client
-        - [ ] telnet-client
-        - [ ] raspberry-pi-hw
-        - [ ] rstp-to-ws
-        - [ ] mdns-client
-        - [ ] mqqt
-- [x] HTTP Server
+        - netsh (set Network info on windows)
+        - av-touch-panel (https://github.com/treytiderman/av-touchpanel)
+        - dhcp-server
+        - ssh-client
+        - telnet-client
+        - raspberry-pi-hw
+        - rstp-to-ws
+        - mdns-client
+        - mqqt
+- HTTP Server
     - Any files put in the `./public` directory will be served
-- [ ] HTTPS / WSS (encrypt all data between the server and clients)
-- [ ] Help
-    - [ ] How to run on startup?
-    - [ ] How to use the web server?
-    - [ ] How to use the API?
+- HTTPS / WSS (encrypt all data between the server and clients)
+- Help
+    - How to run on startup?
+    - How to use the web server?
+    - How to use the API?
 - Ideas
     - Rewrite in Rust? Tauri is nice
     - Linux Cockpit integration
