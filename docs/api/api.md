@@ -220,14 +220,14 @@ More details: [system-js](./system-js.md) or [system-json](./system-json.md)
 | recieve	|		| user/token		| pub						| token									|
 | send		|		| user/token		| login						| {username, password}					|
 | recieve	|		| user/token		| login						| "ok" or "error..."					|
-| send		|		| user/users		| get or sub				| 										|
-| recieve	|		| user/users		| get or sub				| "ok" or "error..."					|
-| recieve	|		| user/users		| pub						| [{username, [groups]}]				|
+| send		|	y	| user/users		| get or sub				| 										|
+| recieve	|	y	| user/users		| get or sub				| "ok" or "error..."					|
+| recieve	|	y	| user/users		| pub						| [{username, [groups]}]				|
 | send		|	y	| user/users		| reset-to-default			| 										|
 | recieve	|	y	| user/users		| reset-to-default			| "ok" or "error..."					|
-| send		|		| user/groups		| get or sub				| 										|
-| recieve	|		| user/groups		| get or sub				| "ok" or "error..."					|
-| recieve	|		| user/groups		| pub						| value									|
+| send		|	y	| user/groups		| get or sub				| 										|
+| recieve	|	y	| user/groups		| get or sub				| "ok" or "error..."					|
+| recieve	|	y	| user/groups		| pub						| value									|
 | send		|	y	| user/groups		| create					| groupToAdd							|
 | recieve	|	y	| user/groups		| create					| "ok" or "error..."					|
 | send		|	y	| user/groups		| delete					| groupToDelete							|
@@ -244,11 +244,11 @@ More details: [system-js](./system-js.md) or [system-json](./system-json.md)
 | recieve	|		| user/{username}	| logout					| "ok" or "error..."					|
 | send		|	y	| user/{username}	| create					| {password, passwordConfirm, groups}	|
 | recieve	|	y	| user/{username}	| create					| "ok" or "error..."					|
-| send		|	y	| user/{username}	| delete					| {password, passwordConfirm, groups}	|
+| send		|	y	| user/{username}	| delete					| 										|
 | recieve	|	y	| user/{username}	| delete					| "ok" or "error..."					|
-| send		|	y	| user/{username}	| add-group					| {groupToAdd}							|
+| send		|	y	| user/{username}	| add-group					| groupToAdd							|
 | recieve	|	y	| user/{username}	| add-group					| "ok" or "error..."					|
-| send		|	y	| user/{username}	| remove-group				| {groupToRemove}						|
+| send		|	y	| user/{username}	| remove-group				| groupToRemove							|
 | recieve	|	y	| user/{username}	| remove-group				| "ok" or "error..."					|
 | send		|	y	| user/{username}	| change-password			| {newPassword, newPasswordConfirm}		|
 | recieve	|	y	| user/{username}	| change-password			| "ok" or "error..."					|

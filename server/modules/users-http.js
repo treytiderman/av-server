@@ -17,12 +17,12 @@ import {
     getToken,
     verifyToken,
     
-    addUser,
+    createUser,
     isUserInGroup,
     addGroupToUser,
     removeGroupFromUser,
     changeUserPassword,
-    removeUser,
+    deleteUser,
     resetUsersToDefault,
 } from './users.js'
 
@@ -132,7 +132,7 @@ router.get('/users', async (req, res) => {
     res.json(response)
 })
 router.post('/add', gate({isAdmin: true}), async (req, res) => {
-    const response = await addUser(req.body.username, req.body.password, req.body.passwordConfirm, req.body.groups)
+    const response = await createUser(req.body.username, req.body.password, req.body.passwordConfirm, req.body.groups)
     res.json(response)
 })
 router.post('/add-group-to-user', gate({isAdmin: true}), async (req, res) => {
@@ -148,7 +148,7 @@ router.post('/change-user-password', gate({isAdmin: true}), async (req, res) => 
     res.json(response)
 })
 router.post('/remove', gate({isAdmin: true}), async (req, res) => {
-    const response = await removeUser(req.body.username)
+    const response = await deleteUser(req.body.username)
     res.json(response)
 })
 

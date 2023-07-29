@@ -3,7 +3,7 @@
 // ws  = websocket client
 
 // Imports
-import { receiveEvent, subscribe, sendEvent, sendEventAll, unsubscribe } from '../tools/websocket-server.js'
+import { receiveEvent, subscribe, sendEvent, sendEventAll, unsubscribe, receiveAny } from '../tools/websocket-server.js'
 import {
     validUsermame,
     validPassword,
@@ -22,12 +22,12 @@ import {
     getToken,
     verifyToken,
     
-    addUser,
+    createUser,
     isUserInGroup,
     addGroupToUser,
     removeGroupFromUser,
     changeUserPassword,
-    removeUser,
+    deleteUser,
     resetUsersToDefault,
 } from './users.js'
 
@@ -35,176 +35,300 @@ import {
 export { isAdmin }
 
 // Helper Functions
-function isAdmin(ws, name) {
-    subscribe(ws, "user")
+function isAdmin(ws, topic, event) {
+    subscribe(ws, topic)
     if (!ws.auth) {
-        sendEvent(ws, "user", name, "error login first")
-        return false
-    } else if (!ws.user.groups.some(group => group === "admins")) {
-        sendEvent(ws, "user", name, "error not in group admins")
-        return false
-    } else {
+        sendEvent(ws, topic, event, "error login first")
         return true
+    } else if (!ws.user.groups.some(group => group === "admins")) {
+        sendEvent(ws, topic, event, "error not in group admins")
+        return true
+    } else {
+        return false
     }
 }
 
-// Receive
-receiveEvent("user", "login-with-password", async (ws, body) => {
-    subscribe(ws, "user")
-    const response = getToken(body.username, body.password)
-    // Sending "password incorrect" or "username doesn't exists" is bad for security
-    if (response === "error password incorrect") sendEvent(ws, "user", "login-with-password", "error username or password incorrect")
-    else if (response === "error username doesn't exists") sendEvent(ws, "user", "login-with-password", "error username or password incorrect")
-    else {
+// Receive user/token
+receiveEvent("user/token", "login", async (ws, body) => {
+    subscribe(ws, "user/token")
+    try {
+        const token = getToken(body.username, body.password)
+        sendEvent(ws, `user/token`, "login", "ok")
+        sendEvent(ws, `user/token`, "pub", token)
         const user = getUser(body.username)
         ws.auth = true
         ws.user = user
-        sendEvent(ws, "user", "login-with-password", response)
-        sendEvent(ws, "user", "who-am-i", user)
+    } catch (error) {
+        sendEvent(ws, `user/token`, "login", error.message)
     }
 })
-receiveEvent("user", "login-with-token", async (ws, body) => {
-    subscribe(ws, "user")
-    verifyToken(body.token, (response) => {
-        if (response === "error bad token") sendEvent(ws, "user", "login-with-token", response)
-        else {
-            // const user = getUser(response)
-            const user = getUser(body.username)
-            ws.auth = true
-            ws.user = user
-            sendEvent(ws, "user", "login-with-token", "ok")
-            sendEvent(ws, "user", "who-am-i", user)
-        }
-    })
-})
-receiveEvent("user", "who-am-i", async (ws, body) => {
-    subscribe(ws, "user")
-    if (ws.auth) sendEvent(ws, "user", "who-am-i", ws.user)
-    else sendEvent(ws, "user", "who-am-i", "error login first")
-})
-receiveEvent("user", "logout", async (ws, body) => {
-    subscribe(ws, "user")
-    ws.auth = false
-    ws.user = {}
-    sendEvent(ws, "user", "logout", "ok")
-    sendEvent(ws, "user", "who-am-i", {})
-})
-
-receiveEvent("user", "groups", async (ws, body) => {
-    subscribe(ws, "user")
-    sendEvent(ws, "user", "groups", getGroups())
-})
-receiveEvent("user", "create-group", async (ws, body) => {
-    subscribe(ws, "user")
-    if (isAdmin(ws, "create-group")) {
-        await createGroup(body)
-        sendEvent(ws, "user", "create-group", "ok")
-        sendEventAll("user", "groups", getGroups())
+receiveEvent("user/token", "get", async (ws, body) => {
+    subscribe(ws, "user/token")
+    try {
+        const token = getToken(ws.user.username, ws.user.password)
+        sendEvent(ws, `user/token`, "get", "ok")
+        sendEvent(ws, `user/token`, "pub", token)
+        ws.auth = true
+        unsubscribe(ws, `user/token`)
+    } catch (error) {
+        sendEvent(ws, `user/token`, "get", error.message)
+        unsubscribe(ws, `user/token`)
     }
 })
-receiveEvent("user", "delete-group", async (ws, body) => {
-    subscribe(ws, "user")
-    if (isAdmin(ws, "delete-group")) {
-        await deleteGroup(body)
-        sendEvent(ws, "user", "delete-group", "ok")
-        sendEventAll("user", "groups", getGroups())
-        sendEventAll("user", "users", getUsers())
+receiveEvent("user/token", "sub", async (ws, body) => {
+    subscribe(ws, "user/token")
+    try {
+        const token = getToken(ws.user.username, ws.user.password)
+        sendEvent(ws, `user/token`, "sub", "ok")
+        sendEvent(ws, `user/token`, "pub", token)
+        ws.auth = true
+    } catch (error) {
+        sendEvent(ws, `user/token`, "sub", error.message)
     }
 })
 
-receiveEvent("user", "users", async (ws, body) => {
-    subscribe(ws, "user")
-    if (isAdmin(ws, "users")) {
-        sendEvent(ws, "user", "users", getUsers())
+// Receive user/users
+receiveEvent("user/users", "get", async (ws, body) => {
+    subscribe(ws, "user/users")
+    try {
+        if (isAdmin(ws, "user/users", "get")) {
+            const users = getUsers()
+            sendEvent(ws, `user/users`, "get", "ok")
+            sendEvent(ws, `user/users`, "pub", users)
+            unsubscribe(ws, `user/users`)
+        }
+    } catch (error) {
+        sendEvent(ws, `user/users`, "get", error.message)
+        unsubscribe(ws, `user/users`)
     }
 })
-receiveEvent("user", "reset-users-to-default", async (ws, body) => {
-    subscribe(ws, "user")
-    if (isAdmin(ws, "reset-users-to-default")) {
-        await resetUsersToDefault()
-        sendEvent(ws, "user", "users", getUsers())
+receiveEvent("user/users", "sub", async (ws, body) => {
+    subscribe(ws, "user/users")
+    try {
+        if (isAdmin(ws, "user/users", "sub")) {
+            const users = getUsers()
+            sendEvent(ws, `user/users`, "sub", "ok")
+            sendEvent(ws, `user/users`, "pub", users)
+        }
+    } catch (error) {
+        sendEvent(ws, `user/users`, "sub", error.message)
+    }
+})
+receiveEvent("user/users", "reset-to-defualt", async (ws, body) => {
+    subscribe(ws, "user/users")
+    try {
+        if (isAdmin(ws, "user/users", "reset-to-defualt")) {
+            await resetUsersToDefault()
+            const users = getUsers()
+            sendEvent(ws, `user/users`, "reset-to-defualt", "ok")
+            sendEventAll(`user/users`, "pub", users)
+            unsubscribe(ws, `user/users`)
+        }
+    } catch (error) {
+        sendEvent(ws, `user/users`, "reset-to-defualt", error.message)
+        unsubscribe(ws, `user/users`)
     }
 })
 
-receiveEvent("user", "add", async (ws, body) => {
-    subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "add", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "add", "error not in group admins")
-    else {
-        const response = await addUser(body.username, body.password, body.passwordConfirm, body.groups)
-        if (response.startsWith("error")) sendEvent(ws, "user", "add", response)
-        else {
-            sendEvent(ws, "user", "add", response)
-            sendEventAll("user", "users", getUsers())
+// Receive user/groups
+receiveEvent("user/groups", "get", async (ws, body) => {
+    subscribe(ws, "user/groups")
+    try {
+        if (isAdmin(ws, "user/groups", "get")) {
+            const groups = getGroups()
+            sendEvent(ws, `user/groups`, "get", "ok")
+            sendEvent(ws, `user/groups`, "pub", groups)
+            unsubscribe(ws, `user/groups`)
         }
+    } catch (error) {
+        sendEvent(ws, `user/groups`, "get", error.message)
+        unsubscribe(ws, `user/groups`)
     }
 })
-receiveEvent("user", "add-group-to-user", async (ws, body) => {
-    subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "add-group-to-user", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "add-group-to-user", "error not in group admins")
-    else {
-        const response = await addGroupToUser(body.username, body.groupToAdd)
-        if (response.startsWith("error")) sendEvent(ws, "user", "add-group-to-user", response)
-        else {
-            sendEvent(ws, "user", "add-group-to-user", response)
-            sendEventAll("user", "users", getUsers())
-            const isSelf = ws.user.username === body.username
-            if (isSelf) {
-                const user = getUser(body.username)
-                ws.user = user
-                sendEvent(ws, "user", "who-am-i", ws.user)
+receiveEvent("user/groups", "sub", async (ws, body) => {
+    subscribe(ws, "user/groups")
+    try {
+        if (isAdmin(ws, "user/groups", "sub")) {
+            const groups = getGroups()
+            sendEvent(ws, `user/groups`, "sub", "ok")
+            sendEvent(ws, `user/groups`, "pub", groups)
+        }
+    } catch (error) {
+        sendEvent(ws, `user/groups`, "sub", error.message)
+    }
+})
+receiveEvent("user/groups", "create", async (ws, body) => {
+    subscribe(ws, "user/groups")
+    try {
+        if (isAdmin(ws, "user/groups", "create")) {
+            await createGroup(body)
+            const groups = getGroups()
+            sendEvent(ws, `user/groups`, "create", "ok")
+            sendEventAll(`user/groups`, "pub", groups)
+            unsubscribe(ws, `user/groups`)
+        }
+    } catch (error) {
+        sendEvent(ws, `user/groups`, "create", error.message)
+        unsubscribe(ws, `user/groups`)
+    }
+})
+receiveEvent("user/groups", "delete", async (ws, body) => {
+    subscribe(ws, "user/groups")
+    try {
+        if (isAdmin(ws, "user/groups", "delete")) {
+            await deleteGroup(body)
+            const groups = getGroups()
+            sendEvent(ws, `user/groups`, "delete", "ok")
+            sendEventAll(`user/groups`, "pub", groups)
+            unsubscribe(ws, `user/groups`)
+        }
+    } catch (error) {
+        sendEvent(ws, `user/groups`, "delete", error.message)
+        unsubscribe(ws, `user/groups`)
+    }
+})
+
+// Receive user/who-am-i
+receiveEvent("user/who-am-i", "get", async (ws, body) => {
+    subscribe(ws, "user/who-am-i")
+    try {
+        if (!ws.auth) sendEvent(ws, "user/who-am-i", "get", "error login first")
+        else sendEvent(ws, "user/who-am-i", "get", ws.user)
+        unsubscribe(ws, `user/who-am-i`)
+    } catch (error) {
+        sendEvent(ws, `user/who-am-i`, "get", error.message)
+        unsubscribe(ws, `user/who-am-i`)
+    }
+})
+receiveEvent("user/who-am-i", "sub", async (ws, body) => {
+    subscribe(ws, "user/who-am-i")
+    try {
+        if (!ws.auth) sendEvent(ws, "user/who-am-i", "sub", "error login first")
+        else sendEvent(ws, "user/who-am-i", "sub", ws.user)
+    } catch (error) {
+        sendEvent(ws, `user/who-am-i`, "sub", error.message)
+    }
+})
+
+// Receive user/{username}
+receiveAny(async (ws, topic, event, body) => {
+    const topicSplit = topic?.split("/")
+    if (topic && topic.startsWith("user/") && topicSplit.length === 2) {
+        const username = topicSplit[1]
+        subscribe(ws, `user/${username}`)
+
+        if (event === "get") {
+            try {
+                const user = getUser(username)
+                sendEvent(ws, `user/${username}`, "get", "ok")
+                sendEvent(ws, `user/${username}`, "pub", user)
+                unsubscribe(ws, `user/${username}`)
+            } catch (error) {
+                sendEvent(ws, `user/${username}`, "get", error.message)
+                unsubscribe(ws, `user/${username}`)
             }
         }
-    }
-})
-receiveEvent("user", "remove-group-from-user", async (ws, body) => {
-    subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "remove-group-from-user", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "remove-group-from-user", "error not in group admins")
-    else {
-        const response = await removeGroupFromUser(body.username, body.groupToRemove)
-        if (response.startsWith("error")) sendEvent(ws, "user", "remove-group-from-user", response)
-        else {
-            sendEvent(ws, "user", "remove-group-from-user", response)
-            sendEventAll("user", "users", getUsers())
-            const isSelf = ws.user.username === body.username
-            if (isSelf) {
-                const user = getUser(body.username)
-                ws.user = user
-                sendEvent("user", "who-am-i", ws.user)
+        else if (event === "sub") {
+            try {
+                const user = getUser(username)
+                sendEvent(ws, `user/${username}`, "sub", "ok")
+                sendEvent(ws, `user/${username}`, "pub", user)
+            } catch (error) {
+                sendEvent(ws, `user/${username}`, "sub", error.message)
             }
         }
-    }
-})
-receiveEvent("user", "change-user-password", async (ws, body) => {
-    subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "change-user-password", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "change-user-password", "error not in group admins")
-    else {
-        const response = await changeUserPassword(body.username, body.newPassword, body.newPasswordConfirm)
-        if (response.startsWith("error")) sendEvent(ws, "user", "change-user-password", response)
-        else {
-            sendEvent(ws, "user", "change-user-password", response)
-        }
-    }
-})
-receiveEvent("user", "delete", async (ws, body) => {
-    subscribe(ws, "user")
-    if (!ws.auth) sendEvent(ws, "user", "delete", "error login first")
-    else if (!ws.user.groups.some(group => group === "admins")) sendEvent(ws, "user", "delete", "error not in group admins")
-    else {
-        const isSelf = ws.user.username === body.username
-        const response = await deleteUser(body.username)
-        if (response.startsWith("error")) sendEvent(ws, "user", "delete", response)
-        else {
-            sendEvent(ws, "user", "remove", response)
-            sendEventAll("user", "users", getUsers())
-            if (isSelf) {
-                ws.auth = false
-                ws.user = {}
-                sendEvent(ws, "user", "who-am-i", {})
+        else if (event === "login-wih-token") {
+            try {
+                verifyToken(body.token, (response, error) => {
+                    if (error) sendEvent(ws, `user/${username}`, "login-with-token", error)
+                    else {
+                        const user = getUser(response.username)
+                        ws.auth = true
+                        ws.user = user
+                        sendEvent(ws, `user/${username}`, "login-wih-token", "ok")
+                        sendEvent(ws, `user/${username}`, "pub", user)
+                    }
+                })
+            } catch (error) {
+                sendEvent(ws, `user/${username}`, "login-wih-token", error.message)
             }
         }
+        else if (event === "logout") {
+            ws.auth = false
+            ws.user = {}
+            sendEvent(ws, `user/${username}`, "logout", "ok")
+            sendEvent(ws, `user/${username}`, "pub", user)
+        }
+        else if (event === "create") {
+            try {
+                if (isAdmin(ws, `user/${username}`, "create")) {
+                    await createUser(username, body.password, body.passwordConfirm, body.groups)
+                    const user = getUser(username)
+                    sendEvent(ws, `user/${username}`, "create", "ok")
+                    sendEventAll(`user/${username}`, "pub", user)
+                    const users = getUsers()
+                    sendEventAll(`user/users`, "pub", users)
+                }
+            } catch (error) {
+                sendEvent(ws, `user/${username}`, "create", error.message)
+            }
+        }
+        else if (event === "delete") {
+            try {
+                if (isAdmin(ws, `user/${username}`, "delete")) {
+                    await deleteUser(username)
+                    const user = getUser(username)
+                    sendEvent(ws, `user/${username}`, "delete", "ok")
+                    sendEventAll(`user/${username}`, "pub", user)
+                    const users = getUsers()
+                    sendEventAll(`user/users`, "pub", users)
+                }
+            } catch (error) {
+                sendEvent(ws, `user/${username}`, "delete", error.message)
+            }
+        }
+        else if (event === "add-group") {
+            try {
+                if (isAdmin(ws, `user/${username}`, "add-group")) {
+                    await addGroupToUser(username, body)
+                    const user = getUser(username)
+                    sendEvent(ws, `user/${username}`, "add-group", "ok")
+                    sendEventAll(`user/${username}`, "pub", user)
+                    const users = getUsers()
+                    sendEventAll(`user/users`, "pub", users)
+                }
+            } catch (error) {
+                sendEvent(ws, `user/${username}`, "add-group", error.message)
+            }
+        }
+        else if (event === "remove-group") {
+            try {
+                if (isAdmin(ws, `user/${username}`, "remove-group")) {
+                    await removeGroupFromUser(username, body)
+                    const user = getUser(username)
+                    sendEvent(ws, `user/${username}`, "remove-group", "ok")
+                    sendEventAll(`user/${username}`, "pub", user)
+                    const users = getUsers()
+                    sendEventAll(`user/users`, "pub", users)
+                }
+            } catch (error) {
+                sendEvent(ws, `user/${username}`, "remove-group", error.message)
+            }
+        }
+        else if (event === "change-password") {
+            try {
+                if (isAdmin(ws, `user/${username}`, "change-password")) {
+                    await changeUserPassword(username, body.newPassword, body.newPasswordConfirm)
+                    const user = getUser(username)
+                    sendEvent(ws, `user/${username}`, "change-password", "ok")
+                    sendEventAll(`user/${username}`, "pub", user)
+                    const users = getUsers()
+                    sendEventAll(`user/users`, "pub", users)
+                }
+            } catch (error) {
+                sendEvent(ws, `user/${username}`, "change-password", error.message)
+            }
+        }
+
     }
 })

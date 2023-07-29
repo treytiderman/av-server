@@ -24,12 +24,12 @@ export {
     getToken,
     verifyToken,
     
-    addUser,
+    createUser,
     isUserInGroup,
     addGroupToUser,
     removeGroupFromUser,
     changeUserPassword,
-    removeUser,
+    deleteUser,
     resetUsersToDefault,
 }
 
@@ -65,7 +65,7 @@ function getUserAndPassword(username) {
     return db.data.users.find(user => user.username === username)
 }
 function getUser(username) {
-    if (!isUser(username)) return "username doesn't exists"
+    if (!isUser(username)) throw new Error("error can not delete admins group")
     const user = getUserAndPassword(username)
     return { username: user.username, groups: user.groups }
 }
@@ -100,9 +100,8 @@ async function createGroup(groupToAdd) {
 }
 async function deleteGroup(groupToRemove) {
     if (groupToRemove === "admins") {
-        const error = "error can not delete admins group"
-        log.error(`deleteGroup("${groupToRemove}")`, error)
-        return error
+        log.error(`deleteGroup("${groupToRemove}")`, "error can not delete admins group")
+        throw new Error("error can not delete admins group")
     }
 
     // Remove group from list of groups
@@ -121,53 +120,58 @@ async function deleteGroup(groupToRemove) {
 }
 
 function getToken(username, password) {
-    let result = ""
     const user = getUserAndPassword(username)
+    let error = ""
+    if (!isUser(username)) error = "error username doesn't exists"
+    else if (!isHashedPassword(password, user.password.hash, user.password.salt)) error = "error password incorrect"
+    if (error !== "") {
+        // Sending "password incorrect" or "username doesn't exists" is bad for security
+        error = "error username or password incorrect"
+        log.error(`createUser("${username}", "********", "********", "${groups}")`, error)
+        throw new Error(error)
+    }
 
-    if (!isUser(username)) result = "error username doesn't exists"
-    else if (!isHashedPassword(password, user.password.hash, user.password.salt)) result = "error password incorrect"
-    else result = generateJWT({ username: user.username })
-
+    const token = generateJWT({ username: user.username })
     const passwordToLog = process.env.DEV_MODE ? password : "********"
-    const resultToLog = result.startsWith("error") || process.env.DEV_MODE ? result : "********"
+    const resultToLog = token.startsWith("error") || process.env.DEV_MODE ? token : "********"
     log.debug(`getToken("${username}", "${passwordToLog}")`, resultToLog)
-    return result
+    return token
 }
 function verifyToken(token, cb) {
-    let result = ""
-
     verifyJWT(token, (error, jwtJson) => {
-        if (error) result = "error bad token"
-        else result = jwtJson
-
-        // log.debug(`verifyToken("${token}")`, result)
-        log.debug(`verifyToken("********")`, result)
-        cb(result)
+        if (error) {
+            log.error(`verifyToken("********")`, "error bad token")
+            cb(jwtJson, "error bad token")
+        }
+        else {
+            log.debug(`verifyToken("********")`, jwtJson)
+            cb(jwtJson, error)
+        }
     })
 }
 
-async function addUser(username, password, passwordConfirm, groups = []) {
-    let result = ""
-
-    if (!validUsermame(username)) result = "error username invailed"
-    else if (!validPassword(password)) result = "error password invailed"
-    else if (password !== passwordConfirm) result = "error passwordConfirm does not match password"
-    else if (isUser(username)) result = "error username exists"
-    else if (!areGroups(groups)) result = "error group in groups does not exist"
-    else {
-        const user = {
-            username: username,
-            password: hashPassword(password),
-            groups: groups,
-        }
-        db.data.users.push(user)
-        result = "ok"
-        await db.write()
+async function createUser(username, password, passwordConfirm, groups = []) {
+    let error = ""
+    if (!validUsermame(username)) error = "error username invailed"
+    else if (!validPassword(password)) error = "error password invailed"
+    else if (password !== passwordConfirm) error = "error passwordConfirm does not match password"
+    else if (isUser(username)) error = "error username exists"
+    else if (!areGroups(groups)) error = "error group in groups does not exist"
+    if (error !== "") {
+        log.error(`createUser("${username}", "********", "********", "${groups}")`, error)
+        throw new Error(error)
     }
 
-    // log.info(`addUser("${username}", "${password}", "${passwordConfirm}", "${groups}")`, result)
-    log.info(`addUser("${username}", "********", "********", "${groups}")`, result)
-    return result
+    const user = {
+        username: username,
+        password: hashPassword(password),
+        groups: groups,
+    }
+    db.data.users.push(user)
+    await db.write()
+
+    log.info(`createUser("${username}", "********", "********", "${groups}")`, "ok")
+    return user
 }
 function isUserInGroup(username, groupToCheck) {
     if (!isUser(username)) return false
@@ -176,66 +180,58 @@ function isUserInGroup(username, groupToCheck) {
     return result
 }
 async function addGroupToUser(username, groupToAdd) {
-    let result = ""
-
-    if (!isUser(username)) result = "error username doesn't exists"
-    else if (!isGroup(groupToAdd)) result = "error groupToAdd does not exist"
-    else if (isUserInGroup(username, groupToAdd)) result = "error user already in groupToAdd"
-    else {
-        const user = getUserAndPassword(username)
-        user.groups.push(groupToAdd)
-        await db.write()
-        result = "ok"
+    let error = ""
+    if (!isUser(username)) error = "error username doesn't exists"
+    else if (!isGroup(groupToAdd)) error = "error groupToAdd does not exist"
+    else if (isUserInGroup(username, groupToAdd)) error = "error user already in groupToAdd"
+    if (error !== "") {
+        log.error(`addGroupToUser("${username}", "${groupToAdd}")`, error)
+        throw new Error(error)
     }
     
-    log.info(`addGroupToUser("${username}", "${groupToAdd}")`, result)
-    return result
+    const user = getUser(username)
+    user.groups.push(groupToAdd)
+    await db.write()
+    log.info(`addGroupToUser("${username}", "${groupToAdd}")`, "ok")
+    return user
 }
 async function removeGroupFromUser(username, groupToRemove) {
-    let result = ""
-
-    if (!isUser(username)) result = "error username doesn't exists"
-    else if (!isGroup(groupToRemove)) result = "error groupToRemove does not exist"
-    else if (!isUserInGroup(username, groupToRemove)) result = "error user is not in groupToRemove"
-    else {
-        const user = getUserAndPassword(username)
-        user.groups = user.groups.filter(group => group !== groupToRemove)
-        await db.write()
-        result = "ok"
+    let error = ""
+    if (!isUser(username)) error = "error username doesn't exists"
+    else if (!isGroup(groupToRemove)) error = "error groupToRemove does not exist"
+    else if (!isUserInGroup(username, groupToRemove)) error = "error user is not in groupToRemove"
+    if (error !== "") {
+        log.error(`removeGroupFromUser("${username}", "${groupToRemove}")`, error)
+        throw new Error(error)
     }
-    
-    log.info(`removeGroupFromUser("${username}", "${groupToRemove}")`, result)
-    return result
+
+    const user = getUser(username)
+    user.groups = user.groups.filter(group => group !== groupToRemove)
+    await db.write()
+    log.info(`removeGroupFromUser("${username}", "${groupToRemove}")`, "ok")
+    return user
 }
 async function changeUserPassword(username, newPassword, newPasswordConfirm) {
-    let result = ""
-
-    if (!isUser(username)) result = "error username doesn't exists"
-    else if (!validPassword(newPassword)) result = "error newPassword invailed"
-    else if (newPassword !== newPasswordConfirm) result = "error newPasswordConfirm does not match newPassword"
-    else {
-        const user = getUserAndPassword(username)
-        user.password = hashPassword(newPassword)
-        await db.write()
-        result = "ok"
+    let error = ""
+    if (!isUser(username)) error = "error username doesn't exists"
+    else if (!validPassword(newPassword)) error = "error newPassword invailed"
+    else if (newPassword !== newPasswordConfirm) error = "error newPasswordConfirm does not match newPassword"
+    if (error !== "") {
+        log.error(`changeUserPassword("${username}", "********", "********")`, error)
+        throw new Error(error)
     }
 
-    // log.debug(`changeUserPassword("${username}", "${newPassword}", "${newPasswordConfirm}")`, result)
-    log.debug(`changeUserPassword("${username}", "********", "********")`, result)
-    return result
+    const user = getUserAndPassword(username)
+    user.password = hashPassword(newPassword)
+    await db.write()
+    log.debug(`changeUserPassword("${username}", "********", "********")`, "ok")
+    return user
 }
-async function removeUser(username) {
-    let result = ""
-
-    if (!isUser(username)) result = "error username doesn't exists"
-    else {
-        db.data.users = db.data.users.filter(user => user.username !== username)
-        await db.write()
-        result = "ok"
-    }
-
-    log.info(`removeUser("${username}")`, result)
-    return result
+async function deleteUser(username) {
+    db.data.users = db.data.users.filter(user => user.username !== username)
+    await db.write()
+    log.info(`deleteUser("${username}")`, "ok")
+    return "ok"
 }
 
 async function resetUsersToDefault() {
@@ -292,22 +288,27 @@ async function runTests(testName) {
     await deleteGroup("testGroup")
     if (isGroup("testGroup")) pass = false
 
-    const removeGroupResponse = await deleteGroup("admins")
-    if (removeGroupResponse !== "error can not delete admins group") pass = false
+    try {
+        await deleteGroup("admins")
+        pass = false
+    } catch (error) {
+        if (error.message !== "error can not delete admins group") pass = false
+    }
     if (!isGroup("admins")) pass = false
 
     const token = getToken("admin", "admin")
     if (token.startsWith("error")) pass = false
-    verifyToken("BAD_TOKEN", (response) => {
-        if (response !== "error bad token") pass = false
+    verifyToken("BAD_TOKEN", (response, error) => {
+        if (error !== "error bad token") pass = false
     })
-    verifyToken(token, (response) => {
-        if (response === "error bad token") pass = false
+    verifyToken(token, (response, error) => {
+        if (error === "error bad token") pass = false
         if (response.username !== "admin") pass = false
     })
 
-    const addUserResponse = await addUser("user4", "password", "password", ["admins"])
-    if (addUserResponse !== "ok") pass = false
+    await deleteUser("user4")
+    const createUserResponse = await createUser("user4", "password", "password", ["admins"])
+    if (createUserResponse.username !== "user4") pass = false
     if (!isUser("user4")) pass = false
     const token2 = getToken("user4", "password")
     if (token2.startsWith("error")) pass = false
@@ -317,17 +318,17 @@ async function runTests(testName) {
     if (isUserInGroup("user4", "hop") === true) pass = false
 
     const addGroupToUserResponse = await addGroupToUser("user4", "users")
-    if (addGroupToUserResponse !== "ok") pass = false
+    if (!addGroupToUserResponse.groups.some(group => group === "users")) pass = false
     const removeGroupFromUserResponse = await removeGroupFromUser("user4", "users")
-    if (removeGroupFromUserResponse !== "ok") pass = false
+    if (removeGroupFromUserResponse.groups.some(group => group === "users")) pass = false
 
     const changeUserPasswordResponse = await changeUserPassword("user4", "password2", "password2")
-    if (changeUserPasswordResponse !== "ok") pass = false
+    if (changeUserPasswordResponse.username !== "user4") pass = false
     const token3 = getToken("user4", "password2")
     if (token3.startsWith("error")) pass = false
 
-    const removeUserResponse2 = await removeUser("user4")
-    if (removeUserResponse2 !== "ok") pass = false
+    const deleteUserResponse2 = await deleteUser("user4")
+    if (deleteUserResponse2 !== "ok") pass = false
 
     if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }
