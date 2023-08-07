@@ -90,8 +90,11 @@ function help(ws) {
 emitter.on("recieve", async (ws, topic, event, body) => {
     const topicSplit = topic?.split("/")
 
+    // require admin for all endpoints
+    if (!isAdmin(ws, topic, event)) {}
+
     // program/all
-    if (topic && topic === "program/all") {
+    else if (topic && topic === "program/all") {
         subscribe(ws, "program/all")
         if (event === "get") {
             try {
@@ -147,7 +150,7 @@ emitter.on("recieve", async (ws, topic, event, body) => {
     }
 
     // program/available
-    if (topic && topic === "program/available") {
+    else if (topic && topic === "program/available") {
         subscribe(ws, "program/available")
         if (event === "get") {
             try {

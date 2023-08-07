@@ -219,7 +219,7 @@ async function writeText(path, text) {
     }
     catch (error) {
         if (error?.code === "ENOENT") {
-            console.info(`writeText(${path}, text...)`, "path doesn't exist. creating path...")
+            // console.info(`writeText(${path}, text...)`, "path doesn't exist. creating path...")
             await makeDir(path.slice(0, path.lastIndexOf('/')) + "/")
             await writeText(path, text)
             return
@@ -235,7 +235,7 @@ async function appendText(path, text) {
     }
     catch (error) {
         if (error?.code === "ENOENT") {
-            console.info(`appendText(${path}, text...)`, "path doesn't exist. creating path...")
+            // console.info(`appendText(${path}, text...)`, "path doesn't exist. creating path...")
             await makeDir(path.slice(0, path.lastIndexOf('/')) + "/")
             await appendText(path, text)
             return
@@ -252,7 +252,7 @@ async function writeJSON(path, obj) {
     }
     catch (error) {
         if (error?.code === "ENOENT") {
-            console.info(`writeJSON(${path}, obj...)`, "path doesn't exist. creating path...")
+            // console.info(`writeJSON(${path}, obj...)`, "path doesn't exist. creating path...")
             await makeDir(path.slice(0, path.lastIndexOf('/')) + "/")
             await writeJSON(path, obj)
             return
@@ -330,16 +330,13 @@ async function exists(path) {
 // Tests
 if (process.env.DEV_MODE) await runTests("auth.js")
 async function runTests(testName) {
-    // getStats("../private/logs/example.log")
-    //   .then(stats => console.log(stats))
+    // getStats("../docs")
+    //   .then(stats => writeJSON("../DELETE_ME/test1.json", stats))
     
-    // getStats("../private/docs")
-    //   .then(stats => writeJSON("../private/DELETE_ME/test.json", stats))
+    // getStatsRecursive("../docs")
+    //   .then(stats => writeJSON("../DELETE_ME/test2.json", stats))
     
-    // getStatsRecursive("../private/docs")
-    //   .then(stats => writeJSON("../private/DELETE_ME/test.json", stats))
-    
-    // writeJSON("../private/DELETE_ME/test.json", { 
+    // writeJSON("../DELETE_ME/test3.json", { 
     //   name: 'Mike',
     //   age: 24, 
     //   gender: 'Male',
@@ -347,18 +344,18 @@ async function runTests(testName) {
     //   car: 'Honda' 
     // })
     
-    // readJSON("../private/DELETE_ME/test.json")
+    // readJSON("../DELETE_ME/test.json")
     //   .then(json => console.log(json))
     
-    // appendText("../private/DELETE_ME/go/ddd/example.log", "test other \n")
+    // appendText("../DELETE_ME/go/ddd/example.log", "test other \n")
     
-    // readText("../private/logs/example.log").then(async text => {
+    // readText("../logs/example.log").then(async text => {
     //   log(text)
-    //   await writeText("../private/DELETE_ME/example.log", text)
-    //   await appendText("../private/DELETE_ME/example.log", "test others \n")
+    //   await writeText("../DELETE_ME/example.log", text)
+    //   await appendText("../DELETE_ME/example.log", "test others \n")
     // })
     
-    // writeJSON("../private/DELETE_ME/1/2/test.json", { 
+    // writeJSON("../DELETE_ME/1/2/test.json", { 
     //   name: 'John',
     //   age: 29, 
     //   gender: 'Male',
@@ -366,16 +363,16 @@ async function runTests(testName) {
     //   car: 'Honda' 
     // })
     
-    // makeDir("../private/DELETE_ME/super/path/")
-    // makeDir("../private/DELETE_ME/super/path2")
+    // makeDir("../DELETE_ME/super/path/")
+    // makeDir("../DELETE_ME/super/path2")
     
-    // exists("../private/DELETE_ME/1/2/test.json")
+    // exists("../DELETE_ME/1/2/test.json")
     //   .then(bool => console.log(bool))
     
-    // rename("../private/DELETE_ME/1/2/test.json", "../private/DELETE_ME/1/test.json")
-    // rename("../private/DELETE_ME/1/2/test.json", "../private/DELETE_ME/1/3/test.json")
+    // rename("../DELETE_ME/1/2/test.json", "../DELETE_ME/1/test.json")
+    // rename("../DELETE_ME/1/2/test.json", "../DELETE_ME/1/3/test.json")
     
-    // deleteFile("../private/DELETE_ME/example.log")
+    // deleteFile("../DELETE_ME/example.log")
     
-    // deleteFolder("../private/DELETE_ME/")
+    // deleteFolder("../DELETE_ME/")
 }

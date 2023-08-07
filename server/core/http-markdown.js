@@ -1,4 +1,4 @@
-// Require
+// Imports
 import showdown from 'showdown'
 import { readText } from '../modules/files.js'
 

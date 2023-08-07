@@ -1,6 +1,6 @@
 // Overview: express web server
 
-// Impots
+// Imports
 import express from 'express'
 import cors from 'cors'
 
