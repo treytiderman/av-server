@@ -1,6 +1,4 @@
 node_modules/
-public/
 LICENSE
 Dockerfile
 .gitignore
-*.md

@@ -1,11 +1,11 @@
 // HTTP Server
-import { create as createHttpServer, startupConsoleLog } from '../tools/http-server.js'
+import { create as createHttpServer, startupConsoleLog } from './http-server.js'
 const httpServer = createHttpServer()
 // import { router } from './http-routes.js'
 // httpServer.use(router)
 
 // WebSocket Server
-import { create as createWsServer } from '../tools/websocket-server.js'
+import { create as createWsServer } from './websocket-server.js'
 const server = createWsServer(httpServer)
 import "./websocket-routes.js"
 

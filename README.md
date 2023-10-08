@@ -34,7 +34,7 @@
         - http
         - tcp
         - ipc / cli / sockets?
-    - Api modules (system managment)
+    - Api modules
         - files
         - logger
         - programs
@@ -69,60 +69,11 @@
     - How to use the web server?
     - How to use the API?
 - Ideas
-    - Rewrite in Rust? Tauri is nice
+    - Rewrite in Go?
     - Linux Cockpit integration
     - Node-RED programs
 
-# Source Code
-
-## Clone
-
-```
-cd ~/
-git clone https://github.com/treytiderman/av-server.git
-```
-
-## Install as a service (Windows 10, 11)
-
-1. Run the following commands in the `/av-server/server` folder
-2. Create the service with
-
-```
-npm install
-npm run service-install
-```
-
-3. Uninstall service when needed
-
-```
-npm run service-uninstall
-```
-
-## Run
-
-1. Run the following commands in the `/av-server/server` folder
-2. Install project dependencies (package.json) with
-
-```
-cd ~/av-server/server
-npm install
-```
-
-3. Then to start the server (server.js) with
-
-```
-npm run start
-```
-
-4. Or in development mode (Reloads every file change) with
-
-```
-npm run dev
-```
-
-5. Go to http://SERVER_IP:4620, Example http://192.168.1.1:4620
-
-## Podman
+# Podman
 
 1. Run the following commands in the `/av-server` folder
 2. Build the image
@@ -141,7 +92,16 @@ podman rm av-server
 4. Then to run the image
 
 ```
-podman run -d --name av-server --hostname av-server -p 4620:4620 -v $(pwd)/public:/app/public:Z -v $(pwd)/private:/app/private:Z av-server
+podman run -d \
+    --name av-server \
+    --hostname av-server \
+    -p 4620:4620 \
+    -v $(pwd)/databases:/app/databases:Z \
+    -v $(pwd)/docs:/app/docs:Z \
+    -v $(pwd)/extensions:/app/extensions:Z \
+    -v $(pwd)/programs:/app/programs:Z \
+    -v $(pwd)/web:/app/web:Z \
+    av-server
 ```
 
 5. Start / Restart / Stop / Remove
@@ -162,7 +122,7 @@ podman stop av-server
 podman rm av-server
 ```
 
-### Run on system startup / Restart if fails
+## Run on system startup / Restart if fails
 
 Generate service, enable, and start
 
@@ -190,3 +150,33 @@ Disable
 ```
 systemctl --user disable av-server.service
 ```
+
+# Podman - Dev
+
+1. Run the following commands in the root `/av-server` folder
+2. Build the image
+
+```
+podman build -f dev.Dockerfile . -t av-server-dev
+```
+
+3. Remove the current running container if it exists
+
+```
+podman stop av-server-dev
+podman rm av-server-dev
+```
+
+4. Then to run the image
+
+```
+podman run -d \
+    --name av-server-dev \
+    --hostname av-server-dev \
+    -p 4622:4620 \
+    -v $(pwd)/server:/app/server:Z \
+    -v $(pwd)/public:/app/public:Z \
+    -v $(pwd)/private:/app/private:Z \
+    av-server-dev
+```
+

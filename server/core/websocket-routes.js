@@ -1,15 +1,13 @@
-// Modules
-import "../modules/database-ws.js"
-import "../modules/files-ws.js"
-import "../modules/logger-ws.js"
-import "../modules/programs-ws.js"
-import "../modules/system-ws.js"
-import "../modules/users-ws.js"
+import "./ws-users-v1.js"
 
-// Tools
+// import "../modules/database-ws.js"
+// import "../modules/files-ws.js"
 // import "../tools/http-client-ws.js"
 // import "../tools/http-server-ws.js"
+// import "../modules/logger-ws.js"
+// import "../modules/programs-ws.js"
 // import "../tools/serial-ws.js"
+// import "../modules/system-ws.js"
 // import "../tools/tcp-client-ws.js"
 // import "../tools/tcp-server-ws.js"
 // import "../tools/udp-client-ws.js"

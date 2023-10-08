@@ -1,9 +1,14 @@
-# Build
-# sudo docker build . -t AV-Tools
+# Docker
+# sudo docker build -f dev.Dockerfile . -t av-server
+# sudo docker stop av-server
+# sudo docker rm av-server
+# sudo docker run -d --name av-server --hostname av-server -p 4620:4620 -v $(pwd)/public:/app/public -v $(pwd)/private:/app/private av-server
 
-# Run
-# sudo docker run -d -p 4620:4620 -v $(pwd)/public:/app/public --restart unless-stopped --name AV-Tools AV-Tools
-# podman run -d -p 4620:4620 -v $(pwd)/public:/app/public:Z --restart unless-stopped --name av-Tools av-Tools
+# Podman
+# podman build -f dev.Dockerfile . -t av-server
+# podman stop av-server
+# podman rm av-server
+# podman run -d --name av-server --hostname av-server -p 4620:4620 -v $(pwd)/public:/app/public -v $(pwd)/private:/app/private av-server
 
 # Lastest node image
 FROM node:lts-alpine
@@ -11,14 +16,13 @@ FROM node:lts-alpine
 # Set working directory
 WORKDIR /app/server
 
-# Copy all the files in the same folder as the Dockerfile
+# Copy all the files in to the container
 COPY ./server .
+COPY ./public ../public
+COPY ./private ../private
 
 # Install node dependencies
 RUN npm install
-
-# Environment variables
-ENV port=4620
 
 # Run the app
 CMD "npm" "start"

@@ -27,7 +27,7 @@ export {
 const NUMBER_OF_FILES_MAX = 10
 const NUMBER_OF_LINES_MAX = 10_000
 const OBJ_JSON_LENGTH_MAX = 10_000
-const PATH_TO_LOG_FOLDER = "../logs/"
+const PATH_TO_LOG_FOLDER = "../private/logs/" // ~/av-server/private/logs
 
 // Variables
 const emitter = new EventEmitter()

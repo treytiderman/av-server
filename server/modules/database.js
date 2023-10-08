@@ -25,7 +25,7 @@ export {
 }
 
 // Constants
-const PATH_TO_DATABASE_FOLDER = "../databases" // ~/av-server/database
+const PATH_TO_DATABASE_FOLDER = "../private/databases" // ~/av-server/private/database
 
 // Variables
 const log = new Logger("database.js")
