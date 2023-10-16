@@ -3,6 +3,7 @@
 // Imports
 import os from 'os'
 import dns from 'dns'
+import events from 'events'
 import { exec } from 'child_process'
 import { Logger } from './logger.js'
 
@@ -14,11 +15,16 @@ export {
     getUptime,
     getNICs,
     getOS,
-    getSystemInfo
+    getSystemInfo,
+    emitter
 }
+
+// Constants
+const UPDATE_INTERVAL = 1_000
 
 // Variables
 const log = new Logger("system.js")
+const emitter = new events.EventEmitter()
 const startupTime = Date.now()
 
 // Functions
@@ -93,6 +99,14 @@ function getSystemInfo() {
         eol: os.EOL,
     }
 }
+
+// Updater
+setInterval(() => {
+    emitter.emit('getTime', getTime())
+    emitter.emit('getTimeAsISO', getTimeAsISO())
+    emitter.emit('getUptime', getUptime())
+    emitter.emit('getSystemInfo', getSystemInfo())
+}, UPDATE_INTERVAL);
 
 // Startup
 log.info("startup", getSystemInfo())

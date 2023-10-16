@@ -4,8 +4,7 @@
 import express from 'express'
 import fs from 'fs/promises'
 import { Logger } from '../modules/logger.js'
-import { renderMarkdown } from './http-markdown.js'
-// import { router as usersRouter, checkRequest } from '../modules/users-http.js'
+import { renderMarkdown } from '../modules/markdown.js'
 
 // Exports
 export { router }
@@ -13,6 +12,12 @@ export { router }
 // Variables
 const router = express.Router()
 const log = new Logger("http-routes.js")
+
+// Render Markdown Files
+router.use(renderMarkdown)
+router.get('/help', (req, res) => res.redirect(302, '/docs/README.md'))
+router.get('/docs', (req, res) => res.redirect(302, '/docs/README.md'))
+router.get('/api', (req, res) => res.redirect(302, '/docs/README.md'))
 
 // Public folder, everything in this folder is available to anyone
 router.use("/", express.static("../public"))
@@ -36,14 +41,6 @@ function logRequests(req, res, next) {
     next()
 }
 router.use(logRequests)
-
-// Request checking middleware
-// Is localhost? req.isLocalhost = true || false
-// Has Token? req.token = token || "no token" || "bad token"
-// What User? req.user { username, groups }
-// Admin? req.isAdmin = in group "admins"
-// Is self? req.isSelf = true || false
-// router.use(checkRequest)
 
 // Test Routes
 router.get('/try/time', async (req, res) => {

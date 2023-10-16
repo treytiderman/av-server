@@ -4,12 +4,6 @@
 // Change for multiple servers
 // Use db.js
 
-// Structure
-// {
-//   "path": "string",
-//   "body": "string" or [] or {}
-// }
-
 // Imports
 import { WebSocketServer, WebSocket } from 'ws'
 import { EventEmitter } from 'events'
@@ -101,6 +95,11 @@ function onConnection(ws, req) {
 }
 function onReceive(ws, data) {
     emitter.emit("recieve", ws, data)
+    // if (isJSON(data)) {
+    //     log.debug(`receive json ${ws.ip}`, JSON.parse(data))
+    // } else {
+    //     log.debug(`receive ${ws.ip}`, data)
+    // }
 }
 
 function receiveRaw(callback) {
@@ -111,15 +110,7 @@ function receiveRaw(callback) {
 function receiveJson(callback) {
     receiveRaw((ws, data) => {
         if (isJSON(data)) {
-            log.debug(`receiveJson ${ws.ip}`, JSON.parse(data))
             callback(ws, JSON.parse(data))
-        }
-    })
-}
-function receivePath(path, callback) {
-    receiveJson((ws, obj) => {
-        if (obj.path === path) {
-            callback(ws, obj.path, obj.body)
         }
     })
 }
@@ -127,10 +118,14 @@ function receivePath(path, callback) {
 function sendRaw(ws, data) {
     if (ws.readyState === WebSocket.OPEN) {
         ws.send(data)
+        // if (isJSON(data)) {
+        //     log.debug(`send json ${ws.ip}`, JSON.parse(data))
+        // } else {
+        //     log.debug(`send ${ws.ip}`, data)
+        // }
     }
 }
 function sendJson(ws, obj) {
-    log.debug(`sendJson ${ws.ip}`, obj)
     sendRaw(ws, JSON.stringify(obj))
 }
 function sendPath(ws, path, body) {
@@ -150,6 +145,36 @@ function sendAllJson(obj) {
         sendJson(ws, obj)
     })
 }
+
+function subscriptions(ws) {
+    sendPath(ws, "subscriptions", ws.subs)
+    // log.debug(`subscriptions ${ws.ip}`, ws.subs)
+}
+function subscribe(ws, path) {
+    if (ws.subs.indexOf(path) !== -1) return "already subscribed"
+    ws.subs.push(path)
+    subscriptions(ws)
+    // log.debug(`subscribe ${ws.ip}`, path)
+}
+function unsubscribe(ws, path) {
+    if (path === "*") ws.subs = []
+    else ws.subs = ws.subs.filter(sub => sub !== path)
+    subscriptions(ws)
+    // log.debug(`unsubscribe ${ws.ip}`, path)
+}
+
+// Api
+// {
+//   "path": "string",
+//   "body": "string" or [] or {}
+// }
+function receivePath(path, callback) {
+    receiveJson((ws, obj) => {
+        if (obj.path === path) {
+            callback(ws, obj.path, obj.body)
+        }
+    })
+}
 function sendAllPath(path, body) {
     wsServer.clients.forEach(ws => {
         sendPath(ws, path, body)
@@ -159,21 +184,4 @@ function sendAllPathIfSub(path, body) {
     wsServer.clients.forEach(ws => {
         sendPathIfSub(ws, path, body)
     })
-}
-
-function subscriptions(ws) {
-    sendPath(ws, "subscriptions", ws.subs)
-    log.debug(`subscriptions ${ws.ip}`, ws.subs)
-}
-function subscribe(ws, path) {
-    if (ws.subs.indexOf(path) !== -1) return "already subscribed"
-    ws.subs.push(path)
-    subscriptions(ws)
-    log.debug(`subscribe ${ws.ip}`, path)
-}
-function unsubscribe(ws, path) {
-    if (path === "*") ws.subs = []
-    else ws.subs = ws.subs.filter(sub => sub !== path)
-    subscriptions(ws)
-    log.debug(`unsubscribe ${ws.ip}`, path)
 }

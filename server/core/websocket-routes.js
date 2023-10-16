@@ -1,4 +1,6 @@
-import "./ws-users-v1.js"
+import "./ws-users-v0.js"
+import "./ws-system-v0.js"
+import "./ws-logger-v0.js"
 
 // import "../modules/database-ws.js"
 // import "../modules/files-ws.js"

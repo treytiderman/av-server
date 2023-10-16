@@ -1,11 +1,12 @@
 // Overview: user managment
 
-// Import
+// Imports
+import events from 'events'
 import { hashPassword, isHashedPassword, generateJWT, verifyJWT } from './auth.js'
 import { createDatabase, resetDatabase } from './database.js'
 import { Logger } from './logger.js'
 
-// Export
+// Exports
 export {
     validUsermame,
     validPassword,
@@ -31,6 +32,8 @@ export {
     changeUserPassword,
     deleteUser,
     resetUsersToDefault,
+
+    emitter
 }
 
 // Constants
@@ -47,17 +50,16 @@ const DEFAULT_STATE = {
 
 // Variables
 const log = new Logger("user.js")
+const emitter = new events.EventEmitter()
 let db = await createDatabase("user", DEFAULT_STATE)
 
-// Helper Functions
+// Functions
 function validUsermame(username) {
     return username && username.length >= 2
 }
 function validPassword(password) {
     return password && password.length >= 1
 }
-
-// Functions
 function isUser(username) {
     return db.data.users.some(user => user.username === username)
 }
@@ -95,6 +97,7 @@ function areGroups(groupsArray) {
 async function createGroup(groupToAdd) {
     if (isGroup(groupToAdd)) return false
     db.data.groups.push(groupToAdd)
+    emitter.emit('groups', getGroups())
     log.info(`createGroup("${groupToAdd}")`)
     await db.write()
 }
@@ -115,6 +118,8 @@ async function deleteGroup(groupToRemove) {
     })
     db.data.users = newUsers
 
+    emitter.emit('users', getUsers())    
+    emitter.emit('groups', getGroups())
     log.info(`deleteGroup("${groupToRemove}")`, "ok")
     await db.write()
 }
@@ -122,7 +127,7 @@ async function deleteGroup(groupToRemove) {
 function getToken(username, password) {
     const user = getUserAndPassword(username)
     let error = ""
-    if (!isUser(username)) error = "error username doesn't exists"
+    if (!isUser(username)) error = `error username "${username}" doesn't exists`
     else if (!isHashedPassword(password, user.password.hash, user.password.salt)) error = "error password incorrect"
     if (error !== "") {
         // Sending "password incorrect" or "username doesn't exists" is bad for security
@@ -170,6 +175,7 @@ async function createUser(username, password, passwordConfirm, groups = []) {
     db.data.users.push(user)
     await db.write()
 
+    emitter.emit('users', getUsers())    
     log.info(`createUser("${username}", "********", "********", "${groups}")`, "ok")
     return user
 }
@@ -181,9 +187,9 @@ function isUserInGroup(username, groupToCheck) {
 }
 async function addGroupToUser(username, groupToAdd) {
     let error = ""
-    if (!isUser(username)) error = "error username doesn't exists"
-    else if (!isGroup(groupToAdd)) error = "error groupToAdd does not exist"
-    else if (isUserInGroup(username, groupToAdd)) error = "error user already in groupToAdd"
+    if (!isUser(username)) error = `error username "${username}" doesn't exists`
+    else if (!isGroup(groupToAdd)) error = `error group "${groupToAdd}" does not exist`
+    else if (isUserInGroup(username, groupToAdd)) error = `error user already in group "${groupToAdd}"`
     if (error !== "") {
         log.error(`addGroupToUser("${username}", "${groupToAdd}")`, error)
         throw new Error(error)
@@ -192,14 +198,16 @@ async function addGroupToUser(username, groupToAdd) {
     const user = getUser(username)
     user.groups.push(groupToAdd)
     await db.write()
+
+    emitter.emit('users', getUsers())    
     log.info(`addGroupToUser("${username}", "${groupToAdd}")`, "ok")
     return user
 }
 async function removeGroupFromUser(username, groupToRemove) {
     let error = ""
-    if (!isUser(username)) error = "error username doesn't exists"
-    else if (!isGroup(groupToRemove)) error = "error groupToRemove does not exist"
-    else if (!isUserInGroup(username, groupToRemove)) error = "error user is not in groupToRemove"
+    if (!isUser(username)) error = `error username "${username}" doesn't exists`
+    else if (!isGroup(groupToRemove)) error = `error group "${groupToRemove}" does not exist`
+    else if (!isUserInGroup(username, groupToRemove)) error = `error user is not in group "${groupToRemove}"`
     if (error !== "") {
         log.error(`removeGroupFromUser("${username}", "${groupToRemove}")`, error)
         throw new Error(error)
@@ -209,12 +217,14 @@ async function removeGroupFromUser(username, groupToRemove) {
     user.groups = user.groups.filter(group => group !== groupToRemove)
     log.debug("user.groups", user.groups)
     await db.write()
+
+    emitter.emit('users', getUsers())    
     log.info(`removeGroupFromUser("${username}", "${groupToRemove}")`, "ok")
     return user
 }
 async function changeUserPassword(username, newPassword, newPasswordConfirm) {
     let error = ""
-    if (!isUser(username)) error = "error username doesn't exists"
+    if (!isUser(username)) error = `error username "${username}" doesn't exists`
     else if (!validPassword(newPassword)) error = "error newPassword invailed"
     else if (newPassword !== newPasswordConfirm) error = "error newPasswordConfirm does not match newPassword"
     if (error !== "") {
@@ -231,12 +241,16 @@ async function changeUserPassword(username, newPassword, newPasswordConfirm) {
 async function deleteUser(username) {
     db.data.users = db.data.users.filter(user => user.username !== username)
     await db.write()
+
+    emitter.emit('users', getUsers())    
     log.info(`deleteUser("${username}")`, "ok")
     return "ok"
 }
 
 async function resetUsersToDefault() {
     db = await resetDatabase("user")
+    emitter.emit('users', getUsers())    
+    emitter.emit('groups', getGroups())
 }
 
 // Tests

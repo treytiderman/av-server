@@ -2,22 +2,41 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="av-server-ui">
-    <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA/02XAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARERERERERARERERERERERERERABEREREREREAEREREREREQARERERERERABEREREREREAEREREREREQARERERERERABEREREREREAEREREREREQAREREREQAAAAAAERERAAAAAAARERERERERERERERERERERERARERERERERCAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAA" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="./favicon.ico" type="image/x-icon" />
     <title>av-server-ui</title>
 
-    <!-- Prevent Mobile Zoom -->
+    <!-- Prevent mobile zoom on text input -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <!-- Imports -->
-    <!-- <link rel="preload" href="./fonts/open-sans/open-sans-regular.woff2" as="font" type="font/woff2" crossorigin> -->
+    <!-- Download Fonts -->
+    <link rel="stylesheet" href="./fonts/rubik.css">
     <link rel="stylesheet" href="./fonts/fira-code.css">
-    <link rel="stylesheet" href="./fonts/open-sans.css">
+
+    <!-- Preload Fonts -->
+    <!-- Removing these lines means the fonts aren't loaded until needed -->
+    <!-- It prevents a "Flash of Unstyled Text" -->
+    <link rel="preload" href="./fonts/rubik/rubik-v28-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/rubik/rubik-v28-latin-600.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/fira-code/fira-code-regular.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Prevent a flash of white -->
+    <style>html {background-color: black;}</style>
+    
+    <!-- Stylesheets -->
+    
+    
+    
+
+    <!-- Other Themes -->
+    
+    
+    
+    
 
     <!-- Libraries used -->
-    <script src="./js/svg-inject.js"></script>
-    <script src="./js/jsmpeg.min.js"></script>
+    <!-- <script src="./js/jsmpeg.min.js"></script> -->
 
     <!-- PWA stuff -->
     <script src="./sw.js"></script>
@@ -29,20 +48,15 @@
     <link rel="apple-touch-icon" sizes="192x192" href="./pwa/icons/icon-192x192.png">
 
     <!-- Create App -->
-    <style> html { background-color: black; } </style>
-    
-    
-    
-    
-    
     
 
-  <script type="module" crossorigin src="./assets/index.14783fb0.js"></script>
-  <link rel="stylesheet" href="./assets/index.649bcd5d.css">
+  <script type="module" crossorigin src="./assets/index.9388fe52.js"></script>
+  <link rel="stylesheet" href="./assets/index.9fb0f558.css">
 </head>
 
-<!-- App -->
+<!-- Force css active state to work on mobile -->
 <body id="app" ontouchstart=""></body>
+
 <!-- <body id="app"></body> -->
 
 </html>
