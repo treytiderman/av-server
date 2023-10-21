@@ -9,8 +9,8 @@
     {
       "username": "admin",
       "password": {
-        "salt": "+S0VUfjRZnjpmTMoM2LQiVcLO6utNYYyEE5nu1jT+kq5yCGg92QH17sXAkym4biydWBi3GadHFnl5IYMjQZGFg==",
-        "hash": "25MonAYBR/o+fZIAg5eE3dynZaRfES9H446OEG277rpqBJuSyhtFrb1iECwgyuK5NVf2j8gzBo/RWuZcZqC4ug=="
+        "salt": "ociAP0KnjKZbP2gLqBlOrJjN9WTueukBpTN7LcyQvRqm6iMpA8c6/9hcH07gGwD2eym/Z/bWLZy0BW4K+Ikb4w==",
+        "hash": "9M5lMDoSXqz3AnSAfH9H8Q0ZhEt/fxU5QgAexVOWgXN0rNVqRYPG7aybTOe8aAP8A+ReffqiBZBqAL8E5+9k+g=="
       },
       "groups": [
         "admin"
@@ -19,8 +19,8 @@
     {
       "username": "arlo",
       "password": {
-        "salt": "jTB2BpusXDXwStNiAM6C/spTLptsyw5h8mGBPgy8O7I00qsODdc4mzIS41q5UMPEyySluyPQKLfl9DTQf5AeRQ==",
-        "hash": "kgrdMxNmxFGNF0y/fpbBjmge2UQR3gJv14qS3HeHZ19IDjkWp1deIL/0Nz4hyrPMsvWFw+dN2bVq89yf1Uqptw=="
+        "salt": "U2amKeWqlzc+a2msUkNDTgrpAozHdnkL6x0JJVTOlasZgN2BByMCAPCMtYInvpDX8AYSaGCxvkHRbYGFek16vQ==",
+        "hash": "vUq50YLD5qcXRQldKFmsgjCMk0T0bPHgvVXZ7S4Y7qzjkhV5jYndxRfmTW9/6kNJew5gUjF9uyoiXjETNXn5ew=="
       },
       "groups": [
         "admin",

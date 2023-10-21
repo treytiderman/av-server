@@ -31,7 +31,7 @@ export {
 
 // Constants
 const MAX_HISTORY_LENGTH = 10_000
-const NUMBER_OF_FILES_MAX = 100
+const NUMBER_OF_FILES_MAX = 30
 const NUMBER_OF_LINES_MAX = 10_000
 const OBJ_JSON_LENGTH_MAX = 10_000
 const PATH_TO_LOG_FOLDER = "../private/logs/" // ~/av-server/private/logs
@@ -74,12 +74,13 @@ async function deleteOldLogs() {
     }
 }
 async function log(level, group, message, obj = {}) {
+    count++
     const line = createLogLine(level, group, message, obj)
     const path = getCurrentPath()
-    count++
-    emitter.emit("log", line)
     history.push(line)
     if (history.length > MAX_HISTORY_LENGTH) history.shift()
+
+    emitter.emit("log", line)
     await makeDir(PATH_TO_LOG_FOLDER)
     await appendText(path, line + "\n")
     await deleteOldLogs()
