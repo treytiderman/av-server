@@ -33,7 +33,7 @@ export {
     deleteUser,
     resetUsersToDefault,
 
-    emitter
+    emitter,
 }
 
 // Constants
@@ -51,7 +51,7 @@ const DEFAULT_STATE = {
 // Variables
 const log = new Logger("user.js")
 const emitter = new events.EventEmitter()
-let db = await createDatabase("user", DEFAULT_STATE)
+const db = await createDatabase("user", DEFAULT_STATE)
 
 // Functions
 function validUsermame(username) {

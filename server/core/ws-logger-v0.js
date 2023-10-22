@@ -1,4 +1,4 @@
-// Overview: websocket routes for the system.js module
+// Overview: websocket routes for the logger.js module
 
 // Imports
 import {

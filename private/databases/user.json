@@ -3,7 +3,8 @@
     "admin",
     "user",
     "guest",
-    "dragon"
+    "dragon",
+    "small"
   ],
   "users": [
     {
@@ -28,10 +29,10 @@
       ]
     },
     {
-      "username": "test",
+      "username": "user",
       "password": {
-        "salt": "a7Eq0k8cSZr45UlX09AZjKniAyEh4rgnSBNnh4gsz0ODvGP0kw5uibMnRrNEcGa135E+Erb81swGpt8uLlCQIw==",
-        "hash": "/PFld6yVFa8VicPVWl/wWRrJbA8/7TWlugeQ38XD8mDjndDf6tFtIuIfGIGgL0all0QPGuxS07jtbrQKZOVCSg=="
+        "salt": "X8wnzg434m6CQyVQNDRzA6y/gCNqb+tyPx5v1b73JDKwyKF3bKt5HIwHitPLjqqwAyiYoCfMqHVa0CVe6UoHew==",
+        "hash": "kY7cuMtAW43oNLEHJpV188hFdpU+pRJCc7TPBHfDfudibEHUyuuN6xZA0ZnfbYhUcoglnxaooHFtwPNvawFIvA=="
       },
       "groups": [
         "user"
