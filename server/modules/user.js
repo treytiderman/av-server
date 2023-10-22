@@ -15,16 +15,16 @@ export {
     getUserAndPassword,
     getUser,
     getUsers,
-    
+
     getGroups,
     isGroup,
     areGroups,
     createGroup,
     deleteGroup,
-    
+
     getToken,
     verifyToken,
-    
+
     createUser,
     isUserInGroup,
     addGroupToUser,
@@ -98,12 +98,12 @@ async function createGroup(groupToAdd) {
     if (isGroup(groupToAdd)) return false
     db.data.groups.push(groupToAdd)
     emitter.emit('groups', getGroups())
-    log.info(`createGroup("${groupToAdd}")`)
+    log.info(`createGroup("${groupToAdd}") -> "ok"`)
     await db.write()
 }
 async function deleteGroup(groupToRemove) {
     if (groupToRemove === "admin") {
-        log.error(`deleteGroup("${groupToRemove}")`, "error can not delete admin group")
+        log.error(`deleteGroup("${groupToRemove}") -> "error can not delete admin group"`)
         throw new Error("error can not delete admin group")
     }
 
@@ -118,9 +118,9 @@ async function deleteGroup(groupToRemove) {
     })
     db.data.users = newUsers
 
-    emitter.emit('users', getUsers())    
+    emitter.emit('users', getUsers())
     emitter.emit('groups', getGroups())
-    log.info(`deleteGroup("${groupToRemove}")`, "ok")
+    log.info(`deleteGroup("${groupToRemove}") -> "ok"`)
     await db.write()
 }
 
@@ -132,24 +132,27 @@ function getToken(username, password) {
     if (error !== "") {
         // Sending "password incorrect" or "username doesn't exists" is bad for security
         error = "error username or password incorrect"
-        log.error(`getToken("${username}", "********")`, error)
+        const passwordToLog = process.env.DEV_MODE ? password : "********"
+        log.error(`getToken("${username}", "${passwordToLog}") -> "${error}"`)
         throw new Error(error)
     }
 
     const token = generateJWT({ username: user.username })
     const passwordToLog = process.env.DEV_MODE ? password : "********"
     const resultToLog = token.startsWith("error") || process.env.DEV_MODE ? token : "********"
-    log.debug(`getToken("${username}", "${passwordToLog}")`, resultToLog)
+    log.debug(`getToken("${username}", "${passwordToLog}") -> "${resultToLog}"`)
     return token
 }
 function verifyToken(token, cb) {
     verifyJWT(token, (error, jwtJson) => {
         if (error) {
-            log.error(`verifyToken("********")`, "error bad token")
+            const tokenToLog = process.env.DEV_MODE ? token : "********"
+            log.error(`verifyToken("${tokenToLog}") -> "error bad token"`)
             cb(jwtJson, "error bad token")
         }
         else {
-            log.debug(`verifyToken("********")`, jwtJson)
+            const tokenToLog = process.env.DEV_MODE ? token : "********"
+            log.debug(`verifyToken("${tokenToLog}") -> "ok"`, jwtJson)
             cb(jwtJson, error)
         }
     })
@@ -161,9 +164,21 @@ async function createUser(username, password, passwordConfirm, groups = []) {
     else if (!validPassword(password)) error = "error password invailed"
     else if (password !== passwordConfirm) error = "error passwordConfirm does not match password"
     else if (isUser(username)) error = "error username exists"
-    else if (!areGroups(groups)) error = "error group in groups does not exist"
+    else if (!areGroups(groups)) {
+        const badGroups = []
+        groups.forEach(group => {
+            if (!isGroup(group)) badGroups.push(group)
+        });
+        if (badGroups.length === 1) {
+            error = `error group ${badGroups[0]} does not exist`
+        } else {
+            error = `error groups ${badGroups} do not exist`
+        }
+    }
     if (error !== "") {
-        log.error(`createUser("${username}", "********", "********", "${groups}")`, error)
+        const passwordToLog = process.env.DEV_MODE ? password : "********"
+        const passwordConfirmToLog = process.env.DEV_MODE ? passwordConfirm : "********"
+        log.error(`createUser("${username}", "${passwordToLog}", "${passwordConfirmToLog}", "${groups}") -> ${error}`)
         throw new Error(error)
     }
 
@@ -175,8 +190,10 @@ async function createUser(username, password, passwordConfirm, groups = []) {
     db.data.users.push(user)
     await db.write()
 
-    emitter.emit('users', getUsers())    
-    log.info(`createUser("${username}", "********", "********", "${groups}")`, "ok")
+    emitter.emit('users', getUsers())
+    const passwordToLog = process.env.DEV_MODE ? password : "********"
+    const passwordConfirmToLog = process.env.DEV_MODE ? passwordConfirm : "********"
+    log.info(`createUser("${username}", "${passwordToLog}", "${passwordConfirmToLog}", "${groups}") -> "ok"`)
     return user
 }
 function isUserInGroup(username, groupToCheck) {
@@ -191,16 +208,16 @@ async function addGroupToUser(username, groupToAdd) {
     else if (!isGroup(groupToAdd)) error = `error group "${groupToAdd}" does not exist`
     else if (isUserInGroup(username, groupToAdd)) error = `error user already in group "${groupToAdd}"`
     if (error !== "") {
-        log.error(`addGroupToUser("${username}", "${groupToAdd}")`, error)
+        log.error(`addGroupToUser("${username}", "${groupToAdd}") -> ${error}`)
         throw new Error(error)
     }
-    
+
     const user = getUser(username)
     user.groups.push(groupToAdd)
     await db.write()
 
-    emitter.emit('users', getUsers())    
-    log.info(`addGroupToUser("${username}", "${groupToAdd}")`, "ok")
+    emitter.emit('users', getUsers())
+    log.info(`addGroupToUser("${username}", "${groupToAdd}") -> "ok"`)
     return user
 }
 async function removeGroupFromUser(username, groupToRemove) {
@@ -209,17 +226,16 @@ async function removeGroupFromUser(username, groupToRemove) {
     else if (!isGroup(groupToRemove)) error = `error group "${groupToRemove}" does not exist`
     else if (!isUserInGroup(username, groupToRemove)) error = `error user is not in group "${groupToRemove}"`
     if (error !== "") {
-        log.error(`removeGroupFromUser("${username}", "${groupToRemove}")`, error)
+        log.error(`removeGroupFromUser("${username}", "${groupToRemove}") -> ${error}`)
         throw new Error(error)
     }
 
     const user = getUser(username)
     user.groups = user.groups.filter(group => group !== groupToRemove)
-    log.debug("user.groups", user.groups)
     await db.write()
 
-    emitter.emit('users', getUsers())    
-    log.info(`removeGroupFromUser("${username}", "${groupToRemove}")`, "ok")
+    emitter.emit('users', getUsers())
+    log.info(`removeGroupFromUser("${username}", "${groupToRemove}") -> "ok"`)
     return user
 }
 async function changeUserPassword(username, newPassword, newPasswordConfirm) {
@@ -228,28 +244,32 @@ async function changeUserPassword(username, newPassword, newPasswordConfirm) {
     else if (!validPassword(newPassword)) error = "error newPassword invailed"
     else if (newPassword !== newPasswordConfirm) error = "error newPasswordConfirm does not match newPassword"
     if (error !== "") {
-        log.error(`changeUserPassword("${username}", "********", "********")`, error)
+        const passwordToLog = process.env.DEV_MODE ? newPassword : "********"
+        const passwordConfirmToLog = process.env.DEV_MODE ? newPasswordConfirm : "********"
+        log.error(`changeUserPassword("${username}", "${passwordToLog}", "${passwordConfirmToLog}") -> ${error}`)
         throw new Error(error)
     }
 
     const user = getUserAndPassword(username)
     user.password = hashPassword(newPassword)
     await db.write()
-    log.debug(`changeUserPassword("${username}", "********", "********")`, "ok")
+    const passwordToLog = process.env.DEV_MODE ? newPassword : "********"
+    const passwordConfirmToLog = process.env.DEV_MODE ? newPasswordConfirm : "********"
+    log.debug(`changeUserPassword("${username}", "${passwordToLog}", "${passwordConfirmToLog}") -> "ok"`)
     return user
 }
 async function deleteUser(username) {
     db.data.users = db.data.users.filter(user => user.username !== username)
     await db.write()
 
-    emitter.emit('users', getUsers())    
-    log.info(`deleteUser("${username}")`, "ok")
+    emitter.emit('users', getUsers())
+    log.info(`deleteUser("${username}") -> "ok"`)
     return "ok"
 }
 
 async function resetUsersToDefault() {
     db = await resetDatabase("user")
-    emitter.emit('users', getUsers())    
+    emitter.emit('users', getUsers())
     emitter.emit('groups', getGroups())
 }
 
@@ -257,6 +277,7 @@ async function resetUsersToDefault() {
 if (process.env.DEV_MODE) await runTests("users.js")
 async function runTests(testName) {
     let pass = true
+    log.debug("...Running Tests")
 
     if (validUsermame()) pass = false
     if (validUsermame("")) pass = false
@@ -327,7 +348,7 @@ async function runTests(testName) {
     if (!isUser("user4")) pass = false
     const token2 = getToken("user4", "password")
     if (token2.startsWith("error")) pass = false
-    
+
     if (isUserInGroup("user4", "admin") === false) pass = false
     if (isUserInGroup("user4", "user") === true) pass = false
     if (isUserInGroup("user4", "hop") === true) pass = false
@@ -345,5 +366,6 @@ async function runTests(testName) {
     const deleteUserResponse2 = await deleteUser("user4")
     if (deleteUserResponse2 !== "ok") pass = false
 
+    log.debug(`...Tests pass: ${pass}`)
     if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }

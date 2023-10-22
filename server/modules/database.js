@@ -34,10 +34,10 @@ const databaseList = {}
 // Functions
 function getDatabase(name) {
     if (!databaseList[name]) {
-        log.error(`getDatabase("${name}")`, "error database doesn't exist")
+        log.error(`getDatabase("${name}") -> "error database doesn't exist"`)
         throw new Error("error database doesn't exist")
     }
-    log.debug(`getDatabase("${name}")`, "ok")
+    log.debug(`getDatabase("${name}") -> "ok"`, databaseList[name].data)
     return databaseList[name].data
 }
 async function createDatabase(name, defaultData = {}) {
@@ -49,66 +49,66 @@ async function createDatabase(name, defaultData = {}) {
     db.path = path
     databaseList[name] = db
     await db.write()
-    log.debug(`createDatabase("${name}", defaultData)`, {"defaultData": defaultData})
+    log.debug(`createDatabase("${name}", defaultData) -> "ok"`, {"defaultData": defaultData})
     return db
 }
 async function writeDatabase(name) {
     if (!databaseList[name]) {
-        log.error(`writeDatabase("${name}")`, "error database doesn't exist")
+        log.error(`writeDatabase("${name}") -> "error database doesn't exist"`)
         throw new Error("error database doesn't exist")
     }
     await databaseList[name].write()
-    log.debug(`writeDatabase("${name}")`, "ok")
+    log.debug(`writeDatabase("${name}") -> "ok"`)
     return databaseList[name]
 }
 async function deleteDatabase(name) {
     if (!databaseList[name]) {
-        log.error(`getDatabase("${name}")`, "error database doesn't exist")
+        log.error(`getDatabase("${name}") -> "error database doesn't exist"`)
         throw new Error("error database doesn't exist")
     }
     const path = databaseList[name].path
     delete databaseList[name]
     await fs.rm(path)
-    log.debug(`deleteDatabase("${name}")`, "ok")
+    log.debug(`deleteDatabase("${name}") -> "ok"`)
     return "ok"
 }
 async function resetDatabase(name) {
     if (!databaseList[name]) {
-        log.error(`resetDatabase("${name}")`, "error database doesn't exist")
+        log.error(`resetDatabase("${name}") -> "error database doesn't exist"`)
         throw new Error("error database doesn't exist")
     }
     const defaultData = databaseList[name].defaultData
     await deleteDatabase(name)
     const db = await createDatabase(name, defaultData)
-    log.debug(`resetDatabase("${name}")`, "ok")
+    log.debug(`resetDatabase("${name}") -> "ok"`)
     return db
 }
 
 function getKeyInDatabase(name, key) {
     if (!databaseList[name]) {
-        log.error(`getKeyInDatabase("${name}", "${key}")`, "error database doesn't exist")
+        log.error(`getKeyInDatabase("${name}", "${key}") -> "error database doesn't exist"`)
         throw new Error("error database doesn't exist")
     }
-    log.debug(`getKeyInDatabase("${name}", "${key}")`, databaseList[name].data[key])
+    log.debug(`getKeyInDatabase("${name}", "${key}") -> ${databaseList[name].data[key]}`)
     return databaseList[name].data[key]
 }
 function setKeyInDatabase(name, key, value) {
     if (!databaseList[name]) {
-        log.error(`setKeyInDatabase("${name}", "${key}", "${value}")`, "error database doesn't exist")
+        log.error(`setKeyInDatabase("${name}", "${key}", "${value}") -> "error database doesn't exist"`)
         throw new Error("error database doesn't exist")
     }
     databaseList[name].data[key] = value
-    log.debug(`setKeyInDatabase("${name}", "${key}", "${value}")`, getKeyInDatabase(name, key))
+    log.debug(`setKeyInDatabase("${name}", "${key}", "${value}") -> ${getKeyInDatabase(name, key)}`)
     return getKeyInDatabase(name, key)
 }
 async function setAndWriteKeyInDatabase(name, key, value) {
     if (!databaseList[name]) {
-        log.error(`setAndWriteKeyInDatabase("${name}", "${key}", "${value}")`, "error database doesn't exist")
+        log.error(`setAndWriteKeyInDatabase("${name}", "${key}", "${value}") -> "error database doesn't exist"`)
         throw new Error("error database doesn't exist")
     }
     databaseList[name].data[key] = value
     await databaseList[name].write()
-    log.debug(`setAndWriteKeyInDatabase("${name}", "${key}", "${value}")`, getKeyInDatabase(name, key))
+    log.debug(`setAndWriteKeyInDatabase("${name}", "${key}", "${value}") -> ${getKeyInDatabase(name, key)}`)
     return getKeyInDatabase(name, key)
 }
 function deleteKeyInDatabase(name, key) {
@@ -117,12 +117,12 @@ function deleteKeyInDatabase(name, key) {
         throw new Error("error database doesn't exist")
     }
     delete databaseList[name].data[key]
-    log.debug(`deleteKeyInDatabase("${name}", "${key}")`, getKeyInDatabase(name, key))
+    log.debug(`deleteKeyInDatabase("${name}", "${key}") -> ${getKeyInDatabase(name, key)}`)
     return getKeyInDatabase(name, key)
 }
 
 function getDatabaseNames() {
-    log.debug(`getDatabaseNames()`, Object.keys(databaseList))
+    log.debug(`getDatabaseNames() -> ${Object.keys(databaseList)}`, Object.keys(databaseList))
     return Object.keys(databaseList)
 }
 async function deleteDatabases() {
@@ -149,6 +149,7 @@ const fileNames = await getDatabaseFiles()
 if (process.env.DEV_MODE) await runTests("state.js")
 async function runTests(testName) {
     let pass = true
+    log.debug("...Running Tests")
 
     const db1 = await createDatabase("test-database-1")
     db1.data.list = []
@@ -220,5 +221,6 @@ async function runTests(testName) {
 
     await deleteDatabase("test-database-2")
 
+    log.debug(`...Tests pass: ${pass}`)
     if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }

@@ -7,17 +7,6 @@
 import { appendText, readText, makeDir, getStatsRecursive, deleteFile } from './files.js'
 import { EventEmitter } from 'events'
 
-// Classes
-// new Logger
-
-// Functions
-// debug(level, group, message, obj)
-// info(level, group, message, obj)
-// error(level, group, message, obj)
-// getLogHistory(length)
-// getLogs()
-// deleteLogs()
-
 // Exports
 export {
     Logger,
@@ -107,7 +96,7 @@ async function deleteLogs() {
             await deleteFile(file.path)
         })
     }
-    log("debug", "logger", "deleteAllLogs")
+    log("debug", "logger.js", "deleteLogs()")
 }
 
 // Class
