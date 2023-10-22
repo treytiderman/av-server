@@ -149,7 +149,7 @@ const fileNames = await getDatabaseFiles()
 if (process.env.DEV_MODE) await runTests("state.js")
 async function runTests(testName) {
     let pass = true
-    log.debug("...Running Tests")
+    log.info("...Running Tests")
 
     const db1 = await createDatabase("test-database-1")
     db1.data.list = []
@@ -221,6 +221,6 @@ async function runTests(testName) {
 
     await deleteDatabase("test-database-2")
 
-    log.debug(`...Tests pass: ${pass}`)
+    log.info(`...Tests pass: ${pass}`)
     if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }

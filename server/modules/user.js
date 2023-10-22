@@ -98,7 +98,7 @@ async function createGroup(groupToAdd) {
     if (isGroup(groupToAdd)) return false
     db.data.groups.push(groupToAdd)
     emitter.emit('groups', getGroups())
-    log.info(`createGroup("${groupToAdd}") -> "ok"`)
+    log.debug(`createGroup("${groupToAdd}") -> "ok"`)
     await db.write()
 }
 async function deleteGroup(groupToRemove) {
@@ -120,7 +120,7 @@ async function deleteGroup(groupToRemove) {
 
     emitter.emit('users', getUsers())
     emitter.emit('groups', getGroups())
-    log.info(`deleteGroup("${groupToRemove}") -> "ok"`)
+    log.debug(`deleteGroup("${groupToRemove}") -> "ok"`)
     await db.write()
 }
 
@@ -193,7 +193,7 @@ async function createUser(username, password, passwordConfirm, groups = []) {
     emitter.emit('users', getUsers())
     const passwordToLog = process.env.DEV_MODE ? password : "********"
     const passwordConfirmToLog = process.env.DEV_MODE ? passwordConfirm : "********"
-    log.info(`createUser("${username}", "${passwordToLog}", "${passwordConfirmToLog}", "${groups}") -> "ok"`)
+    log.debug(`createUser("${username}", "${passwordToLog}", "${passwordConfirmToLog}", "${groups}") -> "ok"`)
     return user
 }
 function isUserInGroup(username, groupToCheck) {
@@ -217,7 +217,7 @@ async function addGroupToUser(username, groupToAdd) {
     await db.write()
 
     emitter.emit('users', getUsers())
-    log.info(`addGroupToUser("${username}", "${groupToAdd}") -> "ok"`)
+    log.debug(`addGroupToUser("${username}", "${groupToAdd}") -> "ok"`)
     return user
 }
 async function removeGroupFromUser(username, groupToRemove) {
@@ -235,7 +235,7 @@ async function removeGroupFromUser(username, groupToRemove) {
     await db.write()
 
     emitter.emit('users', getUsers())
-    log.info(`removeGroupFromUser("${username}", "${groupToRemove}") -> "ok"`)
+    log.debug(`removeGroupFromUser("${username}", "${groupToRemove}") -> "ok"`)
     return user
 }
 async function changeUserPassword(username, newPassword, newPasswordConfirm) {
@@ -263,7 +263,7 @@ async function deleteUser(username) {
     await db.write()
 
     emitter.emit('users', getUsers())
-    log.info(`deleteUser("${username}") -> "ok"`)
+    log.debug(`deleteUser("${username}") -> "ok"`)
     return "ok"
 }
 
@@ -277,7 +277,7 @@ async function resetUsersToDefault() {
 if (process.env.DEV_MODE) await runTests("users.js")
 async function runTests(testName) {
     let pass = true
-    log.debug("...Running Tests")
+    log.info("...Running Tests")
 
     if (validUsermame()) pass = false
     if (validUsermame("")) pass = false
@@ -366,6 +366,6 @@ async function runTests(testName) {
     const deleteUserResponse2 = await deleteUser("user4")
     if (deleteUserResponse2 !== "ok") pass = false
 
-    log.debug(`...Tests pass: ${pass}`)
+    log.info(`...Tests pass: ${pass}`)
     if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }

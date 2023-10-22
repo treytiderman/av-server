@@ -26,6 +26,16 @@
         "admin",
         "dragon"
       ]
+    },
+    {
+      "username": "test",
+      "password": {
+        "salt": "a7Eq0k8cSZr45UlX09AZjKniAyEh4rgnSBNnh4gsz0ODvGP0kw5uibMnRrNEcGa135E+Erb81swGpt8uLlCQIw==",
+        "hash": "/PFld6yVFa8VicPVWl/wWRrJbA8/7TWlugeQ38XD8mDjndDf6tFtIuIfGIGgL0all0QPGuxS07jtbrQKZOVCSg=="
+      },
+      "groups": [
+        "user"
+      ]
     }
   ]
 }

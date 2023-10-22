@@ -29,8 +29,6 @@ async function markdown2htmlPage(markdown, css, title = "markdown") {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${title}</title>
-            <link rel="stylesheet" href="/web/ui/fonts/fira-code.css">
-            <link rel="stylesheet" href="/web/ui/fonts/open-sans.css">
             <style> html { background-color: black; color: white; } </style>
             <style>${css}</style>
         </head>
