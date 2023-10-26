@@ -1,3 +1,17 @@
 {
-  "clients": {}
+  "clients": {
+    "192.168.1.9:23": {
+      "isOpen": true,
+      "address": "192.168.1.9:23",
+      "encoding": "ascii",
+      "history": [
+        {
+          "wasReceived": false,
+          "timestampISO": "2023-10-25T23:59:10.676Z",
+          "encoding": "ascii",
+          "data": "hello"
+        }
+      ]
+    }
+  }
 }

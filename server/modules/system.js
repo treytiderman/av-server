@@ -109,7 +109,7 @@ setInterval(() => {
 }, UPDATE_INTERVAL);
 
 // Startup
-log.info("startup -> " + getSystemInfo().time_iso, getSystemInfo())
+log.info("startup -> " + new Date().toLocaleString(), getSystemInfo())
 
 // Testing
 // console.log(getSystemInfo())

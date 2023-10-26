@@ -12,6 +12,7 @@
 
 # Lastest node image
 FROM node:lts-alpine
+ENV TZ="America/Chicago"
 
 # Set working directory
 WORKDIR /app/server
