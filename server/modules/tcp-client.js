@@ -13,30 +13,28 @@ export {
     open,
     reconnect,
     send,
-    close,
-    
     setEncoding,
-    
+    close,
+    remove,
+
     openAll,
     // sendAll,
     closeAll,
-    
+    removeAll,
+
     getClient,
     getClients,
     getHistory,
-
-    deleteClient,
-    deleteClients,
 
     getClientWithHistory,
     getClientsWithHistory,
 }
 
 // Constants
-const hexSeperators = [ "\\x", "0x", " " ]
+const hexSeperators = ["\\x", "0x", " "]
 const CR = { hex: "0D", ascii: "\r" }
 const LF = { hex: "0A", ascii: "\n" }
-const CONNECT_TIMEOUT = 1000
+const CONNECT_TIMEOUT = 2000
 const RECONNECT_TIMER = 5000
 const MAX_HISTORY_LENGTH = 1000
 const DEFAULT_STATE = {
@@ -70,7 +68,7 @@ function removeEscapeCharsFromAscii(text) {
     text = text.replace(/\\n/g, LF.ascii)
     return text
 }
-function removeSeperatorsFromHex(text) {
+function removeAlleperatorsFromHex(text) {
     if (typeof text !== "string") return text
     text = text.replace(/\\x/g, "")
     text = text.replace(/0x/g, "")
@@ -80,6 +78,15 @@ function removeSeperatorsFromHex(text) {
 
 // Functions
 function open(address, encoding = "ascii", callback = () => { }) {
+    
+    // Return bad address
+    if (address.includes(":") === false) {
+        const error = "error address must contain a ':' followed by a port number, for example '192.168.1.9:23'"
+        log.error(`open("${address}") -> "${error}"`)
+        emitter.emit('open', address, error)
+        return error
+    }
+
     log.debug(`trying open("${address}")`)
     const split = address.split(":")
     const ip = split[0]
@@ -96,6 +103,7 @@ function open(address, encoding = "ascii", callback = () => { }) {
     // Create socket and client object
     db.data.clients[address] = {
         isOpen: false,
+        isReconnect: false,
         address: address,
         encoding: encoding,
         history: db.data.clients[address]?.history ?? [],
@@ -103,7 +111,7 @@ function open(address, encoding = "ascii", callback = () => { }) {
     sockets[address] = new Socket()
     timeouts[address] = setTimeout(() => {
         log.error(`open("${address}") -> error could not connect to server in ${CONNECT_TIMEOUT}ms`)
-        emitter.emit('error', address, `error could not connect to server in ${CONNECT_TIMEOUT}ms`)
+        emitter.emit('open', address, `error could not connect to server in ${CONNECT_TIMEOUT}ms`)
         sockets[address].destroy()
     }, CONNECT_TIMEOUT)
     db.write()
@@ -113,7 +121,7 @@ function open(address, encoding = "ascii", callback = () => { }) {
         clearTimeout(timeouts[address])
         db.data.clients[address].isOpen = true
         log.debug(`open("${address}") event: "open"`)
-        emitter.emit('open', address, encoding)
+        emitter.emit('open', address, "ok")
         db.write()
         callback(address)
     })
@@ -121,16 +129,20 @@ function open(address, encoding = "ascii", callback = () => { }) {
     // Error event
     sockets[address].on('error', (error) => {
         clearTimeout(timeouts[address])
-        emitter.emit('error', address, error)
+        emitter.emit('open', address, error)
     })
 
     // Close event
     sockets[address].on('close', () => {
-        db.data.clients[address].isOpen = false
+        if (db.data.clients[address]?.isOpen) {
+            db.data.clients[address].isOpen = false
+        }
         log.debug(`open("${address}") event: "close"`)
         emitter.emit('close', address, "ok")
         db.write()
-        reconnect(address, encoding, callback)
+        if (db.data.clients[address]?.isReconnect) {
+            reconnect(address, encoding, callback)
+        }
     })
 
     // Data event
@@ -171,8 +183,6 @@ function open(address, encoding = "ascii", callback = () => { }) {
         }
         db.write()
     })
-    
-    return "ok"
 }
 function reconnect(address, encoding = "ascii", callback = () => { }) {
     if (db.data.clients[address]?.isOpen === true) close(address)
@@ -182,36 +192,13 @@ function reconnect(address, encoding = "ascii", callback = () => { }) {
         open(address, encoding, callback)
     }, RECONNECT_TIMER);
 }
-function close(address) {
-    log.debug(`trying close("${address}")`)
-
-    // Return if client is not defined
-    if (db.data.clients[address] === undefined) {
-        const error = "error client is not defined, open the connection first"
-        log.error(`close("${address}") -> "${error}"`)
-        emitter.emit('close', address, error)
-        return error
-    }
-
-    // Return if the client is already closed
-    else if (db.data.clients[address]?.isOpen === false) {
-        const error = "error client already closed"
-        log.error(`close("${address}") -> "${error}"`)
-        emitter.emit('close', address, error)
-        return error
-    }
-
-    // Close connection
-    sockets[address].end()
-    return "ok"
-}
 function send(address, data, encoding = "ascii") {
 
     // Return if client is not defined
     if (db.data.clients[address] === undefined) {
         const error = "error client is not defined, open the connection first"
         log.error(`send("${address}") -> "${error}"`)
-        emitter.emit('send', address, error)
+        // emitter.emit('send', address, error)
         return error
     }
 
@@ -219,7 +206,7 @@ function send(address, data, encoding = "ascii") {
     else if (db.data.clients[address]?.isOpen === false) {
         const error = "error connection closed, open the connection first"
         log.error(`send("${address}") -> "${error}"`)
-        emitter.emit('send', address, error)
+        // emitter.emit('send', address, error)
         return error
     }
 
@@ -230,19 +217,19 @@ function send(address, data, encoding = "ascii") {
         encoding: encoding,
         data: data,
     }
-    
+
     // Prepare buffer
     // let hex = ""
     // let ascii = ""
     let buffer = ""
     if (encoding === "hex") {
-        buffer = removeSeperatorsFromHex(data)
-        buffer = Buffer.from(data, encoding)
+        buffer = removeAlleperatorsFromHex(data)
+        buffer = Buffer.from(buffer, encoding)
         // hex = data
         // ascii = buffer.toString('ascii')
     } else if (encoding === "ascii") {
         buffer = removeEscapeCharsFromAscii(data)
-        buffer = Buffer.from(data, encoding)
+        buffer = Buffer.from(buffer, encoding)
         // hex = buffer.toString('hex')
         // ascii = data
     } else {
@@ -268,7 +255,7 @@ function send(address, data, encoding = "ascii") {
     return "ok"
 }
 function setEncoding(address, encoding) {
-    
+
     // Return if client is not defined
     if (db.data.clients[address] === undefined) {
         const error = "error client is not defined, open the connection first"
@@ -276,7 +263,15 @@ function setEncoding(address, encoding) {
         emitter.emit('setEncoding', address, encoding, error)
         return error
     }
-    
+
+    // Return if client is not defined
+    if (db.data.clients[address].isOpen === true) {
+        const error = "error connection open, close the connection first"
+        log.error(`setEncoding("${address}", "${encoding}") -> "${error}"`)
+        emitter.emit('setEncoding', address, encoding, error)
+        return error
+    }
+
     // Defined encodings
     if (encoding === "hex") {
         db.data.clients[address].encoding = encoding
@@ -287,10 +282,55 @@ function setEncoding(address, encoding) {
     } else {
         db.data.clients[address].encoding = "ascii"
     }
-    
+
     emitter.emit('setEncoding', address, encoding, db.data.clients[address].encoding)
     db.write()
 }
+function close(address) {
+    log.debug(`trying close("${address}")`)
+
+    // Return if client is not defined
+    if (db.data.clients[address] === undefined) {
+        const error = "error client is not defined, open the connection first"
+        log.error(`close("${address}") -> "${error}"`)
+        emitter.emit('close', address, error)
+        return error
+    }
+
+    // Return if the client is already closed
+    else if (db.data.clients[address]?.isOpen === false) {
+        const error = "error client already closed"
+        log.error(`close("${address}") -> "${error}"`)
+        emitter.emit('close', address, error)
+        return error
+    }
+
+    // Close connection
+    sockets[address].end()
+    db.data.clients[address].isReconnect = false
+    return "ok"
+}
+function remove(address) {
+
+    // Return if client is not defined
+    if (db.data.clients[address] === undefined) {
+        const error = "error client is not defined, open the connection first"
+        log.error(`remove("${address}") -> "${error}"`)
+        emitter.emit('remove', address, error)
+        return error
+    }
+
+    // Close if open
+    log.debug(`remove("${address}") -> "ok"`)
+    if (db.data.clients[address]?.isOpen === true) {
+        close(address)
+    }
+
+    delete db.data.clients[address]
+    delete sockets[address]
+    db.write()
+}
+
 function openAll() {
     Object.keys(db.data.clients).forEach(address => {
         open(address, db.data.clients[address].encoding)
@@ -301,13 +341,18 @@ function closeAll() {
         close(address)
     })
 }
+function removeAll() {
+    Object.keys(db.data.clients).forEach(address => {
+        remove(address)
+    })
+}
 
 function getClientWithHistory(address) {
 
     // Return if client is not defined
     if (db.data.clients[address] === undefined) {
         const error = "error client is not defined, open the connection first"
-        log.error(`getClient("${address}") -> "${error}"`)
+        // log.error(`getClientWithHistory("${address}") -> "${error}"`)
         return error
     }
 
@@ -327,7 +372,9 @@ function getClient(address) {
     const clientWithHistory = getClientWithHistory(address)
     const client = {
         isOpen: clientWithHistory.isOpen,
+        isReconnect: clientWithHistory.isReconnect,
         address: clientWithHistory.address,
+        encoding: clientWithHistory.encoding,
     }
     // log.debug(`getClient("${address}") -> ${JSON.stringify(client)}`, client)
     return client
@@ -342,32 +389,7 @@ function getClients() {
     return array
 }
 function getHistory(address) {
-    return getClientWithHistory(address).history
-}
-function deleteClient(address) {
-
-    // Return if client is not defined
-    if (db.data.clients[address] === undefined) {
-        const error = "error client is not defined, open the connection first"
-        log.error(`deleteClient("${address}") -> "${error}"`)
-        emitter.emit('deleteClient', address, error)
-        return error
-    }
-
-    // Return if the client is closed
-    else if (db.data.clients[address]?.isOpen === true) {
-        close(address)
-    }
-
-    log.debug(`deleteClient("${address}") -> "ok"`)
-    delete db.data.clients[address]
-    delete sockets[address]
-    db.write()
-}
-function deleteClients() {
-    Object.keys(db.data.clients).forEach(address => {
-        deleteClient(address)
-    })
+    return getClientWithHistory(address).history ?? []
 }
 
 // Tests
@@ -380,38 +402,84 @@ async function runTests(testName) {
     if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }
 
-setTimeout(() => {
-    const address = "192.168.1.9:23"
+// setTimeout(() => {
+//     const address = "192.168.1.9:23"
 
-    deleteClients()
+//     close(address)
+//     console.log("removeAll()", removeAll());
 
-    console.log("try", address);
-    open(address, "ascii", () => {
-        send(address, "hello")
-    })
+//     console.log("try open", address);
+//     open(address, "ascii", () => {
+//         const history = getHistory(address)
+//         console.log("history", history);
+//         console.log("data", history[history.length - 1]);
+//         send(address, "hello")
+//     })
 
-    // Events: "open", "error", "close", "receive", "send"
-    emitter.on("open", (address) => {
-        console.log("open", address);
-        console.log("client", getClient(address));
-    })
-    emitter.on("error", (address, error) => {
-        console.log("error", address, "->", error);
-    })
-    emitter.on("close", () => {
-        console.log("close");
-        console.log("client", getClient(address));
-    })
-    emitter.on("receive", (address, data) => {
-        console.log("receive", address, "->", data);
-    })
-    emitter.on("send", (address, data) => {
-        console.log("send", address, "->", data);
-    })
+//     // Events: "open", "error", "close", "receive", "send"
+//     emitter.on("open", (address) => {
+//         console.log("open", address);
+//         console.log("client", getClient(address));
+//     })
+//     emitter.on("error", (address, error) => {
+//         console.log("error", address, "->", error);
+//     })
+//     emitter.on("close", (address) => {
+//         console.log("close");
+//         console.log("client", getClients(address));
+//         const history = getHistory(address)
+//         console.log("history", history);
+//         console.log("data", history[history.length - 1]);
+//     })
+//     emitter.on("receive", (address, data) => {
+//         console.log("receive", address, "->", data);
+//     })
+//     emitter.on("send", (address, data) => {
+//         console.log("send", address, "->", data);
+//     })
 
-    // setTimeout(() => {
-    //     const client = getClient(address)
-    //     if (client.isOpen) close(address)
-    // }, 1000);
+//     // setTimeout(() => {
+//     //     console.log("closeAll()", closeAll());
+//     // }, 1000);
 
-}, 1000);
+//     // setTimeout(() => {
+//     //     console.log("openAll()", openAll());
+//     // }, 1200);
+
+//     // setTimeout(() => {
+//     //     console.log("removeAll()", removeAll());
+//     //     console.log("closeAll()", closeAll());
+//     //     console.log("close(address)", close(address));
+//     //     console.log("removeAll()", removeAll());
+//     //     console.log("openAll()", openAll());
+//     // }, 2000);
+
+// }, 1000);
+
+// setTimeout(() => {
+//     const address = "192.168.1.32:23"
+
+//     console.log("try open", address);
+//     open(address, "ascii", () => {
+//         send(address, "MVDOWN\r")
+//     })
+
+//     // Events: "open", "error", "close", "receive", "send"
+//     emitter.on("open", (address) => {
+//         console.log("open", address);
+//         console.log("client", getClient(address));
+//     })
+//     emitter.on("error", (address, error) => {
+//         console.log("error", address, "->", error);
+//     })
+//     emitter.on("close", (address) => {
+//         console.log("close");
+//     })
+//     emitter.on("receive", (address, data) => {
+//         console.log("receive", address, "->", data);
+//     })
+//     emitter.on("send", (address, data) => {
+//         console.log("send", address, "->", data);
+//     })
+
+// }, 1000);

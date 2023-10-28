@@ -96,7 +96,7 @@ async function deleteLogs() {
             await deleteFile(file.path)
         })
     }
-    log("debug", "logger.js", "deleteLogs()")
+    // debug("logger.js", "deleteLogs()")
 }
 
 // Class
@@ -117,7 +117,10 @@ class Logger {
 
 // Startup
 await makeDir(PATH_TO_LOG_FOLDER)
-if (process.env.DEV_MODE) await deleteLogs()
+if (process.env.DEV_MODE) {
+    debug("logger.js", "DEV_MODE environment variable set to true")
+    await deleteLogs()
+}
 
 // Testing
 // const logger = new Logger("logger.js")
