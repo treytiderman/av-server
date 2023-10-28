@@ -31,7 +31,6 @@
     - [Api Documentation](./docs/api/api.md)
     - Interact with the API in the following ways
         - websocket
-        - http
         - tcp
         - ipc / cli / sockets?
     - Api modules
@@ -45,6 +44,10 @@
         - http-client
         - http-server
         - serial (com ports, rs232, rs485 / dmx)
+            ```
+            sudo gpasswd --add ${USER} dialout
+            sudo reboot
+            ```
         - tcp-client
         - tcp-server
         - udp-client

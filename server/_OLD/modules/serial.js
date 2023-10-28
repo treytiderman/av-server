@@ -2,7 +2,7 @@ const { SerialPort } = require('serialport')
 const { DelimiterParser } = require('@serialport/parser-delimiter')
 const events = require('events')
 
-// Constants
+// Variables
 const ports = {}
 const emitter = new events.EventEmitter()
 const CR = { hex: "0D", ascii: "\r" }

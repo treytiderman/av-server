@@ -5,7 +5,26 @@
       "isReconnect": false,
       "address": "192.168.1.32:23",
       "encoding": "ascii",
-      "history": []
+      "history": [
+        {
+          "wasReceived": false,
+          "timestampISO": "2023-10-28T18:48:27.932Z",
+          "encoding": "ascii",
+          "data": "MV?\\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-10-28T18:48:27.979Z",
+          "encoding": "ascii",
+          "data": "MV58\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-10-28T18:48:27.992Z",
+          "encoding": "ascii",
+          "data": "MVMAX 98\r"
+        }
+      ]
     }
   }
 }
