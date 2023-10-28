@@ -77,7 +77,6 @@ receiveJson((ws, obj) => {
 
 // Updates
 emitter.on("open", (address, res) => {
-    console.log("open", res);
     sendAllPathIfSub(`tcp-client/v0/topic/client/${address}`, getClient(address))
     sendAllPathIfSub(`tcp-client/v0/topic/clients`, getClients())
     sendAllPathIfSub(`tcp-client/v0/func/open`, res)
