@@ -1,7 +1,7 @@
 {
   "clients": {
     "192.168.1.32:23": {
-      "isOpen": true,
+      "isOpen": false,
       "isReconnect": false,
       "address": "192.168.1.32:23",
       "encoding": "ascii",
@@ -21,6 +21,24 @@
         {
           "wasReceived": true,
           "timestampISO": "2023-10-28T18:48:27.992Z",
+          "encoding": "ascii",
+          "data": "MVMAX 98\r"
+        },
+        {
+          "wasReceived": false,
+          "timestampISO": "2023-10-28T21:36:10.979Z",
+          "encoding": "ascii",
+          "data": "MV?\\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-10-28T21:36:11.038Z",
+          "encoding": "ascii",
+          "data": "MV305\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-10-28T21:36:11.054Z",
           "encoding": "ascii",
           "data": "MVMAX 98\r"
         }

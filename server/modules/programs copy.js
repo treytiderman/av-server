@@ -115,7 +115,7 @@ function getProgram(name) {
         running: program.running,
         pid: program.pid,
     }
-    // log.debug(`getProgram("${name}")`, programWithoutHistory)
+    log.debug(`getProgram("${name}")`, programWithoutHistory)
     return programWithoutHistory
 }
 function getProgramWithHistory(name) {
@@ -156,19 +156,14 @@ async function createProgram(name, directory, command, startOnBoot = false, env 
     return programs[name]
 }
 async function startProgram(name) {
-    log.debug(`trying startProgram("${name}")`)
     const program = db.data.programs[name]
-
-    // Errors
     if (!program) {
-        const error = "error program does not exist"
-        log.error(`startProgram("${name}") -> ${error}`)
-        return error
+        log.error(`startProgram("${name}")`, "error program does not exist")
+        throw new Error("error program does not exist")
     }
     else if (program.running === true) {
-        const error = "error program already running"
-        log.error(`startProgram("${name}") -> ${error}`)
-        return error
+        log.error(`startProgram("${name}")`, "error program already running")
+        throw new Error("error program already running")
     }
 
     // Spawn
@@ -188,20 +183,20 @@ async function startProgram(name) {
     program.pid = spawned.pid
 
     // Events
-    spawned.on('error', (error) => {
-        emitter.emit('error', name, error)
-        log.error(`startProgram(${name}) onError -> ${error.message}`, error)
+    spawned.on('error', (err) => {
+        emitter.emit('error', name, err)
+        log.error(`startProgram(${name}) onError`, err)
     })
     spawned.on('spawn', async (code, signal) => {
         program.running = true
-        emitter.emit('start', name)
-        log.debug(`startProgram(${name}) onSpawn -> "ok`)
+        emitter.emit('start', name, getProgram(name))
+        log.debug(`startProgram(${name}) onSpawn`, getProgram(name))
         await db.write()
     })
     spawned.on('exit', async (code, signal) => {
         program.running = false
-        emitter.emit('exit', name)
-        log.debug(`startProgram(${name}) onExit`)
+        emitter.emit('exit', name, getProgram(name))
+        log.debug(`startProgram(${name}) onExit`, getProgram(name))
         await db.write()
     })
     spawned.stdout.on('data', async (data) => {
@@ -229,7 +224,9 @@ async function startProgram(name) {
         await db.write()
     })
 
-    return "ok"
+    await db.write()
+    log.debug(`startProgram("${name}")`, program)
+    return program
 }
 async function sendProgram(name, text) {
     const program = db.data.programs[name]
@@ -414,12 +411,7 @@ setInterval(async () => {
 }, UPDATE_AVAILABLE_MS)
 
 // Testing - takes 1 sec
-if (process.env.DEV_MODE) {
-    setTimeout(async () => {
-        await runTests("programs.js")
-    }, 500);
-}
-// if (process.env.DEV_MODE) await runTests("programs.js")
+if (process.env.DEV_MODE) await runTests("programs.js")
 async function runTests(testName) {
     let pass = true
     log.info("...Running Tests")
@@ -429,12 +421,8 @@ async function runTests(testName) {
     const test2 = splitByWhitespace("one")
     if (test2[0] !== "one" || test2.length !== 1) pass = false
 
-    // await createProgram("p1", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node log.js")
+    await createProgram("p1", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node log.js")
     // await startProgram("p1")
-
-    await createProgram("p9", `${PATH_TO_PROGRAMS}/test-nodejs-api`, "node main.mjs")
-    await startProgram("p9")
-    await sendProgram("p9", "420")
     
     // await createProgram("p2", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node interval.js")
     // await startProgram("p2")
@@ -489,11 +477,11 @@ async function runTests(testName) {
     })
 
     setTimeout(async () => {
-        await deletePrograms()
-    }, 9_900);
+        // await deletePrograms()
+    }, 1_900);
 
     setTimeout(async () => {
         log.info(`...Tests pass: ${pass}`)
         if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
-    }, 10_000);
+    }, 2_000);
 }

@@ -84,8 +84,10 @@ async function getAvailablePorts() {
     log.debug(`getAvailablePorts()`)
     try {
         let list = await SerialPort.list()
+        log.debug(`getAvailablePorts() -> ${JSON.stringify(list)}`, list)
         return "ok"
     } catch (error) {
+        log.debug(`getAvailablePorts() -> ${error.message}`, error)
         return error
     }
     /* Example response
