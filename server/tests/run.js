@@ -1,6 +1,7 @@
 // Imports
 import * as log from '../modules/logger.js'
 import * as api from "./api.test.js";
+import * as auth from "./auth.test.js";
 import * as database from "./database.test.js";
 import * as files from "./files.test.js";
 import * as logger from "./logger.test.js";
@@ -16,6 +17,7 @@ if (process.env.DEV_MODE) {
     
     // Tests
     await test("api", api)
+    await test("auth", auth)
     await test("database", database)
     await test("files", files)
     await test("logger", logger)
@@ -31,7 +33,11 @@ if (process.env.DEV_MODE) {
 async function test(name, obj) {
     log.debug("tests/run.js", `run "${name}" tests...`)
     const results = await obj.test()
-    log.debug("tests/run.js", `results of "${name}" tests: ${results ? "ok" : "error"}`)
-    if (results !== true) console.log(name, '\x1b[31mTESTS FAILED\x1b[0m')
+    if (results === true) {
+        log.debug("tests/run.js", `results of "${name}" tests: "pass"`)
+    } else {
+        log.error("tests/run.js", `results of "${name}" tests: "fail"`)
+        if (results !== true) console.log(name, '\x1b[31mTESTS FAILED\x1b[0m')
+    }
     return results
 }

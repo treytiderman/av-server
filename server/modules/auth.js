@@ -1,7 +1,7 @@
 // Overview: create and verify hashed passwords and jsonwebtokens
 
 // Todos
-// Change to async hashing and jwt generation
+// Change to async hashing?
 
 // Imports
 import { randomBytes, pbkdf2Sync } from 'crypto'
@@ -36,26 +36,4 @@ function generateToken(json) {
 }
 function verifyToken(token, callback) {
     jwt.verify(token, CRYPTO_KEY, (error, json) => callback(error, json))
-}
-
-// Tests
-if (process.env.DEV_MODE) await runTests("auth.js")
-async function runTests(testName) {
-    let pass = true
-
-    const testPassword = "password"
-    const hashTestPassword = hashPassword(testPassword)
-    if (isHashedPassword(testPassword, hashTestPassword.hash, hashTestPassword.salt) === false) pass = false
-
-    const testData = { boom: "pow" }
-    const testToken = generateToken(testData)
-    let verifyToken_error = ""
-    let verifyToken_json = ""
-    verifyToken(testToken, (error, json) => {
-        verifyToken_error = error
-        verifyToken_json = json
-    })
-    if (verifyToken_error || verifyToken_json.boom !== testData.boom) pass = false
-
-    if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }
