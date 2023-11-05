@@ -11,14 +11,14 @@ import jwt from 'jsonwebtoken'
 export {
     hashPassword,
     isHashedPassword,
-    generateJWT,
-    verifyJWT,
+    generateToken,
+    verifyToken,
 }
 
 // Constants
 const CRYPTO_KEYSIZE = 64
 const CRYPTO_ITERATIONS = 9999
-const JWT_KEY = process.env.DEV_MODE ? "test" : randomBytes(CRYPTO_KEYSIZE).toString('base64')
+const CRYPTO_KEY = process.env.DEV_MODE ? "test" : randomBytes(CRYPTO_KEYSIZE).toString('base64')
 
 // Functions
 function hashPassword(password) {
@@ -31,11 +31,11 @@ function isHashedPassword(password, hash, salt) {
     const hashTesting = pbkdf2Sync(password, salt, CRYPTO_ITERATIONS, CRYPTO_KEYSIZE, 'sha256').toString('base64')
     return hash === hashTesting
 }
-function generateJWT(json) {
-    return jwt.sign(json, JWT_KEY)
+function generateToken(json) {
+    return jwt.sign(json, CRYPTO_KEY)
 }
-function verifyJWT(token, cb) {
-    jwt.verify(token, JWT_KEY, (error, json) => cb(error, json))
+function verifyToken(token, callback) {
+    jwt.verify(token, CRYPTO_KEY, (error, json) => callback(error, json))
 }
 
 // Tests
@@ -48,14 +48,14 @@ async function runTests(testName) {
     if (isHashedPassword(testPassword, hashTestPassword.hash, hashTestPassword.salt) === false) pass = false
 
     const testData = { boom: "pow" }
-    const testToken = generateJWT(testData)
-    let verifyJWT_error = ""
-    let verifyJWT_json = ""
-    verifyJWT(testToken, (error, json) => {
-        verifyJWT_error = error
-        verifyJWT_json = json
+    const testToken = generateToken(testData)
+    let verifyToken_error = ""
+    let verifyToken_json = ""
+    verifyToken(testToken, (error, json) => {
+        verifyToken_error = error
+        verifyToken_json = json
     })
-    if (verifyJWT_error || verifyJWT_json.boom !== testData.boom) pass = false
+    if (verifyToken_error || verifyToken_json.boom !== testData.boom) pass = false
 
     if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }

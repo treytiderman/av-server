@@ -2,7 +2,7 @@
 
 // Imports
 import events from 'events'
-import { hashPassword, isHashedPassword, generateJWT, verifyJWT } from './auth.js'
+import { hashPassword, isHashedPassword, generateToken as generateJWT, verifyToken as verifyJWT } from './auth.js'
 import { createDatabase, resetDatabase } from './database.js'
 import { Logger } from './logger.js'
 

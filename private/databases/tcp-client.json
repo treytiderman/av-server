@@ -1,3 +1,96 @@
 {
-  "clients": {}
+  "clients": {
+    "192.168.1.9:23": {
+      "isOpen": false,
+      "isReconnect": false,
+      "address": "192.168.1.9:23",
+      "encoding": "ascii",
+      "history": [
+        {
+          "wasReceived": false,
+          "timestampISO": "2023-11-05T17:18:41.506Z",
+          "encoding": "ascii",
+          "data": "ka 01 01\\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:18:43.774Z",
+          "encoding": "ascii",
+          "data": "yo"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:18:49.790Z",
+          "encoding": "ascii",
+          "data": "yo"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:19:03.120Z",
+          "encoding": "ascii",
+          "data": "BF"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:19:10.022Z",
+          "encoding": "ascii",
+          "data": "#F"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:19:18.918Z",
+          "encoding": "ascii",
+          "data": "#F"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:19:22.287Z",
+          "encoding": "ascii",
+          "data": "eF"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:19:28.472Z",
+          "encoding": "ascii",
+          "data": "e\u0018"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:19:32.383Z",
+          "encoding": "ascii",
+          "data": "e\u0012"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:19:35.417Z",
+          "encoding": "ascii",
+          "data": "e\u0012"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:19:38.181Z",
+          "encoding": "ascii",
+          "data": "eA"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-05T17:19:50.238Z",
+          "encoding": "ascii",
+          "data": "yo"
+        },
+        {
+          "wasReceived": false,
+          "timestampISO": "2023-11-05T17:20:03.026Z",
+          "encoding": "ascii",
+          "data": "\\xAA\\x11\\xFE\\x01\\x01\\x11"
+        },
+        {
+          "wasReceived": false,
+          "timestampISO": "2023-11-05T17:20:03.401Z",
+          "encoding": "ascii",
+          "data": "\\x01\\x30\\x41\\x30\\x41\\x30\\x43\\x02\\x43\\x32\\x30\\x33\\x44\\x36\\x30\\x30\\x30\\x31\\x03\\x73\\x0D"
+        }
+      ]
+    }
+  }
 }

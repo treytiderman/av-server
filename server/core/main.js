@@ -8,7 +8,7 @@ const server = createWsServer(httpServer)
 
 // API
 import "./api-routes.js"
-import "./websocket-routes.js"
+import "./ws-users-v0.js"
 
 // Start Server
 const port = process.env.PORT || 4620

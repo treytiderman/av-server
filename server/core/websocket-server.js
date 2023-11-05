@@ -38,7 +38,7 @@ export {
 const log = new Logger("websocket-server.js")
 const emitter = new EventEmitter()
 emitter.setMaxListeners(100) // number of receive uses
-let wsServer
+let wsServer = { clients: [] }
 
 // Helper Functions
 function isJSON(text) {
