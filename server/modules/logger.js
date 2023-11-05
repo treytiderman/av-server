@@ -49,7 +49,7 @@ function createLogLine(level, group, message, obj) {
 }
 async function deleteOldLogs() {
     const logFilesStats = await getStatsRecursive(PATH_TO_LOG_FOLDER)
-    if (logFilesStats.contains_files.length > NUMBER_OF_FILES_MAX) {
+    if (logFilesStats?.contains_files && logFilesStats.contains_files.length > NUMBER_OF_FILES_MAX) {
         const fileNames = logFilesStats.contains_files
         fileNames.sort((a, b) => {
             const keyA = new Date(a.created_iso)
@@ -117,10 +117,6 @@ class Logger {
 
 // Startup
 await makeDir(PATH_TO_LOG_FOLDER)
-if (process.env.DEV_MODE) {
-    debug("logger.js", "DEV_MODE environment variable set to true")
-    await deleteLogs()
-}
 
 // Testing
 // const logger = new Logger("logger.js")

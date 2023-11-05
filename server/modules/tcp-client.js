@@ -129,7 +129,11 @@ function open(address, encoding = "ascii", callback = () => { }) {
     // Error event
     sockets[address].on('error', (error) => {
         clearTimeout(timeouts[address])
-        emitter.emit('open', address, error)
+        if (error.message.includes("ECONNREFUSED")) {
+            emitter.emit('open', address, `error ${address} refused to connect`)
+        } else {
+            emitter.emit('open', address, `error ${error.message}`)
+        }
     })
 
     // Close event

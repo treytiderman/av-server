@@ -414,11 +414,11 @@ setInterval(async () => {
 }, UPDATE_AVAILABLE_MS)
 
 // Testing - takes 1 sec
-if (process.env.DEV_MODE) {
-    setTimeout(async () => {
-        await runTests("programs.js")
-    }, 500);
-}
+// if (process.env.DEV_MODE) {
+//     setTimeout(async () => {
+//         await runTests("programs.js")
+//     }, 500);
+// }
 // if (process.env.DEV_MODE) await runTests("programs.js")
 async function runTests(testName) {
     let pass = true

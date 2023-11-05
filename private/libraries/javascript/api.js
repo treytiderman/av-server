@@ -1,7 +1,7 @@
 // Overview: get all av-server modules and tools
 
 // Imports
-import { ws } from "../js/ws.js";
+import { ws } from "./ws.js";
 
 // Exports
 export { api }

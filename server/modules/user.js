@@ -33,6 +33,10 @@ export {
     deleteUser,
     resetUsersToDefault,
 
+    DEFAULT_GROUPS,
+    DEFAULT_USER,
+    DEFAULT_STATE,
+
     emitter,
 }
 
@@ -49,7 +53,7 @@ const DEFAULT_STATE = {
 }
 
 // Variables
-const log = new Logger("user.js")
+const log = new Logger("modules/user.js")
 const emitter = new events.EventEmitter()
 const db = await createDatabase("user", DEFAULT_STATE)
 
@@ -271,101 +275,4 @@ async function resetUsersToDefault() {
     db = await resetDatabase("user")
     emitter.emit('users', getUsers())
     emitter.emit('groups', getGroups())
-}
-
-// Tests
-if (process.env.DEV_MODE) await runTests("users.js")
-async function runTests(testName) {
-    let pass = true
-    log.info("...Running Tests")
-
-    if (validUsermame()) pass = false
-    if (validUsermame("")) pass = false
-    if (validUsermame(null)) pass = false
-    if (validUsermame(undefined)) pass = false
-    if (validUsermame("h")) pass = false
-    if (validUsermame(32400)) pass = false
-    if (!validUsermame("username")) pass = false
-
-    if (isUser()) pass = false
-    if (isUser("")) pass = false
-    if (isUser(null)) pass = false
-    if (isUser(undefined)) pass = false
-    if (isUser("fakeUser")) pass = false
-    if (!isUser("admin")) pass = false
-
-    const adminUserWithPassword = getUserAndPassword("admin") || {}
-    const adminUser = getUser("admin") || {}
-    if (adminUserWithPassword.username !== DEFAULT_USER.username) pass = false
-    if (adminUser.username !== DEFAULT_USER.username) pass = false
-
-    if (isGroup()) pass = false
-    if (isGroup("")) pass = false
-    if (isGroup(null)) pass = false
-    if (isGroup(undefined)) pass = false
-    if (isGroup("fakeGroup")) pass = false
-    if (!isGroup("admin")) pass = false
-
-    if (areGroups([])) pass = false
-    if (areGroups()) pass = false
-    if (areGroups("")) pass = false
-    if (areGroups(null)) pass = false
-    if (areGroups(undefined)) pass = false
-    if (areGroups("admin")) pass = false
-    if (areGroups(["admin", "fakeGroup"])) pass = false
-    if (!areGroups(["admin", "user"])) pass = false
-
-    const groups = getGroups()
-    if (!groups.some(group => group === "admin")) pass = false
-
-    await createGroup("testGroup")
-    await createGroup("testGroup")
-    if (!isGroup("testGroup")) pass = false
-    await deleteGroup("testGroup")
-    if (isGroup("testGroup")) pass = false
-
-    try {
-        await deleteGroup("admin")
-        pass = false
-    } catch (error) {
-        if (error.message !== "error can not delete admin group") pass = false
-    }
-    if (!isGroup("admin")) pass = false
-
-    const token = getToken("admin", "admin")
-    if (token.startsWith("error")) pass = false
-    verifyToken("BAD_TOKEN", (response, error) => {
-        if (error !== "error bad token") pass = false
-    })
-    verifyToken(token, (response, error) => {
-        if (error === "error bad token") pass = false
-        if (response.username !== "admin") pass = false
-    })
-
-    await deleteUser("user4")
-    const createUserResponse = await createUser("user4", "password", "password", ["admin", "guest"])
-    if (createUserResponse.username !== "user4") pass = false
-    if (!isUser("user4")) pass = false
-    const token2 = getToken("user4", "password")
-    if (token2.startsWith("error")) pass = false
-
-    if (isUserInGroup("user4", "admin") === false) pass = false
-    if (isUserInGroup("user4", "user") === true) pass = false
-    if (isUserInGroup("user4", "hop") === true) pass = false
-
-    const addGroupToUserResponse = await addGroupToUser("user4", "user")
-    if (!addGroupToUserResponse.groups.some(group => group === "user")) pass = false
-    const removeGroupFromUserResponse = await removeGroupFromUser("user4", "user")
-    if (removeGroupFromUserResponse.groups.some(group => group === "user")) pass = false
-
-    const changeUserPasswordResponse = await changeUserPassword("user4", "password2", "password2")
-    if (changeUserPasswordResponse.username !== "user4") pass = false
-    const token3 = getToken("user4", "password2")
-    if (token3.startsWith("error")) pass = false
-
-    const deleteUserResponse2 = await deleteUser("user4")
-    if (deleteUserResponse2 !== "ok") pass = false
-
-    log.info(`...Tests pass: ${pass}`)
-    if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
 }

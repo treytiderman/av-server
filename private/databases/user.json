@@ -3,15 +3,14 @@
     "admin",
     "user",
     "guest",
-    "dragon",
-    "small"
+    "dragon"
   ],
   "users": [
     {
       "username": "admin",
       "password": {
-        "salt": "5Qxps3VLAYbUb7z2t8ivt9TDOkC4svMOdKoffpslZF9T3EGsqfZ7MfBoKyXkFSRe8pqtcTGGfS1WBrfFYI7sgg==",
-        "hash": "yPBk6O4hGBgMgkEuobQ4ltH2t4WPK0pqMFLQjHxFWK96mmgZmhtqbsGOKyWROlhPb4DfLjhyi4M3MDefTL7nQg=="
+        "salt": "v9r6TaZluIodpnFnnzQu/V+6zWRbJ0aib++H+Y3oxd37UzwvfY6PShqRo9CKoZbSsHf0w4+dpCEEYbmBAWQa8w==",
+        "hash": "iL5/5l+YEO5ePDA1t1OG6esoM0A4Mi9uFdqLyU6F6QriJjQZkhi1QtvXfgjpvQyZGdchM1Pt0PZGs3oSiPNPEQ=="
       },
       "groups": [
         "admin"
@@ -20,23 +19,12 @@
     {
       "username": "arlo",
       "password": {
-        "salt": "kI2QvGBQ0VwLWYIcYcu5vZ8U/L9KNZaexbC1Q5k/9uxImgqrfllKqeh6XUoBwRkaei8qhYDIycxCuEegeFSDUw==",
-        "hash": "gvmzP+27b/r+4wMN4sz0lcB3bdJSCCpZh9jfTD7FqEyr8mtch2xHRWvnZOEc/nC6naOM/qzsuboJ7FalloCfiA=="
+        "salt": "j/OypSUS1SQCcSLB0dImryjyROFu4OZjq+6YQ25NY3sTO8JFntwvyzbDplEvnMxOvdYFGxh+GHnlbocNiny3IA==",
+        "hash": "pHfyihBnwK9+1lhhyZM4A4gnVX8CQFwrlPUtOKkmSiwdGBUM2aC0kNfVasM70roB3lyGe9bUo0VMcMvnUQx7ow=="
       },
       "groups": [
         "admin",
         "dragon"
-      ]
-    },
-    {
-      "username": "user",
-      "password": {
-        "salt": "X8wnzg434m6CQyVQNDRzA6y/gCNqb+tyPx5v1b73JDKwyKF3bKt5HIwHitPLjqqwAyiYoCfMqHVa0CVe6UoHew==",
-        "hash": "kY7cuMtAW43oNLEHJpV188hFdpU+pRJCc7TPBHfDfudibEHUyuuN6xZA0ZnfbYhUcoglnxaooHFtwPNvawFIvA=="
-      },
-      "groups": [
-        "user",
-        "small"
       ]
     }
   ]

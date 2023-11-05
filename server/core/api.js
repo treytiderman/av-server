@@ -7,11 +7,11 @@ const api = {
 const protocals = ["websocket", "stdio", "tcp", "udp"]
 
 // Receive
-api.receive("/path/to/endpoint", (client, body) => {
+api.receive("/path/to/endpoint", (client, path, body) => {
     const response = someFunction(body)
     client.send(response)
 })
-api.receive("/path/to/endpoint/:id", (client, body, params) => {
+api.receive("/path/to/endpoint/:id", (client, path, body, params) => {
     const response = anotherFunction(params.id, body)
     client.send(response)
 })

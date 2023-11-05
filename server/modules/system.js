@@ -23,7 +23,7 @@ export {
 const UPDATE_INTERVAL = 1_000
 
 // Variables
-const log = new Logger("system.js")
+const log = new Logger("modules/system.js")
 const emitter = new events.EventEmitter()
 const startupTime = Date.now()
 
@@ -110,9 +110,3 @@ setInterval(() => {
 
 // Startup
 log.info("startup -> " + new Date().toLocaleString(), getSystemInfo())
-
-// Testing
-// console.log(getSystemInfo())
-// console.log(getTime())
-// console.log(getTimeAsISO())
-// console.log(getUptime())
