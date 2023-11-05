@@ -30,7 +30,6 @@ const protocals = {
 
 // Functions
 function send(path, body) {
-    // log.debug(`send("${path}", "${body}")`)
     ws.sendAllPathIfSub(path, body)
 }
 function receive(template, callback) {

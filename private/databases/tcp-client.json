@@ -1,7 +1,7 @@
 {
   "clients": {
     "192.168.1.9:23": {
-      "isOpen": false,
+      "isOpen": true,
       "isReconnect": false,
       "address": "192.168.1.9:23",
       "encoding": "ascii",

@@ -2,7 +2,7 @@
 
 // Imports
 import * as api from '../modules/api.js'
-import * as user from '../modules/user.js'
+import * as user from '../modules/users.js'
 
 // Functions
 // api.receive("user/v0/func/login", async (client, path, body, params) => {

@@ -1,5 +1,5 @@
 // Imports
-import * as user from '../modules/user.js'
+import * as user from '../modules/users.js'
 
 // Functions
 export async function test() {

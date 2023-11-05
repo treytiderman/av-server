@@ -24,6 +24,7 @@ COPY ./private ../private
 
 # Install node dependencies
 RUN npm install
+RUN apk add g++ make py3-pip
 
 # Run the app
 CMD "npm" "run" "dev"

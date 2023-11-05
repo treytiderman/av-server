@@ -48,7 +48,7 @@ const RESTART_TIMEOUT_MS = 1_000
 const DEFAULT_STATE = { programs: {}, available: {} }
 
 // Variables
-const log = new Logger("programs.js")
+const log = new Logger("modules/programs.js")
 const emitter = new events.EventEmitter()
 const db = await createDatabase('programs', DEFAULT_STATE)
 const spawnedList = {}
@@ -115,7 +115,7 @@ function getProgram(name) {
         running: program.running,
         pid: program.pid,
     }
-    log.debug(`getProgram("${name}")`, programWithoutHistory)
+    // log.debug(`getProgram("${name}")`, programWithoutHistory)
     return programWithoutHistory
 }
 function getProgramWithHistory(name) {
@@ -156,14 +156,19 @@ async function createProgram(name, directory, command, startOnBoot = false, env 
     return programs[name]
 }
 async function startProgram(name) {
+    log.debug(`trying startProgram("${name}")`)
     const program = db.data.programs[name]
+
+    // Errors
     if (!program) {
-        log.error(`startProgram("${name}")`, "error program does not exist")
-        throw new Error("error program does not exist")
+        const error = "error program does not exist"
+        log.error(`startProgram("${name}") -> ${error}`)
+        return error
     }
     else if (program.running === true) {
-        log.error(`startProgram("${name}")`, "error program already running")
-        throw new Error("error program already running")
+        const error = "error program already running"
+        log.error(`startProgram("${name}") -> ${error}`)
+        return error
     }
 
     // Spawn
@@ -183,20 +188,20 @@ async function startProgram(name) {
     program.pid = spawned.pid
 
     // Events
-    spawned.on('error', (err) => {
-        emitter.emit('error', name, err)
-        log.error(`startProgram(${name}) onError`, err)
+    spawned.on('error', (error) => {
+        emitter.emit('error', name, error)
+        log.error(`startProgram(${name}) onError -> ${error.message}`, error)
     })
     spawned.on('spawn', async (code, signal) => {
         program.running = true
-        emitter.emit('start', name, getProgram(name))
-        log.debug(`startProgram(${name}) onSpawn`, getProgram(name))
+        emitter.emit('start', name)
+        log.debug(`startProgram(${name}) onSpawn -> "ok`)
         await db.write()
     })
     spawned.on('exit', async (code, signal) => {
         program.running = false
-        emitter.emit('exit', name, getProgram(name))
-        log.debug(`startProgram(${name}) onExit`, getProgram(name))
+        emitter.emit('exit', name)
+        log.debug(`startProgram(${name}) onExit`)
         await db.write()
     })
     spawned.stdout.on('data', async (data) => {
@@ -224,9 +229,7 @@ async function startProgram(name) {
         await db.write()
     })
 
-    await db.write()
-    log.debug(`startProgram("${name}")`, program)
-    return program
+    return "ok"
 }
 async function sendProgram(name, text) {
     const program = db.data.programs[name]
@@ -404,84 +407,8 @@ async function deletePrograms() {
 }
 
 // Startup
-await killPrograms()
 await checkAvailablePrograms()
 setInterval(async () => {
     await checkAvailablePrograms()
 }, UPDATE_AVAILABLE_MS)
-
-// Testing - takes 1 sec
-if (process.env.DEV_MODE) await runTests("programs.js")
-async function runTests(testName) {
-    let pass = true
-    log.info("...Running Tests")
-
-    const test1 = splitByWhitespace("1  jkhgakfger-=[];,/.,/`163-9 ef   whfiwheifhbwe fwef")
-    if (test1[2] !== "ef") pass = false
-    const test2 = splitByWhitespace("one")
-    if (test2[0] !== "one" || test2.length !== 1) pass = false
-
-    await createProgram("p1", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node log.js")
-    // await startProgram("p1")
-    
-    // await createProgram("p2", `${PATH_TO_PROGRAMS}/test-nodejs-log`, "node interval.js")
-    // await startProgram("p2")
-    
-    // const p3_obj = getAvailablePrograms()["test-python-log"]
-    // await createProgram("p3", p3_obj.directory, p3_obj.command)
-    // await startProgram("p3")
-
-    // setTimeout(async () => await startProgram("p1"), 200)
-
-    // setTimeout(async () => {
-    //     try {
-    //         await startProgram("p72") // will throw since program doesn't exist
-    //         pass = false // if it doesn't throw
-    //     } catch (error) {}
-    // }, 400)
-
-    // setTimeout(async () => {
-    //     try {
-    //         await startProgram("p2") // will throw since program is running
-    //         pass = false // if it doesn't throw
-    //     } catch (error) {}
-    // }, 500)
-
-    // const p4 = await createProgram("p4", `${PATH_TO_PROGRAMS}/test-nodejs-nodemon`, "nodemon main.js")
-    // if (p4.command !== "nodemon main.js") pass = false
-    // await startProgram("p4")
-
-    
-    emitter.on("available", (body) => {
-        console.log("available", body)
-    })
-
-    emitter.on("start", (name, body) => {
-        console.log("start", name, body)
-        // if (name === "p72" && body.startsWith("error") === false) pass = false
-    })
-
-    emitter.on("data", (name, body) => {
-        console.log("data", name, body)
-        // if (name === "p1" && body.data.includes("NodeJS") === false) pass = false
-        // if (name === "p3" && body.data.includes("Python") === false) pass = false
-    })
-
-    emitter.on("error", (name, body) => {
-        console.log("error", name, body)
-    })
-
-    emitter.on("exit", async (name, body) => {
-        console.log("exit", name, body)
-        // if (name === "p1" && body.running === true) pass = false
-    })
-
-    setTimeout(async () => {
-        // await deletePrograms()
-    }, 1_900);
-
-    setTimeout(async () => {
-        log.info(`...Tests pass: ${pass}`)
-        if (pass !== true) console.log(testName, '\x1b[31mTESTS FAILED\x1b[0m')
-    }, 2_000);
-}
+// await killPrograms()

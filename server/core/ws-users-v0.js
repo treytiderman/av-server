@@ -31,7 +31,7 @@ import {
 
     resetUsersToDefault,
     emitter,
-} from '../modules/user.js'
+} from '../modules/users.js'
 
 // Exports
 export { isAuth, isAdmin }

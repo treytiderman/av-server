@@ -5,6 +5,7 @@ import * as auth from "./auth.test.js";
 import * as database from "./database.test.js";
 import * as files from "./files.test.js";
 import * as logger from "./logger.test.js";
+import * as programs from "./programs.test.js";
 import * as serial from "./serial.test.js";
 import * as system from "./system.test.js";
 import * as tcpClient from "./tcp-client.test.js";
@@ -21,6 +22,7 @@ if (process.env.DEV_MODE) {
     await test("database", database)
     await test("files", files)
     await test("logger", logger)
+    await test("programs", programs)
     await test("serial", serial)
     await test("system", system)
     await test("tcpClient", tcpClient)

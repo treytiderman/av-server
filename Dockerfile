@@ -24,6 +24,7 @@ COPY ./private ../private
 
 # Install node dependencies
 RUN npm install
+RUN apt-get install -y python3
 
 # Run the app
 CMD "npm" "start"
