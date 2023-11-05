@@ -1,5 +1,5 @@
-import { stdio } from "../../libraries/javascript/stdio.mjs"
+import { api } from "../../libraries/javascript/api.mjs"
 
-stdio.receive.text(text => {
-    stdio.send.text(`echo: ${text}`);
+api.uptime(time => {
+    // console.log(time)
 })

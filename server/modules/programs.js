@@ -6,12 +6,10 @@
 
 // Imports
 import { spawn } from 'child_process'
+import { EventEmitter } from 'events'
 import { getStatsRecursive, readText } from './files.js'
 import { Logger } from './logger.js'
 import { createDatabase } from './database.js'
-
-// Event Emitter
-import events from 'events'
 
 // Exports
 export {
@@ -24,10 +22,10 @@ export {
 
     create,
     start,
+    send,
     kill,
     restart,
     remove,
-    send,
 
     setDirectory,
     setCommand,
@@ -35,6 +33,8 @@ export {
     setEnviromentVariables,
     
     statusAll,
+    startAll,
+    sendAll,
     killAll,
     restartAll,
     removeAll,
@@ -51,10 +51,11 @@ const RESTART_TIMEOUT_MS = 100
 const DEFAULT_STATE = { programs: {}, available: {} }
 
 // Variables
-const emitter = new events.EventEmitter()
 const db = await createDatabase('programs', DEFAULT_STATE)
 const log = new Logger("modules/programs.js")
 const spawnedList = {}
+const emitter = new EventEmitter()
+emitter.setMaxListeners(100) // number of receive uses
 
 // Startup
 dbResetRunning()
@@ -469,6 +470,16 @@ function setEnviromentVariables(name, env) {
     return "ok"
 }
 
+function startAll() {
+    log.debug(`startAll() -> "ok"`)
+    Object.keys(db.data.programs).forEach(name => start(name))
+    return "ok"
+}
+function sendAll(text) {
+    log.debug(`killAll() -> "ok"`)
+    Object.keys(db.data.programs).forEach(name => send(name, text))
+    return "ok"
+}
 function killAll() {
     log.debug(`killAll() -> "ok"`)
     Object.keys(db.data.programs).forEach(name => kill(name))
@@ -485,4 +496,3 @@ function removeAll() {
     db.data.programs = {}
     return "ok"
 }
-

@@ -3,9 +3,9 @@
 // Imports
 import { Logger } from '../modules/logger.js'
 import * as ws from '../core/websocket-server.js'
+import * as pg from './programs.js'
 // import * as tcp from './tcp-server.js'
 // import * as udp from './udp-server.js'
-// import * as stdio from './stdio.js'
 
 // Exports
 export {
@@ -25,28 +25,56 @@ const protocals = {
     ws: "ws",
     tcp: "tcp",
     udp: "udp",
+    programs: "pg",
     stdio: "stdio",
 }
 
 // Functions
+function isJSON(text) {
+    try { JSON.parse(text) }
+    catch (error) { return false }
+    return true
+}
+
 function send(path, body) {
+    const obj = { path: path, body: body }
+    const json = JSON.stringify(obj)
     ws.sendAllPathIfSub(path, body)
+    // pg.sendAll(json)
 }
 function receive(template, callback) {
     // log.debug(`receive("${template}", "${callback}")`)
     const templateObj = parseTemplate(template)
     ws.receiveJson((client, obj) => {
         const path = obj.path
-        const body = obj.body
-        client.protocal = protocals.ws
-        client.sendPath = (path, body) => ws.sendPath(client, path, body)
-        client.subscribe = (path) => ws.subscribe(client, path)
-        client.unsubscribe = (path) => ws.unsubscribe(client, path)
         if (path.startsWith(templateObj.base)) {
+            const body = obj.body
+            client.protocal = protocals.ws
+            client.sendPath = (path, body) => ws.sendPath(client, path, body)
+            client.subscribe = (path) => ws.subscribe(client, path)
+            client.unsubscribe = (path) => ws.unsubscribe(client, path)
             const params = parseParams(templateObj, path)
             callback(client, path, body, params)
         }
     })
+    // pg.emitter.on("data", (name, obj) => {
+    //     if (isJSON(obj.data)) {
+    //         const json = JSON.parse(obj.data)
+    //         const path = json.path
+    //         if (path.startsWith(templateObj.base)) {
+    //             const body = json.body
+    //             const client = {}
+    //             client.protocal = protocals.programs
+    //             client.sendPath = (path, body) => pg.send(name, JSON.stringify({path: path, body: body}))
+    //             client.subscribe = (path) => {}
+    //             client.unsubscribe = (path) => {}
+    //             const params = parseParams(templateObj, path)
+    //             console.log(client, path, body, params);
+    //             // callback(client, path, body, params)
+    //             // pg.send(name, "yes")
+    //         }
+    //     }
+    // })
 }
 
 function parseTemplate(template) {

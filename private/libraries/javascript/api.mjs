@@ -1,12 +1,7 @@
 // Overview: get all av-server modules and tools
 
 // Imports
-import { ws } from "./ws.js";
-
-// Exports
-export { api }
-
-
+import { stdio } from "./stdio.mjs";
 
 // // Api
 // import { v0 as logger_v0 } from "../js/api-logger-v0.js";
@@ -15,11 +10,11 @@ export { api }
 // import { v0 as user_v0 } from "../js/api-user-v0.js";
 
 // // Exports
-// export const api = {
-//     "ws": ws,
-//     "connect": ws.connect,
-//     "logger": { v0: logger_v0 },
-//     "system": { v0: system_v0 },
-//     "tcpClient": { v0: tcpClient_v0 },
-//     "user": { v0: user_v0 },
-// }
+export const api = {
+    uptime,
+}
+
+function uptime(callback = () => { }) {
+    stdio.send.path("system/v0/topic/uptime", "get")
+    stdio.receiveOnce.path("system/v0/topic/uptime", (response) => callback(response))
+}

@@ -3,14 +3,14 @@
     "p1": {
       "running": false,
       "startOnBoot": false,
-      "pid": 6716,
+      "pid": 15751,
       "directory": "../private/programs/tests",
       "command": "node log.js",
       "env": {},
       "history": [
         {
           "from": "stdout",
-          "timestampISO": "2023-11-05T22:55:26.363Z",
+          "timestampISO": "2023-11-05T23:48:14.176Z",
           "data": "Hello from NodeJS\n"
         }
       ]
@@ -18,24 +18,24 @@
     "p2": {
       "running": false,
       "startOnBoot": false,
-      "pid": 6730,
+      "pid": 15765,
       "directory": "../private/programs/tests",
       "command": "node interval.js",
       "env": {},
       "history": [
         {
           "from": "stdout",
-          "timestampISO": "2023-11-05T22:55:26.465Z",
+          "timestampISO": "2023-11-05T23:48:14.282Z",
           "data": "count = 1\n"
         },
         {
           "from": "stdout",
-          "timestampISO": "2023-11-05T22:55:26.563Z",
+          "timestampISO": "2023-11-05T23:48:14.380Z",
           "data": "count = 2\n"
         },
         {
           "from": "stdout",
-          "timestampISO": "2023-11-05T22:55:26.872Z",
+          "timestampISO": "2023-11-05T23:48:14.686Z",
           "data": "count = 1\n"
         }
       ]
@@ -43,19 +43,19 @@
     "p3": {
       "running": false,
       "startOnBoot": false,
-      "pid": 6738,
+      "pid": 15773,
       "directory": "../private/programs/tests",
       "command": "python3 log.py",
       "env": {},
       "history": [
         {
           "from": "stdout",
-          "timestampISO": "2023-11-05T22:55:26.954Z",
+          "timestampISO": "2023-11-05T23:48:14.765Z",
           "data": "Hello from Python\n"
         },
         {
           "from": "stdout",
-          "timestampISO": "2023-11-05T22:55:27.063Z",
+          "timestampISO": "2023-11-05T23:48:14.875Z",
           "data": "Hello from Python\n"
         }
       ]
@@ -63,7 +63,7 @@
     "p4": {
       "running": false,
       "startOnBoot": false,
-      "pid": 6739,
+      "pid": 15774,
       "directory": "../private/programs/tests",
       "command": "node env.js",
       "env": {
@@ -72,7 +72,7 @@
       "history": [
         {
           "from": "stdout",
-          "timestampISO": "2023-11-05T22:55:27.083Z",
+          "timestampISO": "2023-11-05T23:48:14.891Z",
           "data": "env.name: arlo\n"
         }
       ]
@@ -80,20 +80,24 @@
     "p5": {
       "running": false,
       "startOnBoot": false,
-      "pid": 6740,
+      "pid": 15775,
       "directory": "../private/programs/tests",
       "command": "node echo.mjs",
       "env": {},
+      "history": []
+    },
+    "p6": {
+      "running": false,
+      "startOnBoot": false,
+      "pid": 15776,
+      "directory": "../private/programs/tests",
+      "command": "node api.mjs",
+      "env": {},
       "history": [
         {
-          "from": "stdin",
-          "timestampISO": "2023-11-05T22:55:27.063Z",
-          "data": "420"
-        },
-        {
           "from": "stdout",
-          "timestampISO": "2023-11-05T22:55:27.090Z",
-          "data": "echo: 420"
+          "timestampISO": "2023-11-05T23:48:14.900Z",
+          "data": "{\"path\":\"system/v0/topic/uptime\",\"body\":\"get\"}"
         }
       ]
     }
