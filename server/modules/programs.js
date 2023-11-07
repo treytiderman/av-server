@@ -249,7 +249,7 @@ function start(name, callback = () => {}) {
         if (program.history.length > MAX_HISTORY_LENGTH) { program.history.shift() }
         emitter.emit('data', name, dataObj)
         emitter.emit('history', name, history(name))
-        log.debug(`start(${name}) event: "stdout" -> ${JSON.stringify(dataObj.data)}`, dataObj)
+        // log.debug(`start(${name}) event: "stdout" -> ${JSON.stringify(dataObj.data)}`, dataObj)
         db.write()
     })
     spawned.stderr.on('data', (data) => {
@@ -262,7 +262,7 @@ function start(name, callback = () => {}) {
         if (program.history.length > MAX_HISTORY_LENGTH) { program.history.shift() }
         emitter.emit('data', name, dataObj)
         emitter.emit('history', name, history(name))
-        log.debug(`start(${name}) event: "stderr" -> ${JSON.stringify(dataObj.data)}`, dataObj)
+        // log.debug(`start(${name}) event: "stderr" -> ${JSON.stringify(dataObj.data)}`, dataObj)
         db.write()
     })
 
@@ -294,7 +294,7 @@ function send(name, text) {
         if (program.history.length > MAX_HISTORY_LENGTH) { program.history.shift() }
         emitter.emit('data', name, dataObj)
         emitter.emit('history', name, history(name))
-        log.debug(`send("${name}", "${text}") -> "ok"`)
+        // log.debug(`send("${name}", "${text}") -> "ok"`)
         db.write()
         return "ok"
     } catch (err) {
