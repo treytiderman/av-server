@@ -1,131 +1,20 @@
 {
   "programs": {
-    "p1": {
+    "test": {
       "running": false,
-      "startOnBoot": false,
-      "pid": 24829,
-      "directory": "../private/programs/tests",
-      "command": "node log.js",
-      "env": {},
-      "history": [
-        {
-          "from": "stdout",
-          "timestampISO": "2023-11-06T23:58:50.796Z",
-          "data": "Hello from NodeJS\n"
-        }
-      ]
-    },
-    "p2": {
-      "running": false,
-      "startOnBoot": false,
-      "pid": 24843,
+      "startOnBoot": "true",
       "directory": "../private/programs/tests",
       "command": "node interval.js",
-      "env": {},
-      "history": [
-        {
-          "from": "stdout",
-          "timestampISO": "2023-11-06T23:58:50.901Z",
-          "data": "count = 1\n"
-        },
-        {
-          "from": "stdout",
-          "timestampISO": "2023-11-06T23:58:51.000Z",
-          "data": "count = 2\n"
-        },
-        {
-          "from": "stdout",
-          "timestampISO": "2023-11-06T23:58:51.307Z",
-          "data": "count = 1\n"
-        }
-      ]
-    },
-    "p3": {
-      "running": false,
-      "startOnBoot": false,
-      "pid": 24851,
-      "directory": "../private/programs/tests",
-      "command": "python3 log.py",
-      "env": {},
-      "history": [
-        {
-          "from": "stdout",
-          "timestampISO": "2023-11-06T23:58:51.387Z",
-          "data": "Hello from Python\n"
-        },
-        {
-          "from": "stdout",
-          "timestampISO": "2023-11-06T23:58:51.500Z",
-          "data": "Hello from Python\n"
-        }
-      ]
-    },
-    "p4": {
-      "running": false,
-      "startOnBoot": false,
-      "pid": 24852,
-      "directory": "../private/programs/tests",
-      "command": "node env.js",
-      "env": {
-        "name": "arlo"
-      },
-      "history": [
-        {
-          "from": "stdout",
-          "timestampISO": "2023-11-06T23:58:51.516Z",
-          "data": "env.name: arlo\n"
-        }
-      ]
-    },
-    "p5": {
-      "running": false,
-      "startOnBoot": false,
-      "pid": 24853,
-      "directory": "../private/programs/tests",
-      "command": "node echo.mjs",
-      "env": {},
+      "env": "{}",
       "history": []
-    },
-    "p6": {
-      "running": false,
-      "startOnBoot": false,
-      "pid": 24854,
-      "directory": "../private/programs/tests",
-      "command": "node api.mjs",
-      "env": {},
-      "history": [
-        {
-          "from": "stdout",
-          "timestampISO": "2023-11-06T23:58:51.526Z",
-          "data": "{\"path\":\"system/v0/topic/uptime\",\"body\":\"get\"}"
-        }
-      ]
     }
   },
   "available": {
-    "test-express": {
-      "directory": "../private/programs/test-express",
-      "command": "node main.js",
-      "env": {
-        "PORT": "5903",
-        "NAME": "arlo"
-      },
-      "files": [
-        "example.env",
-        "main.js",
-        "package-lock.json",
-        "package.json"
-      ]
-    },
-    "test-nodemon": {
-      "directory": "../private/programs/test-nodemon",
-      "command": "node main.js",
+    "other": {
+      "directory": "../private/programs/other",
+      "command": "echo hi",
       "env": {},
-      "files": [
-        "main.js",
-        "package-lock.json",
-        "package.json"
-      ]
+      "files": []
     },
     "tests": {
       "directory": "../private/programs/tests",

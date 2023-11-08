@@ -115,8 +115,12 @@ async function checkAvailablePrograms() {
 
 // Functions
 function available() {
+    const array = []
+    Object.keys(db.data.available).forEach(name => {
+        array.push({name: name, ...db.data.available[name]})
+    })
     // log.debug(`available()`, db.data.available)
-    return db.data.available
+    return array
 }
 
 function status(name) {
@@ -126,23 +130,16 @@ function status(name) {
         return error
     }
     const statusWithoutHistory = {
+        name: name,
         command: db.data.programs[name].command,
         env: db.data.programs[name].env,
+        directory: db.data.programs[name].directory,
         startOnBoot: db.data.programs[name].startOnBoot,
         running: db.data.programs[name].running,
         pid: db.data.programs[name].pid,
     }
     // log.debug(`status("${name}")`, statusWithoutHistory)
     return statusWithoutHistory
-}
-function statusWithHistory(name) {
-    if (!db.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`statusWithHistory("${name}")`, error)
-        return error
-    }
-    // log.debug(`statusWithHistory("${name}")`, db.data.programs[name])
-    return db.data.programs[name]
 }
 function history(name) {
     if (!db.data.programs[name]) {
@@ -183,7 +180,7 @@ function create(name, directory, command, env = {}, startOnBoot = false) {
     }
 
     emitter.emit('status', name, status(name))
-    emitter.emit('status-all', name, statusAll())
+    emitter.emit('status-all', statusAll())
     log.debug(`create("${name}", "${directory}", "${command}", "${startOnBoot}", "${JSON.stringify(env)}") -> "ok"`, db.data.programs[name])
     db.write()
     return "ok"
@@ -223,7 +220,7 @@ function start(name, callback = () => {}) {
     spawned.on('spawn', (code, signal) => {
         program.running = true
         emitter.emit('status', name, status(name))
-        emitter.emit('status-all', name, statusAll())
+        emitter.emit('status-all', statusAll())
         log.debug(`start(${name}) event: "spawn"`)
         db.write()
         callback(name)
@@ -235,7 +232,7 @@ function start(name, callback = () => {}) {
     spawned.on('exit', (code, signal) => {
         program.running = false
         emitter.emit('status', name, status(name))
-        emitter.emit('status-all', name, statusAll())
+        emitter.emit('status-all', statusAll())
         log.debug(`start(${name}) event: "exit"`)
         db.write()
     })
@@ -317,7 +314,7 @@ function kill(name) {
         db.data.programs[name].running = false
         db.write()
         emitter.emit('status', name, status(name))
-        emitter.emit('status-all', name, statusAll())
+        emitter.emit('status-all', statusAll())
         spawnedList[name].kill()
         log.debug(`kill("${name}") -> "ok"`)
         return "ok"
@@ -341,7 +338,7 @@ function restart(name) {
         db.data.programs[name].running = false
         db.write()
         emitter.emit('status', name, status(name))
-        emitter.emit('status-all', name, statusAll())
+        emitter.emit('status-all', statusAll())
         spawnedList[name].kill()
         setTimeout(() => start(name), RESTART_TIMEOUT_MS)
         log.debug(`restart("${name}") -> "ok"`)
@@ -366,11 +363,11 @@ function remove(name) {
         db.data.programs[name].running = false
         db.write()
         emitter.emit('status', name, status(name))
-        emitter.emit('status-all', name, statusAll())
+        emitter.emit('status-all', statusAll())
         spawnedList[name].kill()
         delete db.data.programs[name]
         db.write()
-        emitter.emit('status-all', name, statusAll())
+        emitter.emit('status-all', statusAll())
         log.debug(`remove("${name}") -> "ok"`)
         return "ok"
     } catch (err) {
@@ -397,7 +394,7 @@ function setDirectory(name, directory) {
     db.data.programs[name].directory = directory
     db.write()
     emitter.emit('status', name, status(name))
-    emitter.emit('status-all', name, statusAll())
+    emitter.emit('status-all', statusAll())
     log.debug(`setDirectory("${name}", "${directory}") -> "ok"`)
     return "ok"
 }
@@ -418,7 +415,7 @@ function setCommand(name, command) {
     db.data.programs[name].command = command
     db.write()
     emitter.emit('status', name, status(name))
-    emitter.emit('status-all', name, statusAll())
+    emitter.emit('status-all', statusAll())
     log.debug(`setCommand("${name}", "${command}") -> "ok"`)
     return "ok"
 }
@@ -440,7 +437,7 @@ function setStartOnBoot(name, startOnBoot) {
     else db.data.programs[name].startOnBoot = false
     db.write()
     emitter.emit('status', name, status(name))
-    emitter.emit('status-all', name, statusAll())
+    emitter.emit('status-all', statusAll())
     log.debug(`setStartOnBoot("${name}", "${startOnBoot}") -> "ok"`)
     return "ok"
 }
@@ -465,7 +462,7 @@ function setEnviromentVariables(name, env) {
     db.data.programs[name].env = env
     db.write()
     emitter.emit('status', name, status(name))
-    emitter.emit('status-all', name, statusAll())
+    emitter.emit('status-all', statusAll())
     log.debug(`setEnviromentVariables("${name}", "${JSON.stringify(env)}") -> "ok"`)
     return "ok"
 }

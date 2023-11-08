@@ -55,7 +55,7 @@ const DEFAULT_STATE = {
 // Variables
 const log = new Logger("modules/user.js")
 const emitter = new events.EventEmitter()
-const db = await createDatabase("user", DEFAULT_STATE)
+let db = await createDatabase("user", DEFAULT_STATE)
 
 // Functions
 function validUsermame(username) {

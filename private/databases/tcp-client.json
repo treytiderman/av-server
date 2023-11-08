@@ -1,7 +1,7 @@
 {
   "clients": {
     "192.168.1.9:23": {
-      "isOpen": true,
+      "isOpen": false,
       "isReconnect": false,
       "address": "192.168.1.9:23",
       "encoding": "ascii",
@@ -89,6 +89,18 @@
           "timestampISO": "2023-11-05T17:20:03.401Z",
           "encoding": "ascii",
           "data": "\\x01\\x30\\x41\\x30\\x41\\x30\\x43\\x02\\x43\\x32\\x30\\x33\\x44\\x36\\x30\\x30\\x30\\x31\\x03\\x73\\x0D"
+        },
+        {
+          "wasReceived": false,
+          "timestampISO": "2023-11-08T02:47:44.225Z",
+          "encoding": "ascii",
+          "data": ""
+        },
+        {
+          "wasReceived": false,
+          "timestampISO": "2023-11-08T02:47:45.049Z",
+          "encoding": "ascii",
+          "data": ""
         }
       ]
     }

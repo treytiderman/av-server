@@ -69,6 +69,11 @@ api.receive("programs/v0/func/remove-all", async (client, path, body, params) =>
 })
 
 // Topics
+api.receive("programs/v0/topic/available", async (client, path, body, params) => {
+    if (body === "unsub") client.unsubscribe(path)
+    else if (body === "sub") client.subscribe(path)
+    client.sendPath(path, programs.available())
+})
 api.receive("programs/v0/topic/data/:name", async (client, path, body, params) => {
     if (body === "unsub") client.unsubscribe(path)
     else if (body === "sub") client.subscribe(path)
