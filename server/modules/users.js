@@ -8,6 +8,7 @@ import { Logger } from './logger.js'
 
 // Exports
 export {
+    validGroup,
     validUsermame,
     validPassword,
 
@@ -58,6 +59,17 @@ const emitter = new events.EventEmitter()
 let db = await createDatabase("user", DEFAULT_STATE)
 
 // Functions
+function validGroup(group) {
+    // check if empty, 0, "", NaN, null, false, undefined
+    if (!group) return false
+    // contains only alphanumaric, whitespace, special charactors _ ! @ # $ % ^ & -
+    const regex = /^[a-zA-Z0-9 _!@#$%^&-]+$/
+    group = group.toString()
+    if (group.length < 2) return false
+    else if (group.length > 20) return false
+    else if (regex.test(group) === false) return false
+    return true
+}
 function validUsermame(username) {
     return username && username.length >= 2
 }

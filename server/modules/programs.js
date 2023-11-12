@@ -5,11 +5,11 @@
 // - PM2 doesn't let you attach to stdin / stdout ??
 
 // Imports
-import { spawn } from 'child_process'
-import { EventEmitter } from 'events'
-import { getStatsRecursive, readText } from './files.js'
 import { Logger } from './logger.js'
-import { createDatabase } from './database.js'
+import { EventEmitter } from 'events'
+import { createDatabase, resetDatabase } from './database.js'
+import { getStatsRecursive, readText } from './files.js'
+import { spawn } from 'child_process'
 
 // Exports
 export {
@@ -41,6 +41,9 @@ export {
 
     splitByWhitespace,
     PATH_TO_PROGRAMS as PATH,
+    
+    // Reset
+    resetToDefault,
 }
 
 // Constants
@@ -51,13 +54,13 @@ const RESTART_TIMEOUT_MS = 100
 const DEFAULT_STATE = { programs: {}, available: {} }
 
 // Variables
-const db = await createDatabase('programs', DEFAULT_STATE)
 const log = new Logger("modules/programs.js")
-const spawnedList = {}
 const emitter = new EventEmitter()
-emitter.setMaxListeners(100) // number of receive uses
+const spawnedList = {}
+let db = await createDatabase('programs', DEFAULT_STATE)
 
 // Startup
+emitter.setMaxListeners(100)
 dbResetRunning()
 await checkAvailablePrograms()
 setInterval(async () => {
@@ -126,7 +129,7 @@ function available() {
 function status(name) {
     if (!db.data.programs[name]) {
         const error = `error program "${name}" does NOT exist`
-        log.error(`status("${name}")`, error)
+        log.error(`status("${name}") -> ${error}`)
         return error
     }
     const statusWithoutHistory = {
@@ -144,7 +147,7 @@ function status(name) {
 function history(name) {
     if (!db.data.programs[name]) {
         const error = `error program "${name}" does NOT exist`
-        log.error(`history("${name}")`, error)
+        log.error(`history("${name}") -> ${error}`)
         return error
     }
     // log.debug(`history("${name}")`, db.data.programs[name].history)
@@ -168,7 +171,7 @@ function create(name, directory, command, env = {}, startOnBoot = false) {
         return error
     }
 
-    // Create program obj
+    // Create
     db.data.programs[name] = {
         running: false,
         startOnBoot: startOnBoot,
@@ -178,7 +181,6 @@ function create(name, directory, command, env = {}, startOnBoot = false) {
         env: env,
         history: [],
     }
-
     emitter.emit('status', name, status(name))
     emitter.emit('status-all', statusAll())
     log.debug(`create("${name}", "${directory}", "${command}", "${startOnBoot}", "${JSON.stringify(env)}") -> "ok"`, db.data.programs[name])
@@ -492,4 +494,9 @@ function removeAll() {
     Object.keys(db.data.programs).forEach(name => remove(name))
     db.data.programs = {}
     return "ok"
+}
+
+async function resetToDefault() {
+    db = await resetDatabase("programs")
+    emitter.emit('status-all', statusAll())
 }

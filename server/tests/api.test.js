@@ -7,24 +7,24 @@ export async function test() {
     let response = {}
 
     // Tests
-    response = api.parseTemplate("path/to/endpoint")
+    response = api.parseTemplateString("path/to/endpoint")
     if (
-        response.template !== "path/to/endpoint" ||
+        response.string !== "path/to/endpoint" ||
         response.base !== "path/to/endpoint"
     ) pass = false
 
-    response = api.parseTemplate("path/to/endpoint/:id")
+    response = api.parseTemplateString("path/to/endpoint/:id")
     if (
-        response.template !== "path/to/endpoint/:id" ||
+        response.string !== "path/to/endpoint/:id" ||
         response.base !== "path/to/endpoint/" ||
         response.params[0] !== "id"
     ) pass = false
     response = api.parseParams(response, "path/to/endpoint/420")
     if (response.id !== "420") pass = false
 
-    response = api.parseTemplate("path/:author/:series/:book")
+    response = api.parseTemplateString("path/:author/:series/:book")
     if (
-        response.template !== "path/:author/:series/:book" ||
+        response.string !== "path/:author/:series/:book" ||
         response.base !== "path/" ||
         response.params[2] !== "book"
     ) pass = false

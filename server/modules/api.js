@@ -12,7 +12,7 @@ export {
     send,
     receive,
 
-    parseTemplate,
+    parseTemplateString,
     parseParams,
 
     isAuth,
@@ -44,7 +44,7 @@ function send(path, body) {
 }
 function receive(template, callback) {
     // log.debug(`receive("${template}", "${callback}")`)
-    const templateObj = parseTemplate(template)
+    const templateObj = parseTemplateString(template)
     ws.receiveJson((client, obj) => {
         const path = obj.path
         if (path.startsWith(templateObj.base)) {
@@ -77,29 +77,29 @@ function receive(template, callback) {
     // })
 }
 
-function parseTemplate(template) {
-    const obj = { template: template, base: template, params: [] }
-    if (template.includes("/:")) {
-        const split = template.split("/:")
-        obj.base = split[0] + "/"
+function parseTemplateString(string) {
+    const template = { string: string, base: string, params: [] }
+    if (string.includes("/:")) {
+        const split = string.split("/:")
+        template.base = split[0] + "/"
         split.forEach((text, i) => {
             if (i === 0) { }
-            else obj.params.push(text)
+            else template.params.push(text)
         })
     }
-    // log.debug(`parseTemplate("${template}") -> ${JSON.stringify(obj)}`)
-    return obj
+    // log.debug(`parseTemplateString("${string}") -> ${JSON.stringify(template)}`)
+    return template
 }
-function parseParams(templateObj, path) {
+function parseParams(template, path) {
     const params = {}
-    if (templateObj.params.length === 0) return params
+    if (template.params.length === 0) return params
     
-    const pathNoBase = path.replace(templateObj.base, "")
+    const pathNoBase = path.replace(template.base, "")
     const split = pathNoBase.split("/")
     split.forEach((text, i) => {
-        params[templateObj.params[i]] = text
+        params[template.params[i]] = text
     })
-    // log.debug(`parseParams("${JSON.stringify(templateObj)}", "${path}") -> ${JSON.stringify(params)}`)
+    // log.debug(`parseParams("${JSON.stringify(template)}", "${path}") -> ${JSON.stringify(params)}`)
     return params
 }
 

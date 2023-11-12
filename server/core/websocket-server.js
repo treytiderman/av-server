@@ -15,30 +15,31 @@ export {
     emitter,
     create,
 
-    sendRaw,
-    sendJson,
-    sendPath,
-    sendPathIfSub,
-
-    sendAllRaw,
-    sendAllJson,
-    sendAllPath,
-    sendAllPathIfSub,
-
-    receiveRaw,
-    receiveJson,
-    receivePath,
+    send,
+    sendAll,
+    receive,
 
     subscribe,
     subscriptions,
     unsubscribe,
+
+    sendJson,
+    sendPath,
+    sendPathIfSub,
+    sendAllJson,
+    sendAllPath,
+    sendAllPathIfSub,
+    receiveJson,
+    receivePath,
 }
 
 // Variables
 const log = new Logger("websocket-server.js")
 const emitter = new EventEmitter()
-emitter.setMaxListeners(100) // number of receive uses
 let wsServer = { clients: [] }
+
+// Startup
+emitter.setMaxListeners(100) // number of receive uses
 
 // Helper Functions
 function isJSON(text) {
@@ -95,54 +96,22 @@ function onConnection(ws, req) {
 }
 function onReceive(ws, data) {
     emitter.emit("recieve", ws, data)
-    // if (isJSON(data)) {
-    //     log.debug(`receive json ${ws.ip}`, JSON.parse(data))
-    // } else {
-    //     log.debug(`receive ${ws.ip}`, data)
-    // }
 }
 
-function receiveRaw(callback) {
+function receive(callback) {
     emitter.on("recieve", (ws, data) => {
         callback(ws, data)
     })
 }
-function receiveJson(callback) {
-    receiveRaw((ws, data) => {
-        if (isJSON(data)) {
-            callback(ws, JSON.parse(data))
-        }
-    })
-}
 
-function sendRaw(ws, data) {
+function send(ws, data) {
     if (ws.readyState === WebSocket.OPEN) {
         ws.send(data)
-        // if (isJSON(data)) {
-        //     log.debug(`send json ${ws.ip}`, JSON.parse(data))
-        // } else {
-        //     log.debug(`send ${ws.ip}`, data)
-        // }
     }
 }
-function sendJson(ws, obj) {
-    sendRaw(ws, JSON.stringify(obj))
-}
-function sendPath(ws, path, body) {
-    sendJson(ws, { "path": path, "body": body })
-}
-function sendPathIfSub(ws, path, body) {
-    if (ws.subs.includes(path)) sendPath(ws, path, body)
-}
-function sendAllRaw(data) {
+function sendAll(data) {
     wsServer.clients.forEach(ws => {
-        sendRaw(ws, data)
-    })
-}
-
-function sendAllJson(obj) {
-    wsServer.clients.forEach(ws => {
-        sendJson(ws, obj)
+        send(ws, data)
     })
 }
 
@@ -161,6 +130,30 @@ function unsubscribe(ws, path) {
     else ws.subs = ws.subs.filter(sub => sub !== path)
     subscriptions(ws)
     // log.debug(`unsubscribe ${ws.ip}`, path)
+}
+
+
+function receiveJson(callback) {
+    receive((ws, data) => {
+        if (isJSON(data)) {
+            callback(ws, JSON.parse(data))
+        }
+    })
+}
+
+function sendJson(ws, obj) {
+    send(ws, JSON.stringify(obj))
+}
+function sendPath(ws, path, body) {
+    sendJson(ws, { "path": path, "body": body })
+}
+function sendPathIfSub(ws, path, body) {
+    if (ws.subs.includes(path)) sendPath(ws, path, body)
+}
+function sendAllJson(obj) {
+    wsServer.clients.forEach(ws => {
+        sendJson(ws, obj)
+    })
 }
 
 // Api

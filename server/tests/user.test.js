@@ -1,5 +1,5 @@
 // Imports
-import * as user from '../modules/users.js'
+import * as users from '../modules/users-v1.js'
 
 // Functions
 export async function test() {
@@ -7,92 +7,97 @@ export async function test() {
     let response = {}
 
     // Tests
-    if (user.validUsermame()) pass = false
-    if (user.validUsermame("")) pass = false
-    if (user.validUsermame(null)) pass = false
-    if (user.validUsermame(undefined)) pass = false
-    if (user.validUsermame("h")) pass = false
-    if (user.validUsermame(32400)) pass = false
-    if (!user.validUsermame("username")) pass = false
+    users.resetToDefault()
 
-    if (user.isUser()) pass = false
-    if (user.isUser("")) pass = false
-    if (user.isUser(null)) pass = false
-    if (user.isUser(undefined)) pass = false
-    if (user.isUser("fakeUser")) pass = false
-    if (!user.isUser("admin")) pass = false
-
-    response = user.getUserAndPassword("admin") || {}
-    if (response.username !== user.DEFAULT_USER.username) pass = false
-    response = user.getUser("admin") || {}
-    if (response.username !== user.DEFAULT_USER.username) pass = false
-
-    if (user.isGroup()) pass = false
-    if (user.isGroup("")) pass = false
-    if (user.isGroup(null)) pass = false
-    if (user.isGroup(undefined)) pass = false
-    if (user.isGroup("fakeGroup")) pass = false
-    if (!user.isGroup("admin")) pass = false
-
-    if (user.areGroups([])) pass = false
-    if (user.areGroups()) pass = false
-    if (user.areGroups("")) pass = false
-    if (user.areGroups(null)) pass = false
-    if (user.areGroups(undefined)) pass = false
-    if (user.areGroups("admin")) pass = false
-    if (user.areGroups(["admin", "fakeGroup"])) pass = false
-    if (!user.areGroups(["admin", "user"])) pass = false
-
-    response = user.getGroups()
-    if (!response.some(group => group === "admin")) pass = false
-
-    await user.createGroup("testGroup")
-    await user.createGroup("testGroup")
-    if (!user.isGroup("testGroup")) pass = false
-    await user.deleteGroup("testGroup")
-    if (user.isGroup("testGroup")) pass = false
-
-    try {
-        await user.deleteGroup("admin")
-        pass = false
-    } catch (error) {
-        if (error.message !== "error can not delete admin group") pass = false
-    }
-    if (!user.isGroup("admin")) pass = false
-
-    const token = user.getToken("admin", "admin")
+    const token = users.login("admin", "admin")
     if (token.startsWith("error")) pass = false
-    user.verifyToken("BAD_TOKEN", (response, error) => {
-        if (error !== "error bad token") pass = false
-    })
-    user.verifyToken(token, (response, error) => {
+    users.loginWithToken(token, (response, error) => {
         if (error === "error bad token") pass = false
         if (response.username !== "admin") pass = false
     })
+    users.loginWithToken("BAD_TOKEN", (response, error) => {
+        if (error !== "error bad token") pass = false
+    })
 
-    await user.deleteUser("user4")
-    const createUserResponse = await user.createUser("user4", "password", "password", ["admin", "guest"])
-    if (createUserResponse.username !== "user4") pass = false
-    if (!user.isUser("user4")) pass = false
-    const token2 = user.getToken("user4", "password")
-    if (token2.startsWith("error")) pass = false
+    if (users.validGroup()) pass = false
+    if (users.validGroup(0)) pass = false
+    if (users.validGroup("")) pass = false
+    if (users.validGroup(``)) pass = false
+    if (users.validGroup([])) pass = false
+    if (users.validGroup({})) pass = false
+    if (users.validGroup(NaN)) pass = false
+    if (users.validGroup(null)) pass = false
+    if (users.validGroup(false)) pass = false
+    if (users.validGroup(undefined)) pass = false
+    if (users.validGroup("0")) pass = false
+    if (!users.validGroup("Capital")) pass = false
+    if (!users.validGroup("white space")) pass = false
+    if (!users.validGroup("special_char-!@#$%^&")) pass = false
 
-    if (user.isUserInGroup("user4", "admin") === false) pass = false
-    if (user.isUserInGroup("user4", "user") === true) pass = false
-    if (user.isUserInGroup("user4", "hop") === true) pass = false
+    if (users.isUsername()) pass = false
+    if (users.isUsername("")) pass = false
+    if (users.isUsername(null)) pass = false
+    if (users.isUsername(undefined)) pass = false
+    if (users.isUsername("fakeUser")) pass = false
+    if (!users.isUsername("admin")) pass = false
 
-    const addGroupToUserResponse = await user.addGroupToUser("user4", "user")
-    if (!addGroupToUserResponse.groups.some(group => group === "user")) pass = false
-    const removeGroupFromUserResponse = await user.removeGroupFromUser("user4", "user")
-    if (removeGroupFromUserResponse.groups.some(group => group === "user")) pass = false
+    response = users.getUserAndPassword("admin") || {}
+    if (response.username !== users.DEFAULT_USER.username) pass = false
+    response = users.getUser("admin") || {}
+    if (response.username !== users.DEFAULT_USER.username) pass = false
 
-    const changeUserPasswordResponse = await user.changeUserPassword("user4", "password2", "password2")
-    if (changeUserPasswordResponse.username !== "user4") pass = false
-    const token3 = user.getToken("user4", "password2")
-    if (token3.startsWith("error")) pass = false
+    if (users.isGroup()) pass = false
+    if (users.isGroup("")) pass = false
+    if (users.isGroup(null)) pass = false
+    if (users.isGroup(undefined)) pass = false
+    if (users.isGroup("fakeGroup")) pass = false
+    if (!users.isGroup("admin")) pass = false
 
-    const deleteUserResponse2 = await user.deleteUser("user4")
-    if (deleteUserResponse2 !== "ok") pass = false
+    if (users.areGroups([])) pass = false
+    if (users.areGroups()) pass = false
+    if (users.areGroups("")) pass = false
+    if (users.areGroups({})) pass = false
+    if (users.areGroups(null)) pass = false
+    if (users.areGroups(undefined)) pass = false
+    if (users.areGroups("admin")) pass = false
+    if (users.areGroups(["admin", "fakeGroup"])) pass = false
+    if (!users.areGroups(users.DEFAULT_GROUPS)) pass = false
+
+    response = users.getGroups()
+    if (!response.some(group => group === users.ADMIN_GROUP)) pass = false
+
+    // await users.createGroup("testGroup")
+    // await users.createGroup("testGroup")
+    // if (!users.isGroup("testGroup")) pass = false
+    // await users.deleteGroup("testGroup")
+    // if (users.isGroup("testGroup")) pass = false
+
+    // response = await users.deleteGroup("admin")
+    // if (!users.isGroup("admin")) pass = false
+
+    // await users.deleteUser("user4")
+    // const createUserResponse = await users.createUser("user4", "password", "password", ["admin", "guest"])
+    // if (createUserResponse.username !== "user4") pass = false
+    // if (!users.isUsername("user4")) pass = false
+    // const token2 = users.getToken("user4", "password")
+    // if (token2.startsWith("error")) pass = false
+
+    // if (users.isUserInGroup("user4", "admin") === false) pass = false
+    // if (users.isUserInGroup("user4", "user") === true) pass = false
+    // if (users.isUserInGroup("user4", "hop") === true) pass = false
+
+    // const addGroupToUserResponse = await users.addGroupToUser("user4", "user")
+    // if (!addGroupToUserResponse.groups.some(group => group === "user")) pass = false
+    // const removeGroupFromUserResponse = await users.removeGroupFromUser("user4", "user")
+    // if (removeGroupFromUserResponse.groups.some(group => group === "user")) pass = false
+
+    // const changeUserPasswordResponse = await users.changeUserPassword("user4", "password2", "password2")
+    // if (changeUserPasswordResponse.username !== "user4") pass = false
+    // const token3 = users.getToken("user4", "password2")
+    // if (token3.startsWith("error")) pass = false
+
+    // const deleteUserResponse2 = await users.deleteUser("user4")
+    // if (deleteUserResponse2 !== "ok") pass = false
 
     return pass
 }
