@@ -9,7 +9,7 @@ import * as programs from "./programs.test.js";
 import * as serial from "./serial.test.js";
 import * as system from "./system.test.js";
 import * as tcpClient from "./tcp-client.test.js";
-import * as user from "./user.test.js";
+import * as users from "./users.test.js";
 
 // Run Tests
 if (process.env.DEV_MODE) {
@@ -26,7 +26,7 @@ if (process.env.DEV_MODE) {
     await test("serial", serial)
     await test("system", system)
     await test("tcpClient", tcpClient)
-    await test("user", user)
+    await test("users", users)
 
     log.info("tests/run.js", "complete")
 }

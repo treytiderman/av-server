@@ -1,23 +1,8 @@
-const emitter = {}
-const api = {
-    send: (path, body) => {},
-    receive: (path, callback) => {},
-}
+// Overview: import api routes
 
-const protocals = ["websocket", "stdio", "tcp", "udp"]
-
-// Receive
-api.receive("/path/to/endpoint", (client, path, body) => {
-    const response = someFunction(body)
-    client.send(response)
-})
-api.receive("/path/to/endpoint/:id", (client, path, body, params) => {
-    const response = anotherFunction(params.id, body)
-    client.send(response)
-})
-
-// Events
-emitter.on("event-name", (data) => {
-    const body = data
-    api.send("/path/to/endpoint", body)
-})
+import "./api-logger-v0.js";
+import "./api-programs-v0.js";
+import "./api-serial-v0.js";
+import "./api-system-v0.js";
+import "./api-tcp-client-v0.js";
+import "./api-users-v0.js";

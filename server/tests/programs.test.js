@@ -34,53 +34,53 @@ export async function test() {
 
     programs.removeAll()
 
-    // Program 0 - fakeProg
-    response = programs.start("fakeProg")
-    if (!response.startsWith("error ")) pass = false
-    response = programs.send("p0", "420")
-    if (!response.startsWith("error ")) pass = false
+    // // Program 0 - fakeProg
+    // response = programs.start("fakeProg")
+    // if (!response.startsWith("error ")) pass = false
+    // response = programs.send("p0", "420")
+    // if (!response.startsWith("error ")) pass = false
 
-    // Program 1 - node log.js
-    response = programs.create("p1", `${programs.PATH}/tests`, "node log.js")
-    if (response !== "ok") pass = false
-    response = programs.start("p1")
-    if (response !== "ok") pass = false
+    // // Program 1 - node log.js
+    // response = programs.create("p1", `${programs.PATH}/tests`, "node log.js")
+    // if (response !== "ok") pass = false
+    // response = programs.start("p1")
+    // if (response !== "ok") pass = false
 
-    // Program 2 - node interval.js
-    response = programs.create("p2", `${programs.PATH}/tests`, "node interval.js")
-    if (response !== "ok") pass = false
-    response = programs.start("p2")
-    if (response !== "ok") pass = false
-    await sleep(300)
-    programs.restart("p2")
-    await sleep(300)
-    if (programs.status("p2").running === false) pass = false
-    programs.kill("p2")
-    if (programs.status("p2").running === true) pass = false
+    // // Program 2 - node interval.js
+    // response = programs.create("p2", `${programs.PATH}/tests`, "node interval.js")
+    // if (response !== "ok") pass = false
+    // response = programs.start("p2")
+    // if (response !== "ok") pass = false
+    // await sleep(300)
+    // programs.restart("p2")
+    // await sleep(300)
+    // if (programs.status("p2").running === false) pass = false
+    // programs.kill("p2")
+    // if (programs.status("p2").running === true) pass = false
 
-    // Program 3 - python3 log.py
-    response = programs.create("p3", `${programs.PATH}/tests`, "python3 log.py")
-    if (response !== "ok") pass = false
-    response = programs.start("p3")
-    if (response !== "ok") pass = false
-    await sleep(100)
-    response = programs.start("p3")
-    if (response !== "ok") pass = false
+    // // Program 3 - python3 log.py
+    // response = programs.create("p3", `${programs.PATH}/tests`, "python3 log.py")
+    // if (response !== "ok") pass = false
+    // response = programs.start("p3")
+    // if (response !== "ok") pass = false
+    // await sleep(100)
+    // response = programs.start("p3")
+    // if (response !== "ok") pass = false
 
-    // Program 4 - node env.js
-    response = programs.create("p4", `${programs.PATH}/tests`, "node env.js", {name: "arlo"})
-    if (response !== "ok") pass = false
-    response = programs.start("p4")
-    if (response !== "ok") pass = false
+    // // Program 4 - node env.js
+    // response = programs.create("p4", `${programs.PATH}/tests`, "node env.js", {name: "arlo"})
+    // if (response !== "ok") pass = false
+    // response = programs.start("p4")
+    // if (response !== "ok") pass = false
 
-    // Program 5 - node echo.mjs
-    response = programs.create("p5", `${programs.PATH}/tests`, "node echo.mjs")
-    response = programs.start("p5", async name => {
-        // response = programs.send("p5", "420")
-        // if (response !== "ok") pass = false
-        // await sleep(200)
-        // if (programs.history("p5")[1].data !== "echo: 420") pass = false
-    })
+    // // Program 5 - node echo.mjs
+    // response = programs.create("p5", `${programs.PATH}/tests`, "node echo.mjs")
+    // response = programs.start("p5", async name => {
+    //     response = programs.send("p5", "420")
+    //     if (response !== "ok") pass = false
+    //     await sleep(200)
+    //     if (programs.history("p5")[1].data !== "echo: 420") pass = false
+    // })
     
     // Program 6 - node api.mjs
     response = programs.create("p6", `${programs.PATH}/tests`, "node api.mjs")

@@ -2,32 +2,152 @@
 
 // Imports
 import { Logger } from '../modules/logger.js'
+import { EventEmitter } from 'events'
+import { createDatabase, resetDatabase } from './database.js'
+
+// Protocals
 import * as ws from '../core/websocket-server.js'
-import * as pg from './programs.js'
-// import * as tcp from './tcp-server.js'
-// import * as udp from './udp-server.js'
+import * as tcp from './tcp-server.js'
+import * as udp from './udp-server.js'
+import * as ipc from './programs.js'
 
 // Exports
 export {
+    emitter, // send, receive, client, clients
+
     send,
     receive,
-
-    parseTemplateString,
-    parseParams,
+    
+    subscribe,
+    unsubscribe,
+    subscriptions,
 
     isAuth,
     isAdmin,
+
+    parsePathTemplate,
+    parseParams,
 }
 
 // Variables
 const log = new Logger("modules/api.js")
+const emitter = new EventEmitter()
 const protocals = {
     ws: "ws",
     tcp: "tcp",
     udp: "udp",
-    programs: "pg",
+    ipc: "ipc",
     stdio: "stdio",
 }
+const clients = { }
+const DEFAULT_CLIENT = { 
+    auth: false,
+    user: {},
+    subs: [],
+    token: undefined,
+    protocal: undefined,
+}
+// const DEFAULT_STATE = { clients: {} }
+// let db = await createDatabase('api', DEFAULT_STATE)
+
+// Startup
+emitter.setMaxListeners(100)
+
+// Api accessed via the WebSocket
+ws.emitter.on("connect", (client, req) => {
+    const sendFn = (path, body) => { return client.send(JSON.stringify({path: path, body: body})) }
+    emitter.emit("connect", client.id, protocals.ws, sendFn)
+})
+ws.emitter.on("disconnect", (client) => {
+    emitter.emit("disconnect", client.id)
+})
+ws.emitter.on("receive", (client, data) => {
+    emitter.emit("receive", clients[client.id], data)
+})
+
+// Api accessed via the TCP
+// tcp.emitter.on("connect", (client) => {
+//     const sendFn = (text) => { return client.send(text) }
+//     emitter.emit("connect", id, protocals.tcp, sendFn)
+// })
+// tcp.emitter.on("disconnect", (client) => {
+//     emitter.emit("disconnect", client.id)
+// })
+// tcp.emitter.on("receive", (client, data) => {
+//     emitter.emit("receive", clients[client.id], data)
+// })
+
+// // Api accessed via the UDP
+// udp.emitter.on("connect", (client) => {
+//     const sendFn = (text) => { return client.send(text) }
+//     emitter.emit("connect", id, protocals.udp, sendFn)
+// })
+// udp.emitter.on("disconnect", (client) => {
+//     emitter.emit("disconnect", client.id)
+// })
+// udp.emitter.on("receive", (client, data) => {
+//     emitter.emit("receive", clients[client.id], data)
+// })
+
+const flag = false
+
+// // Api accessed via the Interprocess Communication
+ipc.emitter.on("create", (id) => {
+    const sendFn = (path, body) => { return ipc.send(id, JSON.stringify({path: path, body: body})) }
+    emitter.emit("connect", id, protocals.ipc, sendFn)
+    console.log("create", id, protocals.ipc, sendFn)
+})
+ipc.emitter.on("delete", (id) => {
+    console.log("delete", id)
+    emitter.emit("disconnect", id)
+})
+ipc.emitter.on("receive", (id, data) => {
+    console.log("data", id, data)
+    emitter.emit("receive", clients[id], data)
+})
+
+// Recieve from any protocal
+emitter.on("connect", (id, protocal, sendFn) => {
+    clients[id] = {
+        id: id,
+        auth: false,
+        user: {},
+        subs: [],
+        token: undefined,
+        protocal: protocal,
+        send: (path, body) => { return sendFn(path, body) },
+        subscribe: (template) => { return subscribe(id, template) },
+        unsubscribe: (template) => { return unsubscribe(id, template) },
+        subscriptions: () => { return subscriptions(id) },
+    }
+    // console.log("connect", clients[id])
+    emitter.emit("client", clients[id])
+})
+emitter.on("disconnect", (id) => {
+    delete clients[id]
+    emitter.emit("client", clients[id])
+})
+emitter.on("receive", (client, data) => {
+    
+    // Is JSON
+    if (isJSON(data)) {
+        const json = JSON.parse(data)
+        emitter.emit("receive-json", client, json)
+        if (client.protocal !== "ws") {
+            console.log("json", json)
+        }
+        
+        
+        // Is API
+        if (json.path) {
+            if (client.protocal !== "ws") {
+                console.log("path", json)
+            }
+            // log.debug(`receive (${client.protocal}) -> ${json.path}`, json.body)
+            emitter.emit("receive-api", client, json.path, json.body)
+        }
+    }
+})
 
 // Functions
 function isJSON(text) {
@@ -35,49 +155,7 @@ function isJSON(text) {
     catch (error) { return false }
     return true
 }
-
-function send(path, body) {
-    const obj = { path: path, body: body }
-    const json = JSON.stringify(obj)
-    ws.sendAllPathIfSub(path, body)
-    // pg.sendAll(json)
-}
-function receive(template, callback) {
-    // log.debug(`receive("${template}", "${callback}")`)
-    const templateObj = parseTemplateString(template)
-    ws.receiveJson((client, obj) => {
-        const path = obj.path
-        if (path.startsWith(templateObj.base)) {
-            const body = obj.body
-            client.protocal = protocals.ws
-            client.sendPath = (path, body) => ws.sendPath(client, path, body)
-            client.subscribe = (path) => ws.subscribe(client, path)
-            client.unsubscribe = (path) => ws.unsubscribe(client, path)
-            const params = parseParams(templateObj, path)
-            callback(client, path, body, params)
-        }
-    })
-    // pg.emitter.on("data", (name, obj) => {
-    //     if (isJSON(obj.data)) {
-    //         const json = JSON.parse(obj.data)
-    //         const path = json.path
-    //         if (path.startsWith(templateObj.base)) {
-    //             const body = json.body
-    //             const client = {}
-    //             client.protocal = protocals.programs
-    //             client.sendPath = (path, body) => pg.send(name, JSON.stringify({path: path, body: body}))
-    //             client.subscribe = (path) => {}
-    //             client.unsubscribe = (path) => {}
-    //             const params = parseParams(templateObj, path)
-    //             console.log(client, path, body, params);
-    //             // callback(client, path, body, params)
-    //             // pg.send(name, "yes")
-    //         }
-    //     }
-    // })
-}
-
-function parseTemplateString(string) {
+function parsePathTemplate(string) {
     const template = { string: string, base: string, params: [] }
     if (string.includes("/:")) {
         const split = string.split("/:")
@@ -87,7 +165,7 @@ function parseTemplateString(string) {
             else template.params.push(text)
         })
     }
-    // log.debug(`parseTemplateString("${string}") -> ${JSON.stringify(template)}`)
+    // log.debug(`parsePathTemplate("${string}") -> ${JSON.stringify(template)}`)
     return template
 }
 function parseParams(template, path) {
@@ -103,24 +181,55 @@ function parseParams(template, path) {
     return params
 }
 
+function send(path, body) {
+    Object.keys(clients).forEach(id => {
+        if (clients[id].subs.includes(path)) {
+            clients[id].send(path, body)
+        }
+    })
+}
+function receive(pathTemplate, callback) {
+    emitter.on("receive-api", (client, path, body) => {
+        if (client.protocal !== "ws") {
+            console.log("data", client)
+        }
+        const template = parsePathTemplate(pathTemplate)
+        if (path.startsWith(template.base)) {
+            const params = parseParams(template, path)
+            if (body === "sub") client.subscribe(path)
+            else if (body === "unsub") client.unsubscribe(path)
+            callback(client, path, body, params)
+        }
+    })
+}
+
+function subscriptions(id) {
+    return clients[id].subs
+}
+function subscribe(id, path) {
+    if (clients[id].subs.indexOf(path) !== -1) return "error already subscribed"
+    clients[id].subs.push(path)
+    return "ok"
+}
+function unsubscribe(id, path) {
+    if (path === "*") clients[id].subs = []
+    else clients[id].subs = clients[id].subs.filter(sub => sub !== path)
+}
+
 function isAuth(client, path) {
     if (!client.send) return false
     else if (client.auth === false) {
         client.send(path, "error login first")
         return false
-    } else {
-        return true
     }
+    else return true
 }
 function isAdmin(client, path) {
-    if (isAuth(client, path) === false) {
-        return false
-    } else if (!client.user || !client.user.groups) {
-        return false
-    } else if (client.user.groups.some(group => group === "admin") === false) {
+    if (isAuth(client, path) === false) return false
+    else if (!client.user || !client.user.groups) return false
+    else if (client.user.groups.some(group => group === "admin") === false) {
         client.send(path, "error not in group admin")
         return false
-    } else {
-        return true
-    }
+    } 
+    else return true
 }

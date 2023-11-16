@@ -15,6 +15,6 @@ export const api = {
 }
 
 function uptime(callback = () => { }) {
-    stdio.send.path("system/v0/topic/uptime", "get")
-    stdio.receiveOnce.path("system/v0/topic/uptime", (response) => callback(response))
+    stdio.send.path("/system/v0/topic/uptime/", "get")
+    stdio.receiveOnce.path("/system/v0/topic/uptime/", (response) => callback(response))
 }

@@ -13,7 +13,7 @@ import { spawn } from 'child_process'
 
 // Exports
 export {
-    emitter, // available, data, history, status, status-all
+    emitter, // available, data, history, status, status-all, create, delete
 
     available,
     
@@ -181,6 +181,7 @@ function create(name, directory, command, env = {}, startOnBoot = false) {
         env: env,
         history: [],
     }
+    emitter.emit('create', name)
     emitter.emit('status', name, status(name))
     emitter.emit('status-all', statusAll())
     log.debug(`create("${name}", "${directory}", "${command}", "${startOnBoot}", "${JSON.stringify(env)}") -> "ok"`, db.data.programs[name])
@@ -246,6 +247,7 @@ function start(name, callback = () => {}) {
         }
         program.history.push(dataObj)
         if (program.history.length > MAX_HISTORY_LENGTH) { program.history.shift() }
+        emitter.emit('receive', name, data)
         emitter.emit('data', name, dataObj)
         emitter.emit('history', name, history(name))
         // log.debug(`start(${name}) event: "stdout" -> ${JSON.stringify(dataObj.data)}`, dataObj)
@@ -259,6 +261,7 @@ function start(name, callback = () => {}) {
         }
         program.history.push(dataObj)
         if (program.history.length > MAX_HISTORY_LENGTH) { program.history.shift() }
+        emitter.emit('receive', name, data)
         emitter.emit('data', name, dataObj)
         emitter.emit('history', name, history(name))
         // log.debug(`start(${name}) event: "stderr" -> ${JSON.stringify(dataObj.data)}`, dataObj)
@@ -369,6 +372,7 @@ function remove(name) {
         spawnedList[name].kill()
         delete db.data.programs[name]
         db.write()
+        emitter.emit('delete', name)
         emitter.emit('status-all', statusAll())
         log.debug(`remove("${name}") -> "ok"`)
         return "ok"
