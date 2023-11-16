@@ -9,6 +9,7 @@ api.receive("/tcp-client/v0/func/open/", async (client, path, body, params) => {
     if (api.isAdmin(client, path)) {
         client.subscribe(path)
         tcpClient.open(body.address, body.encoding)
+        // client.send(path, `hint sub to /tcp-client/v0/topic/client/${body.address}/ for updates`)
     }
 })
 api.receive("/tcp-client/v0/func/send/", async (client, path, body, params) => {

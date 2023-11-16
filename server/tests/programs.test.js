@@ -81,14 +81,14 @@ export async function test() {
     //     await sleep(200)
     //     if (programs.history("p5")[1].data !== "echo: 420") pass = false
     // })
-    
+
     // Program 6 - node api.mjs
     response = programs.create("p6", `${programs.PATH}/tests`, "node api.mjs")
     response = programs.start("p6")
 
     // Kill and Remove
     await sleep(500)
-    programs.killAll()
+    // programs.killAll()
     // programs.removeAll()
 
     await sleep(100)

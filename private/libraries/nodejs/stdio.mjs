@@ -1,4 +1,5 @@
 // Overview: wrapper for stdin / stdout
+import { EventEmitter } from "events";
 
 // Export
 export const stdio = {
@@ -19,6 +20,15 @@ export const stdio = {
     }
 }
 
+// Startup
+const emitter = new EventEmitter()
+emitter.setMaxListeners(100)
+process.stdin.on("data", buffer => {
+    const data = buffer.toString()
+    // console.log("receive", data)
+    emitter.emit("receive", data)
+})
+
 // Functions
 function isJSON(text) {
     try { JSON.parse(text) }
@@ -34,34 +44,35 @@ function sendJSON(obj) {
 }
 
 function receive(callback) {
-    process.stdin.on("data", buffer => {
+    emitter.on("receive", buffer => {
         const data = buffer.toString()
         callback(data)
     })
 }
 function receiveJson(callback) {
-    receive(data => {
+    emitter.on("receive", buffer => {
+        const data = buffer.toString()
         if (isJSON(data)) callback(JSON.parse(data))
     })
 }
 function receiveOnce(callback) {
     function eventListenerFunction(buffer) {
-        process.stdin.removeListener('message', eventListenerFunction)
+        emitter.removeListener('receive', eventListenerFunction)
         const data = buffer.toString()
         callback(data)
     }
-    process.stdin.on("data", eventListenerFunction)
+    emitter.on("receive", eventListenerFunction)
 }
 function receiveJsonOnce(callback) {
     function eventListenerFunction(buffer) {
         const data = buffer.toString()
         if (isJSON(data)) {
             const obj = JSON.parse(data)
-            process.stdin.removeListener('message', eventListenerFunction)
+            emitter.removeListener('receive', eventListenerFunction)
             callback(obj)
         }
     }
-    process.stdin.on("data", eventListenerFunction)
+    emitter.on("receive", eventListenerFunction)
 }
 
 // API
@@ -72,9 +83,13 @@ function sendPath(path, body = {}) {
     })
 }
 function receivePath(path, callback) {
-    receiveJson(obj => {
-        if (obj.path === path) {
-            callback(obj.body)
+    emitter.on("receive", buffer => {
+        const data = buffer.toString()
+        if (isJSON(data)) {
+            const obj = JSON.parse(data)
+            if (obj.path === path) {
+                callback(obj.body)
+            }
         }
     })
 }
@@ -84,10 +99,10 @@ function receivePathOnce(path, callback) {
         if (isJSON(data)) {
             const obj = JSON.parse(data)
             if (obj.path === path) {
-                process.stdin.removeListener('message', eventListenerFunction)
-                callback(obj)
+                emitter.removeListener('receive', eventListenerFunction)
+                callback(obj.body)
             }
         }
     }
-    process.stdin.on("data", eventListenerFunction)
+    emitter.on("receive", eventListenerFunction)
 }

@@ -1,7 +1,7 @@
 // Overview: simple local JSON database to maintain state
 
 // Imports
-import { Low } from 'lowdb'
+import * as lowdb from 'lowdb'
 import { JSONFile } from 'lowdb/node'
 import fs from 'fs/promises'
 import { Logger } from './logger.js'
@@ -43,7 +43,7 @@ function getDatabase(name) {
 async function createDatabase(name, defaultData = {}) {
     const path = `${PATH_TO_DATABASE_FOLDER}/${name}.json`
     const adapter = new JSONFile(path)
-    const db = new Low(adapter, defaultData || {})
+    const db = new lowdb.Low(adapter, defaultData || {})
     await db.read()
     db.defaultData = JSON.parse(JSON.stringify(defaultData || {}))
     db.path = path

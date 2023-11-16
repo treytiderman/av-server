@@ -5,7 +5,7 @@ import * as api from '../modules/api.js'
 import * as programs from '../modules/programs.js'
 
 // Functions
-api.receive("/programs/v0/func//create", async (client, path, body, params) => {
+api.receive("/programs/v0/func/create/", async (client, path, body, params) => {
     if (api.isAdmin(client, path) === false) return
     client.send(path, programs.create(body.name, body.directory, body.command, body.env, body.startOnBoot))
 })

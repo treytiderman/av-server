@@ -95,14 +95,11 @@ const flag = false
 ipc.emitter.on("create", (id) => {
     const sendFn = (path, body) => { return ipc.send(id, JSON.stringify({path: path, body: body})) }
     emitter.emit("connect", id, protocals.ipc, sendFn)
-    console.log("create", id, protocals.ipc, sendFn)
 })
 ipc.emitter.on("delete", (id) => {
-    console.log("delete", id)
     emitter.emit("disconnect", id)
 })
 ipc.emitter.on("receive", (id, data) => {
-    console.log("data", id, data)
     emitter.emit("receive", clients[id], data)
 })
 
@@ -120,7 +117,6 @@ emitter.on("connect", (id, protocal, sendFn) => {
         unsubscribe: (template) => { return unsubscribe(id, template) },
         subscriptions: () => { return subscriptions(id) },
     }
-    // console.log("connect", clients[id])
     emitter.emit("client", clients[id])
 })
 emitter.on("disconnect", (id) => {
@@ -133,16 +129,9 @@ emitter.on("receive", (client, data) => {
     if (isJSON(data)) {
         const json = JSON.parse(data)
         emitter.emit("receive-json", client, json)
-        if (client.protocal !== "ws") {
-            console.log("json", json)
-        }
-        
         
         // Is API
         if (json.path) {
-            if (client.protocal !== "ws") {
-                console.log("path", json)
-            }
             // log.debug(`receive (${client.protocal}) -> ${json.path}`, json.body)
             emitter.emit("receive-api", client, json.path, json.body)
         }
@@ -184,20 +173,23 @@ function parseParams(template, path) {
 function send(path, body) {
     Object.keys(clients).forEach(id => {
         if (clients[id].subs.includes(path)) {
+            if (clients[id].protocal !== "ws") {
+                console.log("send", path, body)
+            }
             clients[id].send(path, body)
         }
     })
 }
 function receive(pathTemplate, callback) {
     emitter.on("receive-api", (client, path, body) => {
-        if (client.protocal !== "ws") {
-            console.log("data", client)
-        }
         const template = parsePathTemplate(pathTemplate)
         if (path.startsWith(template.base)) {
             const params = parseParams(template, path)
             if (body === "sub") client.subscribe(path)
             else if (body === "unsub") client.unsubscribe(path)
+            if (client.protocal !== "ws") {
+                console.log("json", path, body)
+            }
             callback(client, path, body, params)
         }
     })
