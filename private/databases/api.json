@@ -1,14 +1,35 @@
 {
   "clients": {
-    "7": {
-      "id": "7",
-      "auth": false,
-      "user": {},
+    "1": {
+      "id": "1",
+      "auth": true,
+      "user": {
+        "username": "ipc",
+        "groups": [
+          "admin"
+        ]
+      },
       "subs": [],
       "protocal": "ipc"
     },
-    "1700332409952": {
-      "id": 1700332409952,
+    "7": {
+      "id": "7",
+      "auth": true,
+      "user": {
+        "username": "ipc",
+        "groups": [
+          "admin"
+        ]
+      },
+      "subs": [
+        "/tcp-client/v0/func/open/",
+        "/tcp-client/v0/topic/client/192.168.1.32:23/",
+        "/tcp-client/v0/topic/data/192.168.1.32:23/"
+      ],
+      "protocal": "ipc"
+    },
+    "1700337656506": {
+      "id": 1700337656506,
       "auth": true,
       "user": {
         "username": "admin",

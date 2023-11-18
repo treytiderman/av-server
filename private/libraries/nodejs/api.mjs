@@ -13,9 +13,15 @@ import * as user_v0 from "./api-user-v0.mjs";
 // Exports
 export const api = {
     stdio: stdio,
+    sleep: sleep,
     logger: { v0: logger_v0 },
     programs: { v0: programs_v0 },
     system: { v0: system_v0 },
     tcpClient: { v0: tcpClient_v0 },
     user: { v0: user_v0 },
+}
+
+// Functions
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

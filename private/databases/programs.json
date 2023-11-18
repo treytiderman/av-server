@@ -1,12 +1,1664 @@
 {
   "programs": {
-    "7": {
+    "1": {
       "running": false,
+      "startOnBoot": "true",
+      "pid": 3753,
+      "directory": "../private/programs/tests",
+      "command": "python3 log.py",
+      "env": "",
+      "history": [
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:58:57.721Z",
+          "data": "Hello from Python\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:58:59.306Z",
+          "data": "Hello from Python\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:59:01.753Z",
+          "data": "Hello from Python\n"
+        }
+      ]
+    },
+    "7": {
+      "running": true,
       "startOnBoot": false,
+      "pid": 3740,
       "directory": "../private/programs/tests",
       "command": "node test.mjs",
       "env": {},
-      "history": []
+      "history": [
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:50:43.412Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:50:43.422Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:50:43.422Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:50:43.423Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:50:43.428Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:50:43.926Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:50:43.941Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:50:44.426Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:50:44.430Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:52:26.107Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:52:26.108Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:52:26.108Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:52:26.108Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:52:26.109Z",
+          "data": "192.168.1.32:23 is open: true\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:52:26.109Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:52:26.611Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:52:26.611Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:52:26.611Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:52:26.618Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:52:26.656Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:52:26.656Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stderr",
+          "timestampISO": "2023-11-18T19:52:26.664Z",
+          "data": "file:///app/private/libraries/devices/marantz.mjs:67\n            volume = Number(volume)\n                   ^\n\nTypeError: Assignment to constant variable.\n    at file:///app/private/libraries/devices/marantz.mjs:67:20\n    at file:///app/private/libraries/nodejs/api-tcp-client-v0.mjs:118:77\n    at EventEmitter.<anonymous> (file:///app/private/libraries/nodejs/stdio.mjs:91:17)\n    at EventEmitter.emit (node:events:526:35)\n    at Socket.<anonymous> (file:///app/private/libraries/nodejs/stdio.mjs:29:13)\n    at Socket.emit (node:events:514:28)\n    at addChunk (node:internal/streams/readable:324:12)\n    at readableAddChunk (node:internal/streams/readable:297:9)\n    at Readable.push (node:internal/streams/readable:234:10)\n    at Pipe.onStreamRead (node:internal/stream_base_commons:190:23)\n\nNode.js v18.17.1\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:16.810Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:16.810Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:16.810Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:16.810Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:20.571Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:20.571Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:20.572Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:20.572Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:22.977Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:22.977Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:22.978Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:22.978Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:22.979Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:23.481Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:23.481Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:53:23.481Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:23.496Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:23.527Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:53:23.526Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:23.542Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:53:23.542Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:23.550Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:23.981Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:23.982Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:53:23.981Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:23.992Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:24.020Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:53:24.019Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:24.035Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:24.041Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:53:24.041Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:54.817Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:54.817Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:53:54.818Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:53:54.818Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:13.931Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:13.932Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:13.933Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:13.933Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:13.933Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:14.434Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:14.435Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:14.434Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:14.450Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:14.481Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:14.481Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:14.501Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:14.500Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:14.508Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:14.935Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:14.936Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:14.935Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:14.952Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:14.977Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:14.977Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:14.987Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:14.987Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:14.993Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:18.228Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:18.228Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:18.229Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:18.229Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:18.230Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:18.730Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:18.731Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:18.730Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:18.741Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:18.771Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:18.771Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:18.784Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:18.795Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:18.794Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:19.231Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:19.231Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:19.231Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:19.242Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:19.273Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:19.272Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:19.288Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:19.295Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:19.295Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:39.038Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:39.038Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:39.038Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:39.038Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:39.039Z",
+          "data": "192.168.1.32:23 is open: true\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:39.039Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:39.540Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:39.541Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:39.541Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:39.560Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:39.581Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:39.581Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:39.599Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:39.598Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:39.606Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:40.041Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:40.042Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:40.041Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:40.063Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:40.082Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:40.082Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:40.099Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:40.098Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:40.105Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:41.252Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:41.252Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:41.253Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:41.253Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:41.253Z",
+          "data": "192.168.1.32:23 is open: true\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:41.254Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:41.754Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:41.754Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:41.754Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:41.765Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:41.795Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:41.795Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:41.800Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:41.817Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:41.817Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:42.255Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:42.255Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:42.255Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:42.265Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:42.299Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:42.299Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:42.308Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:42.315Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:42.314Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:43.226Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:43.227Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:43.227Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:43.227Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:43.228Z",
+          "data": "192.168.1.32:23 is open: true\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:43.228Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:43.729Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:43.730Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:43.729Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:43.741Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:43.780Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:43.779Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:43.793Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:43.795Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:43.795Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:44.230Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:44.231Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:44.230Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:44.241Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:44.269Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:44.269Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:44.279Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:44.279Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:44.283Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:57.952Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:57.952Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:57.953Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:57.953Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:57.954Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:58.454Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:58.455Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:58.455Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:58.467Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:58.507Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:58.506Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:58.519Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:58.522Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:58.521Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:58.954Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:58.955Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:54:58.954Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:58.963Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:58.993Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:58.993Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:54:59.005Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:54:59.004Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:54:59.011Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:00.113Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:00.114Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:00.114Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:00.114Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:00.115Z",
+          "data": "192.168.1.32:23 is open: true\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:00.115Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:00.616Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:00.616Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:55:00.616Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:00.620Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:00.663Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:00.663Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:00.668Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:00.679Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:00.679Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:01.117Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:01.118Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:55:01.117Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:01.132Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:01.161Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:01.161Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:01.174Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:01.176Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:01.176Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:02.010Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:02.010Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:02.011Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:02.011Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:02.012Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:02.512Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:02.512Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:55:02.512Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:02.526Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:02.550Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:02.550Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:02.562Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:02.571Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:02.571Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:03.012Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:03.013Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:55:03.013Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:03.024Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:03.054Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:03.053Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:03.063Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:03.077Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:03.076Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:49.694Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:49.695Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:49.696Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:49.696Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:49.698Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:50.198Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:50.198Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:55:50.198Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:50.215Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:50.241Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:50.241Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:50.260Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:50.263Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:50.263Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:50.699Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:50.700Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:55:50.699Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:50.711Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:50.744Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:50.743Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:50.755Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:50.758Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:50.758Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:51.751Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:51.752Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:51.753Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:51.753Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:52.254Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:52.254Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:55:52.254Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:52.266Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:52.301Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:52.300Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:52.314Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:52.316Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:52.316Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:52.754Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:52.755Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:55:52.755Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:52.766Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:52.797Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:52.797Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:55:52.814Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:52.820Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:55:52.820Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:55:58.396Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":false,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:00.007Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:00.013Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:00.509Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:00.510Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:56:00.509Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:00.523Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:00.553Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:00.553Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:00.570Z",
+          "data": "vol is now 55.5\nvol is now 55.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:00.579Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:00.578Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:01.010Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:01.010Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:56:01.010Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:01.023Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:01.046Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:01.046Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:01.059Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:01.059Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:01.065Z",
+          "data": "vol is now 55\nvol is now 55\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:22.233Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:22.233Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:22.234Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:22.234Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:22.235Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:22.736Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:22.737Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:56:22.737Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:22.755Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:22.783Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:22.783Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:22.803Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:22.802Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:22.812Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:23.237Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:23.237Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:56:23.237Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:23.241Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:23.279Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:23.279Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:23.285Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:23.301Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:23.300Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:35.102Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:35.103Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:35.104Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:35.105Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:35.605Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:35.606Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:56:35.605Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:35.622Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:35.652Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:35.651Z\",\"encoding\":\"ascii\",\"data\":\"MV555\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:35.668Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:35.668Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:35.677Z",
+          "data": "vol is now 55.5\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:36.105Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:36.106Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:56:36.106Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:36.116Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:36.145Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:36.144Z\",\"encoding\":\"ascii\",\"data\":\"MV55\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:36.156Z",
+          "data": "vol is now 55\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:36.167Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:36.167Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:55.995Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:56:55.995Z\",\"encoding\":\"ascii\",\"data\":\"MV42\\\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:56.047Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:56.046Z\",\"encoding\":\"ascii\",\"data\":\"MV42\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:56:56.066Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:56:56.066Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:56:56.076Z",
+          "data": "vol is now 42\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:02.204Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:05.594Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:05.603Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:05.603Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:05.604Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:05.607Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:06.106Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:06.106Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:57:06.106Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:06.116Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:06.146Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:06.146Z\",\"encoding\":\"ascii\",\"data\":\"MV425\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:06.151Z",
+          "data": "vol is now 42.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:06.151Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:06.151Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:06.606Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:06.607Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:57:06.607Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:06.619Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:06.644Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:06.644Z\",\"encoding\":\"ascii\",\"data\":\"MV42\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:06.649Z",
+          "data": "vol is now 42\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:06.650Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:06.650Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:10.459Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:10.459Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:10.461Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:10.461Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:10.961Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:10.962Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:57:10.961Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:10.967Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:11.006Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:11.006Z\",\"encoding\":\"ascii\",\"data\":\"MV425\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:11.016Z",
+          "data": "vol is now 42.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:11.022Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:11.021Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:11.462Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:11.463Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:57:11.462Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:11.473Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:11.500Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:11.500Z\",\"encoding\":\"ascii\",\"data\":\"MV42\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:11.511Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:11.511Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:11.515Z",
+          "data": "vol is now 42\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:14.330Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/open/\",\"body\":{\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:14.330Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{\"isOpen\":true,\"isReconnect\":false,\"address\":\"192.168.1.32:23\",\"encoding\":\"ascii\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:14.331Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:14.331Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/client/192.168.1.32:23/\",\"body\":{}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:14.331Z",
+          "data": "192.168.1.32:23 is open: true\n{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":\"sub\"}\r\n"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:14.833Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVUP\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:14.833Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:57:14.833Z\",\"encoding\":\"ascii\",\"data\":\"MVUP\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:14.845Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:14.884Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:14.884Z\",\"encoding\":\"ascii\",\"data\":\"MV425\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:14.896Z",
+          "data": "vol is now 42.5\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:14.899Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:14.899Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:15.334Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":{\"address\":\"192.168.1.32:23\",\"data\":\"MVDOWN\\r\",\"encoding\":\"ascii\"}}\r\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:15.334Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":false,\"timestampISO\":\"2023-11-18T19:57:15.334Z\",\"encoding\":\"ascii\",\"data\":\"MVDOWN\\r\"}}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:15.346Z",
+          "data": "{\"path\":\"/tcp-client/v0/func/send/\",\"body\":\"ok\"}"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:15.375Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:15.374Z\",\"encoding\":\"ascii\",\"data\":\"MV42\\r\"}}"
+        },
+        {
+          "from": "stdout",
+          "timestampISO": "2023-11-18T19:57:15.386Z",
+          "data": "vol is now 42\n"
+        },
+        {
+          "from": "stdin",
+          "timestampISO": "2023-11-18T19:57:15.398Z",
+          "data": "{\"path\":\"/tcp-client/v0/topic/data/192.168.1.32:23/\",\"body\":{\"wasReceived\":true,\"timestampISO\":\"2023-11-18T19:57:15.397Z\",\"encoding\":\"ascii\",\"data\":\"MVMAX 98\\r\"}}"
+        }
+      ]
     }
   },
   "available": {
@@ -18,7 +1670,7 @@
     },
     "tests": {
       "directory": "../private/programs/tests",
-      "command": "node tcp.mjs",
+      "command": "node test.mjs",
       "env": {},
       "files": [
         "api.mjs",
@@ -27,7 +1679,8 @@
         "interval.js",
         "log.js",
         "log.py",
-        "tcp.mjs"
+        "tcp.mjs",
+        "test.mjs"
       ]
     }
   }

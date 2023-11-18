@@ -1,7 +1,7 @@
 {
   "clients": {
     "192.168.1.9:23": {
-      "isOpen": true,
+      "isOpen": false,
       "isReconnect": false,
       "address": "192.168.1.9:23",
       "encoding": "ascii",
@@ -6009,40 +6009,118 @@
       ]
     },
     "192.168.1.32:23": {
-      "isOpen": false,
+      "isOpen": true,
       "isReconnect": false,
       "address": "192.168.1.32:23",
       "encoding": "ascii",
       "history": [
         {
           "wasReceived": false,
-          "timestampISO": "2023-11-18T16:46:29.732Z",
+          "timestampISO": "2023-11-18T19:57:06.106Z",
           "encoding": "ascii",
-          "data": "ka 01 01\\r"
+          "data": "MVUP\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:06.146Z",
+          "encoding": "ascii",
+          "data": "MV425\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:06.151Z",
+          "encoding": "ascii",
+          "data": "MVMAX 98\r"
         },
         {
           "wasReceived": false,
-          "timestampISO": "2023-11-18T16:46:36.635Z",
+          "timestampISO": "2023-11-18T19:57:06.607Z",
           "encoding": "ascii",
-          "data": "MV?/r"
+          "data": "MVDOWN\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:06.644Z",
+          "encoding": "ascii",
+          "data": "MV42\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:06.650Z",
+          "encoding": "ascii",
+          "data": "MVMAX 98\r"
         },
         {
           "wasReceived": false,
-          "timestampISO": "2023-11-18T16:46:45.347Z",
+          "timestampISO": "2023-11-18T19:57:10.961Z",
           "encoding": "ascii",
-          "data": "MV?/r"
+          "data": "MVUP\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:11.006Z",
+          "encoding": "ascii",
+          "data": "MV425\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:11.021Z",
+          "encoding": "ascii",
+          "data": "MVMAX 98\r"
         },
         {
           "wasReceived": false,
-          "timestampISO": "2023-11-18T16:46:46.883Z",
+          "timestampISO": "2023-11-18T19:57:11.462Z",
           "encoding": "ascii",
-          "data": "MV?/r"
+          "data": "MVDOWN\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:11.500Z",
+          "encoding": "ascii",
+          "data": "MV42\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:11.511Z",
+          "encoding": "ascii",
+          "data": "MVMAX 98\r"
         },
         {
           "wasReceived": false,
-          "timestampISO": "2023-11-18T16:46:52.339Z",
+          "timestampISO": "2023-11-18T19:57:14.833Z",
           "encoding": "ascii",
-          "data": "MV?/n"
+          "data": "MVUP\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:14.884Z",
+          "encoding": "ascii",
+          "data": "MV425\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:14.899Z",
+          "encoding": "ascii",
+          "data": "MVMAX 98\r"
+        },
+        {
+          "wasReceived": false,
+          "timestampISO": "2023-11-18T19:57:15.334Z",
+          "encoding": "ascii",
+          "data": "MVDOWN\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:15.374Z",
+          "encoding": "ascii",
+          "data": "MV42\r"
+        },
+        {
+          "wasReceived": true,
+          "timestampISO": "2023-11-18T19:57:15.397Z",
+          "encoding": "ascii",
+          "data": "MVMAX 98\r"
         }
       ]
     }

@@ -125,6 +125,13 @@ emitter.on("connect", (id, protocal, sendFn) => {
         unsubscribe: (template) => { return unsubscribe(id, template) },
         subscriptions: () => { return subscriptions(id) },
     }
+    if (protocal === protocals.ipc) {
+        db.data.clients[id].auth = true
+        db.data.clients[id].user = {
+            "username": "ipc",
+            "groups": [ "admin" ]
+        }
+    }
     emitter.emit("client", db.data.clients[id])
     db.write()
 })

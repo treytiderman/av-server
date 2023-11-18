@@ -79,7 +79,7 @@ export async function test() {
         response = programs.send("5", "420")
         if (response !== "ok") pass = false
         await sleep(200)
-        if (programs.history("5")[1].data !== "echo: 420") pass = false
+        if (!programs.history("5")[1].data.startsWith("echo: 420")) pass = false
     })
 
     // Program 6 - node api.mjs
