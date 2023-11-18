@@ -40,60 +40,47 @@ api.receive("/users/v0/func/logout/", (client, path, body, params) => {
     api.send(client, "/users/v0/topic/who-am-i/", client.user)
 })
 
-api.receive("/users/v0/func/group-create/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/func/group-create/", async (client, path, body, params) => {
     client.send(path, await users.createGroup(body))
 })
-api.receive("/users/v0/func/group-delete/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/func/group-delete/", async (client, path, body, params) => {
     client.send(path, await users.deleteGroup(body))
 })
 
-api.receive("/users/v0/func/user-create/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/func/user-create/", async (client, path, body, params) => {
     client.send(path, await users.createUser(body.username, body.password, body.passwordConfirm, body.groups))
 })
-api.receive("/users/v0/func/user-delete/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/func/user-delete/", async (client, path, body, params) => {
     client.send(path, await users.deleteUser(body))
 })
-api.receive("/users/v0/func/user-add-group/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/func/user-add-group/", async (client, path, body, params) => {
     client.send(path, await users.addGroupToUser(body.username, body.group))
 })
-api.receive("/users/v0/func/user-remove-group/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/func/user-remove-group/", async (client, path, body, params) => {
     client.send(path, await users.removeGroupFromUser(body.username, body.group))
 })
-api.receive("/users/v0/func/user-change-password/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/func/user-change-password/", async (client, path, body, params) => {
     client.send(path, await users.changeUserPassword(body.username, body.password, body.passwordConfirm))
 })
 
-api.receive("/users/v0/func/reset-to-default/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/func/reset-to-default/", async (client, path, body, params) => {
     client.send(path, await users.resetToDefault())
 })
 
 // Topics
-api.receive("/users/v0/topic/token/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/topic/token/", async (client, path, body, params) => {
     // client.send(path, client.token)
 })
-api.receive("/users/v0/topic/who-am-i/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/topic/who-am-i/", async (client, path, body, params) => {
     client.send(path, client.user)
 })
-api.receive("/users/v0/topic/groups/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/topic/groups/", async (client, path, body, params) => {
     client.send(path, users.getGroups())
 })
-api.receive("/users/v0/topic/user/:username/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/topic/user/:username/", async (client, path, body, params) => {
     client.send(path, users.getUser(params.username))
 })
-api.receive("/users/v0/topic/users/", async (client, path, body, params) => {
-    if (api.isAdmin(client, path) === false) return
+api.receiveAdmin("/users/v0/topic/users/", async (client, path, body, params) => {
     client.send(path, users.getUsers())
 })
 

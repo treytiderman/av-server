@@ -2,7 +2,7 @@
 import { stdio as api } from "./stdio.mjs";
 
 // Exports
-export const v0 = {
+export {
     getLogs,
     subLogs,
     unsubLogs,

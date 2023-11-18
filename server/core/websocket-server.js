@@ -14,7 +14,7 @@ export {
 }
 
 // Variables
-const log = new Logger("core/websocket-server.js")
+const log = new Logger("core/ws-server.js")
 const emitter = new EventEmitter()
 let wss
 

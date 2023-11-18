@@ -37,7 +37,7 @@ function isJSON(text) {
 }
 
 function send(text) {
-    process.stdout.write(Buffer.from(text))
+    process.stdout.write(Buffer.from(text) + '\r\n')
 }
 function sendJSON(obj) {
     send(JSON.stringify(obj))

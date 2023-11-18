@@ -1,0 +1,30 @@
+{
+  "clients": {
+    "7": {
+      "id": "7",
+      "auth": false,
+      "user": {},
+      "subs": [],
+      "protocal": "ipc"
+    },
+    "1700332409952": {
+      "id": 1700332409952,
+      "auth": true,
+      "user": {
+        "username": "admin",
+        "groups": [
+          "admin"
+        ]
+      },
+      "subs": [
+        "/users/v0/topic/token/",
+        "/tcp-client/v0/topic/clients/",
+        "/logger/v0/topic/data/",
+        "/users/v0/topic/who-am-i/",
+        "/programs/v0/topic/available/",
+        "/programs/v0/topic/status-all/"
+      ],
+      "protocal": "ws"
+    }
+  }
+}

@@ -13,7 +13,7 @@ import { spawn } from 'child_process'
 
 // Exports
 export {
-    emitter, // available, data, history, status, status-all, create, delete
+    emitter, // available, data, history, status, status-all, create, kill, delete
 
     available,
     
@@ -207,39 +207,44 @@ function start(name, callback = () => {}) {
     const commandArray = splitByWhitespace(program.command)
     const commandProgram = commandArray[0]
     commandArray.shift()
-    const spawned = spawn(commandProgram, commandArray, {
-        shell: false,
-        cwd: program.directory,
-        env: {
-            ...program.env,
-            PATH: process.env.PATH, // crashes without this
-        },
-    })
-    spawnedList[name] = spawned
+    try {
+        spawnedList[name] = spawn(commandProgram, commandArray, {
+            shell: false,
+            cwd: program.directory,
+            env: {
+                ...program.env,
+                PATH: process.env.PATH, // crashes without this
+            },
+        })
+    } catch (error) {
+        emitter.emit('start', name, error)
+        log.error(`start("${name}") event: "error" -> ${error.message}`, error)
+    }
+    // spawnedList[name] = spawned
     program.running = false
-    program.pid = spawned.pid
+    program.pid = spawnedList[name].pid
 
     // Events
-    spawned.on('spawn', (code, signal) => {
+    spawnedList[name].on('spawn', (code, signal) => {
         program.running = true
         emitter.emit('status', name, status(name))
         emitter.emit('status-all', statusAll())
-        log.debug(`start(${name}) event: "spawn"`)
+        log.debug(`start("${name}") event: "spawn"`)
         db.write()
         callback(name)
     })
-    spawned.on('error', (error) => {
+    spawnedList[name].on('error', (error) => {
         emitter.emit('start', name, error)
-        log.error(`start(${name}) event: "error" -> ${error.message}`, error)
+        log.error(`start("${name}") event: "error" -> ${error.message}`, error)
     })
-    spawned.on('exit', (code, signal) => {
+    spawnedList[name].on('exit', (code, signal) => {
         program.running = false
         emitter.emit('status', name, status(name))
         emitter.emit('status-all', statusAll())
-        log.debug(`start(${name}) event: "exit"`)
+        log.debug(`start("${name}") event: "exit"`)
         db.write()
     })
-    spawned.stdout.on('data', (data) => {
+    spawnedList[name].stdout.on('data', (data) => {
         const dataObj = {
             from: "stdout",
             timestampISO: new Date(Date.now()).toISOString(),
@@ -247,13 +252,13 @@ function start(name, callback = () => {}) {
         }
         program.history.push(dataObj)
         if (program.history.length > MAX_HISTORY_LENGTH) { program.history.shift() }
-        emitter.emit('receive', name, data)
+        emitter.emit('receive', name, dataObj.data)
         emitter.emit('data', name, dataObj)
         emitter.emit('history', name, history(name))
-        log.debug(`start(${name}) event: "stdout" -> ${JSON.stringify(dataObj.data)}`, dataObj)
+        log.debug(`start("${name}") event: "stdout" -> ${JSON.stringify(dataObj.data)}`, dataObj)
         db.write()
     })
-    spawned.stderr.on('data', (data) => {
+    spawnedList[name].stderr.on('data', (data) => {
         const dataObj = {
             from: "stderr",
             timestampISO: new Date(Date.now()).toISOString(),
@@ -261,10 +266,10 @@ function start(name, callback = () => {}) {
         }
         program.history.push(dataObj)
         if (program.history.length > MAX_HISTORY_LENGTH) { program.history.shift() }
-        emitter.emit('receive', name, data)
+        emitter.emit('receive', name, dataObj.data)
         emitter.emit('data', name, dataObj)
         emitter.emit('history', name, history(name))
-        // log.debug(`start(${name}) event: "stderr" -> ${JSON.stringify(dataObj.data)}`, dataObj)
+        // log.debug(`start("${name}") event: "stderr" -> ${JSON.stringify(dataObj.data)}`, dataObj)
         db.write()
     })
 
@@ -279,7 +284,7 @@ function send(name, text) {
         return error
     } else if (db.data.programs[name].running === false) {
         const error = `error program "${name}" is NOT running`
-        log.error(`start("${name}") -> ${error}`)
+        log.error(`send("${name}") -> ${error}`)
         return error
     }
 
@@ -318,6 +323,7 @@ function kill(name) {
     try {
         db.data.programs[name].running = false
         db.write()
+        emitter.emit('kill', name)
         emitter.emit('status', name, status(name))
         emitter.emit('status-all', statusAll())
         spawnedList[name].kill()

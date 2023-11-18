@@ -14,8 +14,7 @@ api.receive("/system/v0/topic/time-as-iso/", async (client, path, body) => {
 api.receive("/system/v0/topic/uptime/", async (client, path, body) => {
     client.send(path, system.getUptime())
 })
-api.receive("/system/v0/topic/info/", async (client, path, body) => {
-    if (!api.isAdmin(client, path)) return
+api.receiveAdmin("/system/v0/topic/info/", async (client, path, body) => {
     client.send(path, system.getSystemInfo())
 })
 

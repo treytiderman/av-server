@@ -17,6 +17,8 @@ export {
 
     send,
     receive,
+    receiveAuth,
+    receiveAdmin,
     
     subscribe,
     unsubscribe,
@@ -47,11 +49,13 @@ const DEFAULT_CLIENT = {
     token: undefined,
     protocal: undefined,
 }
-// const DEFAULT_STATE = { clients: {} }
-// let db = await createDatabase('api', DEFAULT_STATE)
+const DEFAULT_STATE = { clients: {} }
+const db = await createDatabase('api', DEFAULT_STATE)
 
 // Startup
 emitter.setMaxListeners(100)
+db.data.clients = {}
+await db.write()
 
 // Api accessed via the WebSocket
 ws.emitter.on("connect", (client, req) => {
@@ -62,7 +66,7 @@ ws.emitter.on("disconnect", (client) => {
     emitter.emit("disconnect", client.id)
 })
 ws.emitter.on("receive", (client, data) => {
-    emitter.emit("receive", clients[client.id], data)
+    emitter.emit("receive", db.data.clients[client.id], data)
 })
 
 // Api accessed via the TCP
@@ -89,23 +93,27 @@ ws.emitter.on("receive", (client, data) => {
 //     emitter.emit("receive", clients[client.id], data)
 // })
 
-const flag = false
-
-// // Api accessed via the Interprocess Communication
+// Api accessed via the Interprocess Communication
 ipc.emitter.on("create", (id) => {
     const sendFn = (path, body) => { return ipc.send(id, JSON.stringify({path: path, body: body})) }
     emitter.emit("connect", id, protocals.ipc, sendFn)
+})
+ipc.emitter.on("kill", (id) => {
+    emitter.emit("pause", id)
 })
 ipc.emitter.on("delete", (id) => {
     emitter.emit("disconnect", id)
 })
 ipc.emitter.on("receive", (id, data) => {
-    emitter.emit("receive", clients[id], data)
+    const split = data.split("\r\n")
+    split.forEach(text => {
+        emitter.emit("receive", db.data.clients[id], text)
+    })
 })
 
 // Recieve from any protocal
 emitter.on("connect", (id, protocal, sendFn) => {
-    clients[id] = {
+    db.data.clients[id] = {
         id: id,
         auth: false,
         user: {},
@@ -117,11 +125,22 @@ emitter.on("connect", (id, protocal, sendFn) => {
         unsubscribe: (template) => { return unsubscribe(id, template) },
         subscriptions: () => { return subscriptions(id) },
     }
-    emitter.emit("client", clients[id])
+    emitter.emit("client", db.data.clients[id])
+    db.write()
+})
+emitter.on("pause", (id) => {
+    db.data.clients[id].subscriptions().forEach(sub => {
+        db.data.clients[id].unsubscribe(sub)
+    })
+    db.data.clients[id].auth = false
+    db.data.clients[id].token = ""
+    emitter.emit("client", db.data.clients[id])
+    db.write()
 })
 emitter.on("disconnect", (id) => {
-    delete clients[id]
-    emitter.emit("client", clients[id])
+    delete db.data.clients[id]
+    emitter.emit("client", db.data.clients[id])
+    db.write()
 })
 emitter.on("receive", (client, data) => {
     
@@ -171,12 +190,10 @@ function parseParams(template, path) {
 }
 
 function send(path, body) {
-    Object.keys(clients).forEach(id => {
-        if (clients[id].subs.includes(path)) {
-            if (clients[id].protocal !== "ws") {
-                console.log("send", path, body)
-            }
-            clients[id].send(path, body)
+    Object.keys(db.data.clients).forEach(id => {
+        if (db.data.clients[id].subs.includes(path)) {
+            // if (db.data.clients[id].protocal !== "ws") console.log("send", path, body)
+            db.data.clients[id].send(path, body)
         }
     })
 }
@@ -187,25 +204,50 @@ function receive(pathTemplate, callback) {
             const params = parseParams(template, path)
             if (body === "sub") client.subscribe(path)
             else if (body === "unsub") client.unsubscribe(path)
-            if (client.protocal !== "ws") {
-                console.log("json", path, body)
-            }
             callback(client, path, body, params)
+        }
+    })
+}
+function receiveAuth(pathTemplate, callback) {
+    emitter.on("receive-api", (client, path, body) => {
+        const template = parsePathTemplate(pathTemplate)
+        if (path.startsWith(template.base)) {
+            const params = parseParams(template, path)
+            if (isAuth(client, path)) {
+                if (body === "sub") client.subscribe(path)
+                else if (body === "unsub") client.unsubscribe(path)
+                callback(client, path, body, params)
+            }
+        }
+    })
+}
+function receiveAdmin(pathTemplate, callback) {
+    emitter.on("receive-api", (client, path, body) => {
+        const template = parsePathTemplate(pathTemplate)
+        if (path.startsWith(template.base)) {
+            const params = parseParams(template, path)
+            if (isAdmin(client, path)) {
+                if (body === "sub") client.subscribe(path)
+                else if (body === "unsub") client.unsubscribe(path)
+                callback(client, path, body, params)
+            }
         }
     })
 }
 
 function subscriptions(id) {
-    return clients[id].subs
+    return db.data.clients[id].subs
 }
 function subscribe(id, path) {
-    if (clients[id].subs.indexOf(path) !== -1) return "error already subscribed"
-    clients[id].subs.push(path)
+    if (db.data.clients[id].subs.indexOf(path) !== -1) return "error already subscribed"
+    db.data.clients[id].subs.push(path)
+    db.write()
     return "ok"
 }
 function unsubscribe(id, path) {
-    if (path === "*") clients[id].subs = []
-    else clients[id].subs = clients[id].subs.filter(sub => sub !== path)
+    if (path === "*") db.data.clients[id].subs = []
+    else db.data.clients[id].subs = db.data.clients[id].subs.filter(sub => sub !== path)
+    db.write()
 }
 
 function isAuth(client, path) {
