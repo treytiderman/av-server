@@ -1,5 +1,6 @@
 // Overview: import api routes
 
+import "./api-database-v0.js";
 import "./api-logger-v0.js";
 import "./api-programs-v0.js";
 import "./api-serial-v0.js";

@@ -42,7 +42,7 @@ const DEFAULT_STATE = {
 }
 
 // Variables
-const log = new Logger("tcp-client.js")
+const log = new Logger("modules/tcp-client.js")
 const emitter = new EventEmitter()
 const db = await createDatabase("tcp-client", DEFAULT_STATE)
 const sockets = {}

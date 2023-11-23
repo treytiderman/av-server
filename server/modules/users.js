@@ -236,7 +236,7 @@ async function createUser(username, password, passwordConfirm, groups = []) {
         groups.forEach(group => {
             if (!isGroup(group)) badGroups.push(group)
         })
-        if (badGroups.length === 1) error = `error group ${badGroups[0]} does NOT exist`
+        if (badGroups.length === 1) error = `error group "${badGroups[0]}" does NOT exist`
         else error = `error groups ${badGroups} do not exist`
     }
     if (error !== "") {

@@ -40,7 +40,7 @@ api.receiveAdmin("/tcp-client/v0/func/remove-all/", async (client, path, body, p
 
     // Update clients
     const tcpClients = tcpClient.getClients()
-    client.send(`/tcp-client/v0/topic/clients`, tcpClients)
+    client.send(`/tcp-client/v0/topic/clients/`, tcpClients)
     tcpClients.forEach(tcpc => {
         client.send(`/tcp-client/v0/topic/client/${tcpc.address}/`, tcpClient.getClient(tcpc.address))
     })
@@ -62,7 +62,7 @@ api.receiveAdmin("/tcp-client/v0/topic/history/:address/", async (client, path, 
 tcpClient.emitter.on("open", (address, data) => {
     api.send(`/tcp-client/v0/topic/client/${address}/`, tcpClient.getClient(address))
     api.send(`/tcp-client/v0/topic/clients/`, tcpClient.getClients())
-    api.send(`/tcp-client/v0/func/open`, data)
+    api.send(`/tcp-client/v0/func/open/`, data)
 })
 tcpClient.emitter.on("close", (address) => {
     api.send(`/tcp-client/v0/topic/client/${address}/`, tcpClient.getClient(address))

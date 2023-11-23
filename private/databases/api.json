@@ -1,7 +1,7 @@
 {
   "clients": {
-    "1": {
-      "id": "1",
+    "7": {
+      "id": "7",
       "auth": true,
       "user": {
         "username": "ipc",
@@ -12,24 +12,8 @@
       "subs": [],
       "protocal": "ipc"
     },
-    "7": {
-      "id": "7",
-      "auth": true,
-      "user": {
-        "username": "ipc",
-        "groups": [
-          "admin"
-        ]
-      },
-      "subs": [
-        "/tcp-client/v0/func/open/",
-        "/tcp-client/v0/topic/client/192.168.1.32:23/",
-        "/tcp-client/v0/topic/data/192.168.1.32:23/"
-      ],
-      "protocal": "ipc"
-    },
-    "1700337656506": {
-      "id": 1700337656506,
+    "1700767484853": {
+      "id": 1700767484853,
       "auth": true,
       "user": {
         "username": "admin",
@@ -39,11 +23,11 @@
       },
       "subs": [
         "/users/v0/topic/token/",
-        "/tcp-client/v0/topic/clients/",
-        "/logger/v0/topic/data/",
         "/users/v0/topic/who-am-i/",
-        "/programs/v0/topic/available/",
-        "/programs/v0/topic/status-all/"
+        "/database/v0/topic/data/programs/",
+        "/database/v0/topic/data/tcp-client/",
+        "/database/v0/topic/data/api/",
+        "/database/v0/topic/data/users/"
       ],
       "protocal": "ws"
     }
