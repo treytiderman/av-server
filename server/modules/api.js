@@ -177,7 +177,7 @@ function parsePathTemplate(string) {
         template.base = split[0] + "/"
         split.forEach((text, i) => {
             if (i === 0) { }
-            else template.params.push(text)
+            else template.params.push(text.replace("/", ""))
         })
     }
     // log.debug(`parsePathTemplate("${string}") -> ${JSON.stringify(template)}`)

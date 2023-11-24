@@ -12,8 +12,8 @@
       "subs": [],
       "protocal": "ipc"
     },
-    "1700767484853": {
-      "id": 1700767484853,
+    "1700853677214": {
+      "id": 1700853677214,
       "auth": true,
       "user": {
         "username": "admin",
@@ -25,6 +25,7 @@
         "/users/v0/topic/token/",
         "/users/v0/topic/who-am-i/",
         "/database/v0/topic/data/programs/",
+        "/database/v0/topic/data/serial/",
         "/database/v0/topic/data/tcp-client/",
         "/database/v0/topic/data/api/",
         "/database/v0/topic/data/users/"

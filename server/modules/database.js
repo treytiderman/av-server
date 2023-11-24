@@ -44,7 +44,7 @@ function getDatabase(name) {
         log.error(`getDatabase("${name}") -> ${error}`)
         return error
     }
-    log.debug(`getDatabase("${name}") -> "ok"`, databaseList[name].data)
+    // log.debug(`getDatabase("${name}") -> "ok"`, databaseList[name].data)
     return databaseList[name].data
 }
 async function createDatabase(name, defaultData = {}) {
@@ -114,7 +114,7 @@ function getKeyInDatabase(name, key) {
         log.error(`getKeyInDatabase("${name}, "${key}") -> ${error}`)
         return error
     }
-    log.debug(`getKeyInDatabase("${name}", "${key}") -> ${databaseList[name].data[key]}`)
+    // log.debug(`getKeyInDatabase("${name}", "${key}") -> ${databaseList[name].data[key]}`)
     return databaseList[name].data[key]
 }
 function setKeyInDatabase(name, key, value) {
@@ -156,7 +156,7 @@ function deleteKeyInDatabase(name, key) {
 }
 
 function getDatabaseNames() {
-    log.debug(`getDatabaseNames() -> ${Object.keys(databaseList)}`, Object.keys(databaseList))
+    // log.debug(`getDatabaseNames() -> ${Object.keys(databaseList)}`, Object.keys(databaseList))
     return Object.keys(databaseList)
 }
 async function deleteDatabases() {

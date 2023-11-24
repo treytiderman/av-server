@@ -4,6 +4,7 @@
 import { Logger } from './logger.js'
 import { EventEmitter } from 'events'
 import { createDatabase, resetDatabase } from './database.js'
+import * as dbz from './database.js'
 import { hashPassword, isHashedPassword, generateToken, verifyToken } from './auth.js'
 
 // Exports
@@ -48,12 +49,12 @@ export {
 
 // Constants
 const ADMIN_GROUP = "admin"
-const DEFAULT_GROUPS = [ADMIN_GROUP, "user", "guest"]
 const DEFAULT_USER = {
     username: 'admin',
     password: hashPassword("admin"),
     groups: [ADMIN_GROUP],
 }
+const DEFAULT_GROUPS = [ADMIN_GROUP, "user", "guest"]
 const DEFAULT_STATE = {
     groups: DEFAULT_GROUPS,
     users: [DEFAULT_USER]
@@ -62,7 +63,8 @@ const DEFAULT_STATE = {
 // Variables
 const log = new Logger("modules/users.js")
 const emitter = new EventEmitter()
-let db = await createDatabase("users", DEFAULT_STATE)
+dbz.createDatabase("users", DEFAULT_STATE)
+// let db = await createDatabase("users", DEFAULT_STATE)
 
 // Startup
 emitter.setMaxListeners(100)
@@ -104,7 +106,9 @@ function loginWithToken(token, cb) {
 function logout(username) {}
 
 function isGroup(group) {
-    return db.data.groups.some(groupName => group === groupName)
+    const groups = dbz.getKeyInDatabase("users", "groups")
+    return groups.some(groupName => group === groupName)
+    // return db.data.groups.some(groupName => group === groupName)
 }
 function areGroups(groups) {
     if (!Array.isArray(groups)) return false
@@ -112,7 +116,8 @@ function areGroups(groups) {
     return groups.every(group => isGroup(group))
 }
 function getGroups() {
-    return db.data.groups
+    return dbz.getKeyInDatabase("users", "groups")
+    // return db.data.groups
 }
 function validGroup(group) {
     // check if empty, 0, "", NaN, null, false, undefined
@@ -139,10 +144,13 @@ async function createGroup(group) {
     }
 
     // Create group
-    db.data.groups.push(group)
+    const groups = getGroups()
+    groups.push(group)
+    dbz.setAndWriteKeyInDatabase("users", "groups", groups)
+    // db.data.groups.push(group)
     emitter.emit('groups', getGroups())
     log.debug(`createGroup("${group}") -> "ok"`)
-    await db.write()
+    // await db.write()
     return "ok"
 }
 async function deleteGroup(group) {
@@ -158,10 +166,6 @@ async function deleteGroup(group) {
         return error
     }
 
-    // Delete group
-    db.data.groups = db.data.groups.filter(groupName => groupName !== group)
-    emitter.emit('groups', getGroups())
-
     // Remove group from all user's group lists
     const newUsers = []
     getUsersAndPasswords().forEach(user => {
@@ -169,16 +173,26 @@ async function deleteGroup(group) {
         emitter.emit('user', user)
         newUsers.push(user)
     })
-    db.data.users = newUsers
+    // db.data.users = newUsers
+    dbz.setAndWriteKeyInDatabase("users", "users", newUsers)
     emitter.emit('users', getUsers())
 
+    // Delete group
+    let groups = dbz.getKeyInDatabase("users", "groups")
+    groups = groups.filter(groupName => groupName !== group)
+    dbz.setAndWriteKeyInDatabase("users", "groups", groups)
+    // db.data.groups = db.data.groups.filter(groupName => groupName !== group)
+    emitter.emit('groups', getGroups())
+
     log.debug(`deleteGroup("${group}") -> "ok"`)
-    await db.write()
+    // await db.write()
     return "ok"
 }
 
 function isUsername(username) {
-    return db.data.users.some(user => user.username === username)
+    const users = dbz.getKeyInDatabase("users", "users")
+    return users.some(user => user.username === username)
+    // return db.data.users.some(user => user.username === username)
 }
 function isUserInGroup(username, group) {
     if (!isUsername(username)) return false
@@ -187,7 +201,9 @@ function isUserInGroup(username, group) {
     return result
 }
 function getUserAndPassword(username) {
-    return db.data.users.find(user => user.username === username)
+    const users = dbz.getKeyInDatabase("users", "users")
+    return users.find(user => user.username === username)
+    // return db.data.users.find(user => user.username === username)
 }
 function getUser(username) {
     if (!isUsername(username)) return undefined
@@ -195,11 +211,14 @@ function getUser(username) {
     return { username: user.username, groups: user.groups }
 }
 function getUsersAndPasswords() {
-    return db.data.users
+    return dbz.getKeyInDatabase("users", "users")
+    // return db.data.users
 }
 function getUsers() {
     const array = []
-    db.data.users.forEach(user => {
+    const users = dbz.getKeyInDatabase("users", "users")
+    // db.data.users.forEach(user => {
+    users.forEach(user => {
         const userWithoutPassword = getUser(user.username)
         array.push(userWithoutPassword)
     })
@@ -252,13 +271,16 @@ async function createUser(username, password, passwordConfirm, groups = []) {
         password: hashPassword(password),
         groups: groups,
     }
-    db.data.users.push(user)
+    const users = dbz.getKeyInDatabase("users", "users")
+    users.push(user)
+    dbz.setAndWriteKeyInDatabase("users", "users", users)
+    // db.data.users.push(user)
     emitter.emit('users', getUsers())
     emitter.emit('user', user)
     const passwordToLog = process.env.DEV_MODE ? password : "********"
     const passwordConfirmToLog = process.env.DEV_MODE ? passwordConfirm : "********"
     log.debug(`createUser("${username}", "${passwordToLog}", "${passwordConfirmToLog}", "${groups}") -> "ok"`)
-    await db.write()
+    // await db.write()
     return "ok"
 }
 async function deleteUser(username) {
@@ -271,11 +293,13 @@ async function deleteUser(username) {
     }
 
     // Delete
-    db.data.users = db.data.users.filter(user => user.username !== username)
+    let users = dbz.getKeyInDatabase("users", "users")
+    users = users.filter(user => user.username !== username)
+    dbz.setAndWriteKeyInDatabase("users", "users", users)
     emitter.emit('user', {})
     emitter.emit('users', getUsers())
     log.debug(`deleteUser("${username}") -> "ok"`)
-    await db.write()
+    // await db.write()
     return "ok"
 }
 async function addGroupToUser(username, group) {
@@ -293,10 +317,13 @@ async function addGroupToUser(username, group) {
     // Update
     const user = getUserAndPassword(username)
     user.groups.push(group)
+    const users = dbz.getKeyInDatabase("users", "users")
+    users.push(user)
+    dbz.setAndWriteKeyInDatabase("users", "users", users)
     emitter.emit('user', getUser(username))
     emitter.emit('users', getUsers())
     log.debug(`addGroupToUser("${username}", "${group}") -> "ok"`)
-    await db.write()
+    // await db.write()
     return "ok"
 }
 async function removeGroupFromUser(username, group) {
@@ -314,10 +341,13 @@ async function removeGroupFromUser(username, group) {
     // Update
     const user = getUserAndPassword(username)
     user.groups = user.groups.filter(groupName => groupName !== group)
+    const users = dbz.getKeyInDatabase("users", "users")
+    users.push(user)
+    dbz.setAndWriteKeyInDatabase("users", "users", users)
     emitter.emit('user', getUser(username))
     emitter.emit('users', getUsers())
     log.debug(`removeGroupFromUser("${username}", "${group}") -> "ok"`)
-    await db.write()
+    // await db.write()
     return "ok"
 }
 async function changeUserPassword(username, newPassword, newPasswordConfirm) {
@@ -337,7 +367,10 @@ async function changeUserPassword(username, newPassword, newPasswordConfirm) {
     // Update
     const user = getUserAndPassword(username)
     user.password = hashPassword(newPassword)
-    await db.write()
+    const users = dbz.getKeyInDatabase("users", "users")
+    users.push(user)
+    dbz.setAndWriteKeyInDatabase("users", "users", users)
+    // await db.write()
     const passwordToLog = process.env.DEV_MODE ? newPassword : "********"
     const passwordConfirmToLog = process.env.DEV_MODE ? newPasswordConfirm : "********"
     log.debug(`changeUserPassword("${username}", "${passwordToLog}", "${passwordConfirmToLog}") -> "ok"`)
@@ -345,7 +378,8 @@ async function changeUserPassword(username, newPassword, newPasswordConfirm) {
 }
 
 async function resetToDefault() {
-    db = await resetDatabase("users")
+    await dbz.resetDatabase("users")
+    // db = await resetDatabase("users")
     emitter.emit('users', getUsers())
     emitter.emit('groups', getGroups())
 }

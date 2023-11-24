@@ -44,7 +44,7 @@ const DEFAULT_STATE = {
 }
 
 // Variables
-const log = new Logger("serial.js")
+const log = new Logger("modules/serial.js")
 const emitter = new EventEmitter()
 const db = await createDatabase("serial", DEFAULT_STATE)
 const sockets = {}

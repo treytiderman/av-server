@@ -41,7 +41,6 @@ api.receiveAdmin("/database/v0/func/delete-key/", async (client, path, body, par
 
 // Topics
 api.receiveAdmin("/database/v0/topic/names/", async (client, path, body, params) => {
-    console.log("/database/v0/topic/names/");
     client.send(path, db.getDatabaseNames())
 })
 api.receiveAdmin("/database/v0/topic/data/:name/", async (client, path, body, params) => {

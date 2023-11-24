@@ -1,5 +1,7 @@
 // Imports
 import * as log from '../modules/logger.js'
+import * as db from '../modules/database.js'
+
 import * as api from "./api.test.js";
 import * as auth from "./auth.test.js";
 import * as database from "./database.test.js";
@@ -13,6 +15,7 @@ import * as users from "./users.test.js";
 
 // Run Tests
 if (process.env.DEV_MODE) {
+    await db.deleteDatabases()
     await log.deleteLogs()
     log.info("tests/run.js", "DEV_MODE environment variable set to true")
     
