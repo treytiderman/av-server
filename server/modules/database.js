@@ -6,6 +6,7 @@ import { JSONFile } from 'lowdb/node'
 import { Logger } from './logger.js'
 import { EventEmitter } from 'events'
 import { makeDir, deleteFile } from "./files.js";
+import { create } from 'domain';
 
 // Exports
 export {
@@ -24,6 +25,8 @@ export {
 
     getDatabaseNames,
     deleteDatabases,
+
+    Database,
 }
 
 // Constants
@@ -37,16 +40,30 @@ const databaseList = {}
 // Startup
 await makeDir(PATH_TO_DATABASE_FOLDER)
 
-// Functions
-function getDatabase(name) {
-    if (!databaseList[name]) {
-        const error = `error database "${name}" doesn't exist`
-        log.error(`getDatabase("${name}") -> ${error}`)
-        return error
+// Class
+class Database {
+    constructor(name = "database-with-no-name") { this.name = name }
+
+    async create(defaultData) { 
+        this.defaultData = defaultData
+        return await createDatabase(this.name, this.defaultData)
     }
-    // log.debug(`getDatabase("${name}") -> "ok"`, databaseList[name].data)
-    return databaseList[name].data
+
+    getData() { return getDatabase(this.name) }
+    setData(data) { return setDatabase(this.name, data) }
+
+    async write() { return await writeDatabase(this.name) }
+    async delete() { return await deleteDatabase(this.name) }
+
+    getKey(key) { return getKeyInDatabase(this.name, key) }
+    async setKey(key, value) { return setKeyInDatabase(this.name, key, value) }
+    async deleteKey(key) { return deleteKeyInDatabase(this.name, key) }
+
+    getDefaultData() { return this.defaultData }
+    async resetToDefaultData() { return resetDatabase(this.name) }
 }
+
+// Functions
 async function createDatabase(name, defaultData = {}) {
     const path = `${PATH_TO_DATABASE_FOLDER}/${name}.json`
     let db
@@ -61,12 +78,31 @@ async function createDatabase(name, defaultData = {}) {
         emitter.emit('data', name, defaultData)
         emitter.emit('names', getDatabaseNames())
         await db.write()
-        log.debug(`createDatabase("${name}", defaultData) -> "ok"`, {"defaultData": defaultData})
+        log.debug(`createDatabase("${name}", defaultData) -> "ok"`, { "defaultData": defaultData })
     } catch (error) {
         log.debug(`createDatabase("${name}", defaultData) -> ${error.message}`, error)
         return error.message
     }
     return db
+}
+function getDatabase(name) {
+    if (!databaseList[name]) {
+        const error = `error database "${name}" doesn't exist`
+        log.error(`getDatabase("${name}") -> ${error}`)
+        return error
+    }
+    // log.debug(`getDatabase("${name}") -> "ok"`, databaseList[name].data)
+    return databaseList[name].data
+}
+function setDatabase(name, data) {
+    if (!databaseList[name]) {
+        const error = `error database "${name}" doesn't exist`
+        log.error(`setDatabase("${name}") -> ${error}`)
+        return error
+    }
+    databaseList[name].data = data
+    // log.debug(`setDatabase("${name}", "${data}") -> "ok"`, databaseList[name].data)
+    return "ok"
 }
 async function writeDatabase(name) {
     if (!databaseList[name]) {

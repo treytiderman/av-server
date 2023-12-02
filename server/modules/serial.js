@@ -5,59 +5,65 @@ import { SerialPort } from 'serialport'
 import { DelimiterParser } from '@serialport/parser-delimiter'
 import { Logger } from './logger.js'
 import { EventEmitter } from 'events'
-import { createDatabase } from './database.js'
+import { Database } from './database.js'
 
 // Exports
 export {
-    // emitter, // "open", "error", "close", "receive", "send", "reconnect"
+    // emitter, // open, close, data, receive, send
+
+    // available,
 
     // open,
-    // reconnect,
     // send,
-    // setEncoding,
     // close,
     // remove,
 
+    // setBaudrate,
+    // setDelimiter,
+    // setEncoding,
+
     // openAll,
-    // // sendAll,
+    // sendAll,
     // closeAll,
     // removeAll,
 
-    // getClient,
-    // getClients,
+    // getPort,
+    // getPorts,
     // getHistory,
 
-    // getClientWithHistory,
-    // getClientsWithHistory,
+    // getPortWithHistory,
+    // getPortsWithHistory,
 }
 
 // Constants
-const hexSeperators = ["\\x", "0x", " "]
+// const HEX_SEPERATORS = ["\\x", "0x", " "]
 const CR = { hex: "0D", ascii: "\r" }
 const LF = { hex: "0A", ascii: "\n" }
-const CONNECT_TIMEOUT = 2000
-const RECONNECT_TIMER = 5000
+// const CONNECT_TIMEOUT = 2000
+// const RECONNECT_TIMER = 5000
 const MAX_HISTORY_LENGTH = 1000
-const DEFAULT_STATE = {
-    available: {},
-    ports: {},
-}
 
 // Variables
 const log = new Logger("modules/serial.js")
 const emitter = new EventEmitter()
-const db = await createDatabase("serial", DEFAULT_STATE)
 const sockets = {}
 const timeouts = {}
+const dbAvailable = new Database("serial-available")
+const dbPorts = new Database("serial-ports")
 
 // Startup
-// dbResetClientsIsOpen()
-getAvailablePorts()
+await dbAvailable.create([])
+await dbPorts.create({})
+dbResetIsOpen()
+getAvailable()
 
 // Helper Functions
-function dbResetClientsIsOpen() {
-    Object.keys(db.data.clients).forEach(address => {
-        db.data.clients[address].isOpen = false
+function dbResetIsOpen() {
+    dbPorts.getData()
+    Object.keys(dbPorts.getData()).forEach(address => {
+        const port = dbPorts.getKey(address)
+        port.isOpen = false
+        dbPorts.setKey(address, port)
     })
 }
 function addEscapeCharsToAscii(text) {
@@ -80,14 +86,16 @@ function removeAlleperatorsFromHex(text) {
 }
 
 // Functions
-async function getAvailablePorts() {
-    log.debug(`getAvailablePorts()`)
+async function getAvailable() {
     try {
         let list = await SerialPort.list()
-        log.debug(`getAvailablePorts() -> ${JSON.stringify(list)}`, list)
+        log.debug(`getAvailable() -> ${JSON.stringify(list)}`, list)
+        dbAvailable.setData(list)
         return "ok"
-    } catch (error) {
-        log.debug(`getAvailablePorts() -> ${error.message}`, error)
+    } catch (err) {
+        const error = `error could NOT get available serial ports (${err.message})`
+        log.debug(`getAvailable() -> ${error}`, err)
+        dbAvailable.setData([error])
         return error
     }
     /* Example response

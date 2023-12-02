@@ -176,7 +176,7 @@ podman rm av-server-dev
 podman run -d \
     --name av-server-dev \
     --hostname av-server-dev \
-    -p 4622:4620 \
+    -p 4620:4620 \
     -v $(pwd)/server:/app/server:Z \
     -v $(pwd)/public:/app/public:Z \
     -v $(pwd)/private:/app/private:Z \

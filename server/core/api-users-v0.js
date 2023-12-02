@@ -68,7 +68,7 @@ api.receiveAdmin("/users/v0/func/reset-to-default/", async (client, path, body, 
 })
 
 // Topics
-api.receiveAdmin("/users/v0/topic/token/", async (client, path, body, params) => {
+api.receive("/users/v0/topic/token/", async (client, path, body, params) => {
     // client.send(path, client.token)
 })
 api.receiveAdmin("/users/v0/topic/who-am-i/", async (client, path, body, params) => {

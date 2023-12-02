@@ -12,8 +12,8 @@
       "subs": [],
       "protocal": "ipc"
     },
-    "1700853677214": {
-      "id": 1700853677214,
+    "1701540852401": {
+      "id": 1701540852401,
       "auth": true,
       "user": {
         "username": "admin",
@@ -23,13 +23,9 @@
       },
       "subs": [
         "/users/v0/topic/token/",
-        "/users/v0/topic/who-am-i/",
-        "/database/v0/topic/data/programs/",
-        "/database/v0/topic/data/serial/",
-        "/database/v0/topic/data/tcp-client/",
-        "/database/v0/topic/data/api/",
-        "/database/v0/topic/data/users/"
+        "/users/v0/topic/who-am-i/"
       ],
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzAxNTQwODU1fQ.YLBmKCVzSidMAdqvj0W4tnepUtno4V_Y-uy98JPLQfw",
       "protocal": "ws"
     }
   }
