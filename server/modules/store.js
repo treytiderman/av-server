@@ -8,7 +8,7 @@ export {
 }
 
 const DEBUG = false
-const STORAGE_PATH = "./json/"
+const STORAGE_PATH = "../private/databases/"
 function log(...params) { if (DEBUG) console.log(...params) }
 
 // Class
@@ -75,6 +75,7 @@ class Store {
             this.#keyCallbacks[key].forEach((callback) => callback(this.#data[key]))
         }
     }
+    // updateData(callback) {}
     resetData() {
         log(this.fileName, "resetData()", this.#defaultData);
         this.setData(this.#defaultData)
@@ -98,6 +99,14 @@ class Store {
         this.#keyCallbacks[key].forEach((callback) => callback(value))
         this.#dataCallbacks.forEach((callback) => callback(this.#data))
     }
+    updateKey(key, callback) {
+        log(this.fileName, "updateKey(", key, "callback)", this.#data)
+        const newValue = callback(this.#data[key])
+        this.#data[key] = clone(newValue)
+        if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
+        this.#keyCallbacks[key].forEach((callback) => callback(value))
+        this.#dataCallbacks.forEach((callback) => callback(this.#data))
+    }
     deleteKey(key) {
         log(this.fileName, "deleteKey(", key, ")", this.#data)
         if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
@@ -108,6 +117,7 @@ class Store {
 
     subKey(key, callback) {
         if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
+        // this.unsubKey(key, callback) // unsub incase the same callback keeps getting added??
         this.#keyCallbacks[key].push(callback)
         callback(this.#data[key])
     }
