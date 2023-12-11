@@ -6,7 +6,6 @@ import { JSONFile } from 'lowdb/node'
 import { Logger } from './logger.js'
 import { EventEmitter } from 'events'
 import { makeDir, deleteFile } from "./files.js";
-import { create } from 'domain';
 
 // Exports
 export {

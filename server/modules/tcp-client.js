@@ -68,7 +68,7 @@ function removeEscapeCharsFromAscii(text) {
     text = text.replace(/\\n/g, LF.ascii)
     return text
 }
-function removeAlleperatorsFromHex(text) {
+function removeAllSeperatorsFromHex(text) {
     if (typeof text !== "string") return text
     text = text.replace(/\\x/g, "")
     text = text.replace(/0x/g, "")
@@ -227,7 +227,7 @@ function send(address, data, encoding = "ascii") {
     // let ascii = ""
     let buffer = ""
     if (encoding === "hex") {
-        buffer = removeAlleperatorsFromHex(data)
+        buffer = removeAllSeperatorsFromHex(data)
         buffer = Buffer.from(buffer, encoding)
         // hex = data
         // ascii = buffer.toString('ascii')

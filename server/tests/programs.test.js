@@ -96,7 +96,7 @@ export async function test() {
     programs.removeAll()
 
     // Program 7 - node test.mjs
-    response = programs.create("7", `${programs.PATH}/tests`, "node test.mjs")
+    response = programs.create("7", `${programs.PATH}/examples`, "node quick-start.mjs")
 
     await sleep(100)
     return pass

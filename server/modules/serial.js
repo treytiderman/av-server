@@ -4,19 +4,17 @@
 import { SerialPort } from 'serialport'
 import { DelimiterParser } from '@serialport/parser-delimiter'
 import { Logger } from './logger.js'
-import { EventEmitter } from 'events'
-import { Database } from './database.js'
+import { Store } from './store.js'
 
 // Exports
 export {
-    // emitter, // open, close, data, receive, send
+    db,
 
-    // available,
-
-    // open,
-    // send,
-    // close,
-    // remove,
+    available,
+    open,
+    send,
+    close,
+    remove,
 
     // setBaudrate,
     // setDelimiter,
@@ -26,50 +24,36 @@ export {
     // sendAll,
     // closeAll,
     // removeAll,
-
-    // getPort,
-    // getPorts,
-    // getHistory,
-
-    // getPortWithHistory,
-    // getPortsWithHistory,
 }
 
 // Constants
-// const HEX_SEPERATORS = ["\\x", "0x", " "]
 const CR = { hex: "0D", ascii: "\r" }
 const LF = { hex: "0A", ascii: "\n" }
-// const CONNECT_TIMEOUT = 2000
-// const RECONNECT_TIMER = 5000
+const HEX_SEPERATORS = ["\\x", "0x", " "]
+const BAUDRATES = [9600, 14400, 19200, 38400, 57600, 115200]
+const ENCODINGS = ["ascii", "hex"]
 const MAX_HISTORY_LENGTH = 1000
 
 // Variables
-const log = new Logger("modules/serial.js")
-const emitter = new EventEmitter()
-const sockets = {}
-const timeouts = {}
-const dbAvailable = new Database("serial-available")
-const dbPorts = new Database("serial-ports")
+const logger = new Logger("modules/serial.js")
+const db = new Store("serial-ports")
+const ports = {}
 
 // Startup
-await dbAvailable.create([])
-await dbPorts.create({})
-dbResetIsOpen()
-getAvailable()
+await db.create({})
+await dbStartupReset()
+await logger.call(available)()
+setInterval(available, 1000);
 
 // Helper Functions
-function dbResetIsOpen() {
-    dbPorts.getData()
-    Object.keys(dbPorts.getData()).forEach(address => {
-        const port = dbPorts.getKey(address)
+async function dbStartupReset() {
+    const statusKeys = db.getKeys().filter(key => key.endsWith("-status"))
+    statusKeys.forEach(key => {
+        const port = db.getKey(key)
         port.isOpen = false
-        dbPorts.setKey(address, port)
+        db.setKey(key, port)
     })
-}
-function addEscapeCharsToAscii(text) {
-    text = text.replace(/\r/g, "\\r")
-    text = text.replace(/\n/g, "\\n")
-    return text
+    await db.write()
 }
 function removeEscapeCharsFromAscii(text) {
     if (typeof text !== "string") return text
@@ -77,25 +61,31 @@ function removeEscapeCharsFromAscii(text) {
     text = text.replace(/\\n/g, LF.ascii)
     return text
 }
-function removeAlleperatorsFromHex(text) {
+function removeAllSeperatorsFromHex(text) {
     if (typeof text !== "string") return text
     text = text.replace(/\\x/g, "")
     text = text.replace(/0x/g, "")
     text = text.replace(/ /g, "")
     return text
 }
+function addEscapeCharsToAscii(text) {
+    text = text.replace(/\r/g, "\\r")
+    text = text.replace(/\n/g, "\\n")
+    return text
+}
 
 // Functions
-async function getAvailable() {
+async function available() {
+    db.setKey("available", [])
     try {
-        let list = await SerialPort.list()
-        log.debug(`getAvailable() -> ${JSON.stringify(list)}`, list)
-        dbAvailable.setData(list)
-        return "ok"
+        const list = await SerialPort.list()
+        db.setKey("available", list)
+        await db.write()
+        return list
     } catch (err) {
         const error = `error could NOT get available serial ports (${err.message})`
-        log.debug(`getAvailable() -> ${error}`, err)
-        dbAvailable.setData([error])
+        db.setKey("available", [error])
+        await db.write()
         return error
     }
     /* Example response
@@ -133,139 +123,146 @@ async function getAvailable() {
     ]
     */
 }
-function open(path, baudRate = 9600, delimiter = "\r\n") {
-    log(`open(${path}, ${baudRate}, ${delimiter})`)
+async function open(path, baudRate = 9600, encoding = "ascii", delimiter = "none") {
+    const port = db.getKey(path + "-status")
 
-    // Return if the connection is already open
-    if (ports[path]?.isOpen === true) {
-        const error = "connection already open"
-
-        // Emit event
-        log(`open ${path} ${error}`)
-        emitter.emit('open', path, { error: error })
-
-        // Return
-        return error
-    }
+    // Errors
+    if (port?.isOpen === true) return `error ${path} already open`
 
     // Unescape the delimiter if needed
     delimiter = delimiter.replace(/\\r/g, CR.ascii)
     delimiter = delimiter.replace(/\\n/g, LF.ascii)
-    delimiter = delimiter.replace(/\\x/g, "")
-    delimiter = delimiter.replace(/0x/g, "")
 
-    // Create port object
-    ports[path] = {
-        portObj: new SerialPort({ path: path, baudRate: baudRate }),
+    // Force encoding
+    if (encoding !== "ascii" && encoding !== "hex") encoding = "ascii"
+    if (encoding === "hex") delimiter = removeAllSeperatorsFromHex(delimiter)
+    console.log("delimiter:", addEscapeCharsToAscii(delimiter));
+
+    // New serial port
+    ports[path] = new SerialPort({ path: path, baudRate: Number(baudRate) })
+    db.setKey(path + "-data", undefined)
+    db.setKey(path + "-history", [])
+    db.setKey(path + "-status", {
         isOpen: false,
         path: path,
         baudRate: baudRate,
-        expectedDelimiter: delimiter,
-        history: [],
-        historyRaw: [],
-        error: null,
+        encoding: encoding,
+        delimiter: delimiter,
+    })
+
+    // Events
+    ports[path].on('open', () => onOpen(path))
+    ports[path].on('close', () => onClose(path))
+    ports[path].on('error', (error) => onError(path, error))
+
+    if (delimiter === "none" || delimiter === "") {
+        ports[path].on('data', (data) => onRawData(path, data)) // Raw received data
+    } else {
+        ports[path].parser = ports[path].pipe(new DelimiterParser({ delimiter: delimiter }))
+        ports[path].parser.on('data', (data) => onData(path, data)) // Gather by delimiter
     }
 
-    // Event Open
-    ports[path].portObj.on('open', () => {
-        ports[path].isOpen = true
+    // delay by 200ms because send function will not work for about 60ms after port is opened
+    return new Promise(resolve => setTimeout(() => resolve("ok"), 200));
+}
+async function onOpen(path) {
+    const port = db.getKey(path + "-status")
+    port.isOpen = true
+    db.setKey(path + "-status", port)
+    await db.write()
+}
+async function onClose(path) {
+    const port = db.getKey(path + "-status")
+    port.isOpen = false
+    db.setKey(path + "-status", port)
+    await db.write()
+}
+async function onError(path, error) {
+    db.setKey(path + "-error", error.message)
+    await db.write()
+}
+async function onRawData(path, data) {
+    const port = db.getKey(path + "-status")
+    console.log("rx raw:\t", addEscapeCharsToAscii(data.toString(port.encoding)))
+}
+async function onData(path, data) {
+    const port = db.getKey(path + "-status")
+    const history = db.getKey(path + "-history")
+    const rxObj = {
+        wasReceived: true,
+        timestampISO: new Date(Date.now()).toISOString(),
+        encoding: port.encoding,
+        data: data.toString(port.encoding) + port.delimiter,
+    }
+    console.log("receive:", addEscapeCharsToAscii(rxObj.data))
 
-        // Emit event
-        log(`open ${path}`)
-        emitter.emit('open', path, {
-            isOpen: true,
-            path: path,
-            baudRate: baudRate,
-            expectedDelimiter: delimiter,
-            error: null,
-        })
+    // Add to history
+    history.push(rxObj)
+    if (history.length > MAX_HISTORY_LENGTH) history.shift()
+
+    // Updata db
+    db.setKey(path + "-data", rxObj)
+    db.setKey(path + "-history", history)
+    await db.write()
+}
+async function send(path, data, encoding = "ascii") {
+    const port = db.getKey(path + "-status")
+    const history = db.getKey(path + "-history")
+
+    // Errors
+    if (!port || port?.isOpen !== true) return `error ${path} NOT open`
+
+    // Prepare data
+    data += port.delimiter
+    if (encoding === "hex") {
+        data = removeAllSeperatorsFromHex(data)
+    } else {
+        encoding = "ascii"
+        data = removeEscapeCharsFromAscii(data)
+    }
+
+    // Create send object
+    const txObj = {
+        wasReceived: false,
+        timestampISO: new Date(Date.now()).toISOString(),
+        encoding: encoding,
+        data: data,
+    }
+    console.log("send:\t", addEscapeCharsToAscii(data))
+
+    // Send
+    ports[path].write(Buffer.from(data, encoding))
+
+    // Add to history
+    history.push(txObj)
+    if (history.length > MAX_HISTORY_LENGTH) history.shift()
+
+    // Updata db
+    db.setKey(path + "-data", txObj)
+    db.setKey(path + "-history", history)
+    await db.write()
+
+    return "ok"
+}
+async function close(path) {
+    const port = db.getKey(path + "-status")
+
+    // Errors
+    if (!port || port?.isOpen !== true) return `error ${path} NOT open`
+
+    // Close
+    ports[path].close(async error => {
+        db.setKey(path + "-error", error.message)
+        await db.write()
     })
 
-    // Event Error
-    ports[path].portObj.on('error', (error) => {
-        ports[path].error = error
+    return "ok"
+}
+async function remove(path) {
+    db.deleteKey(path + "-status")
+    db.deleteKey(path + "-history")
+    db.deleteKey(path + "-data")
+    db.deleteKey(path + "-error")
 
-        // Port not found
-        if (error.message.includes("File not found")) {
-            ports[path].error = "COM port / path not found"
-        }
-
-        // Emit event
-        log(`error ${path} ${error}`)
-        emitter.emit('error', path, { error: ports[path].error })
-    })
-
-    // Event Close
-    ports[path].portObj.on('close', () => {
-        ports[path].isOpen = false
-
-        // Emit event
-        log(`close ${path}`)
-        emitter.emit('close', path, {
-            isOpen: false,
-            path: path,
-            baudRate: baudRate,
-            expectedDelimiter: delimiter,
-            error: ports[path].error,
-        })
-    })
-
-    // Listen for any new data
-    ports[path].portObj.on('data', (data) => {
-
-        // Create rxObj
-        const rxObj = {
-            wasReceived: true,
-            timestampISO: new Date(Date.now()).toISOString(),
-            hex: data.toString('hex'),
-            ascii: data.toString('ascii'),
-            buffer: data,
-            error: null,
-        }
-
-        // Add to history
-        ports[path].historyRaw.push(rxObj)
-
-        // If the history length is greater than MAX_HISTORY_LENGTH
-        if (ports[path].historyRaw.length > MAX_HISTORY_LENGTH) {
-            // Then remove the first/oldest element
-            ports[path].historyRaw.shift()
-        }
-
-        // Emit event
-        log(`received ${path} ${JSON.stringify(data)}`)
-        emitter.emit('receiveRaw', path, rxObj)
-    })
-
-    // Listen for new data that ends with the delimiter
-    const parser = ports[path].portObj.pipe(new DelimiterParser({ delimiter: delimiter }))
-    parser.on('data', (data) => {
-
-        // Create rxObj
-        const rxObj = {
-            wasReceived: true,
-            timestampISO: new Date(Date.now()).toISOString(),
-            hex: data.toString('hex') + delimiter,
-            ascii: data.toString('ascii') + delimiter,
-            buffer: data,
-            error: null,
-        }
-
-        // Add rxObj to array
-        ports[path].history.push(rxObj)
-
-        // If the history length is greater than MAX_HISTORY_LENGTH
-        if (ports[path].history.length > MAX_HISTORY_LENGTH) {
-            // Then remove the first/oldest element
-            ports[path].history.shift()
-        }
-
-        // Emit event
-        log(`received ${path} ${JSON.stringify(data)}`)
-        emitter.emit('receive', path, rxObj)
-    })
-
-    // Return
-    const portCopy = copyPortObj(ports[path])
-    return portCopy
+    return "ok"
 }

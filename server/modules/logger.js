@@ -113,6 +113,12 @@ class Logger {
     async error(message, obj = {}) {
         await log("error", this.group, message, obj)
     }
+    call = func => async (...args) => {
+        const result = await func(...args)
+        const message = `${func.name}(${args.join(", ")}) -> ${result}`
+        await log("call", this.group, message)
+        return result
+    }
 }
 
 // Startup
