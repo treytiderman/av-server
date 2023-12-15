@@ -115,7 +115,8 @@ class Logger {
     }
     call = func => async (...args) => {
         const result = await func(...args)
-        const message = `${func.name}(${args.join(", ")}) -> ${result}`
+        const argStrings = args.map(arg => JSON.stringify(arg))
+        const message = `${func.name}(${argStrings.join(", ")}) -> ${JSON.stringify(result)}`
         await log("call", this.group, message)
         return result
     }

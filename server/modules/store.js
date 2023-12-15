@@ -3,6 +3,7 @@ import fs from 'fs/promises'
 export {
     Store,
     deleteAll,
+    getAllNames,
     isObject,
     STORAGE_PATH
 }
@@ -16,6 +17,7 @@ class Store {
     #data
     #defaultData
     #keyCallbacks
+    #keyCallbackMap
     #dataCallbacks
 
     constructor(fileName) {
@@ -56,10 +58,7 @@ class Store {
         log(this.fileName, "delete()", this.path)
         return await deleteFile(this.path)
     }
-    
-    getKeys() {
-        return Object.keys(this.#data)
-    }
+
     getData() {
         return this.#data
     }
@@ -75,12 +74,11 @@ class Store {
             this.#keyCallbacks[key].forEach((callback) => callback(this.#data[key]))
         }
     }
-    // updateData(callback) {}
     resetData() {
         log(this.fileName, "resetData()", this.#defaultData);
         this.setData(this.#defaultData)
     }
-    
+
     subData(callback) {
         this.#dataCallbacks.push(callback)
         callback(this.#data)
@@ -88,7 +86,11 @@ class Store {
     unsubData(callback) {
         this.#dataCallbacks = this.#dataCallbacks.filter((cb) => cb !== callback)
     }
-    
+
+    getKeys() {
+        return Object.keys(this.#data)
+    }
+
     getKey(key) {
         return this.#data[key]
     }
@@ -99,35 +101,29 @@ class Store {
         this.#keyCallbacks[key].forEach((callback) => callback(value))
         this.#dataCallbacks.forEach((callback) => callback(this.#data))
     }
-    updateKey(key, callback) {
-        log(this.fileName, "updateKey(", key, "callback)", this.#data)
-        const newValue = callback(this.#data[key])
-        this.#data[key] = clone(newValue)
-        if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
-        this.#keyCallbacks[key].forEach((callback) => callback(value))
-        this.#dataCallbacks.forEach((callback) => callback(this.#data))
-    }
     deleteKey(key) {
         log(this.fileName, "deleteKey(", key, ")", this.#data)
         if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
         this.#keyCallbacks[key].forEach((callback) => callback(undefined))
         delete this.#data[key]
-        // delete this.#keyCallbacks[key]
+        // delete this.#keyCallbacks[key] // deletes the callback before running callback(undefined)
     }
 
     subKey(key, callback) {
         if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
-        // this.unsubKey(key, callback) // unsub incase the same callback keeps getting added??
         this.#keyCallbacks[key].push(callback)
         callback(this.#data[key])
     }
     unsubKey(key, callback) {
-        if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
+        if (!this.#keyCallbacks[key]) return
         this.#keyCallbacks[key] = this.#keyCallbacks[key].filter((cb) => cb !== callback)
     }
 }
 
 // Functions
+async function getAllNames() {
+    return await readDirectory(STORAGE_PATH)
+}
 async function deleteAll() {
     await deleteFolder(STORAGE_PATH)
 }
@@ -140,6 +136,15 @@ function isObject(obj) {
     return typeof obj === 'object' && !Array.isArray(obj) && obj !== null
 }
 
+async function readDirectory(path) {
+    try {
+        const filenames = await fs.readdir(path)
+        const stores = filenames.map(filename => filename.replace(".json", ""))
+        return stores
+    } catch (error) {
+        return
+    }
+}
 async function createDirectory(path) {
     try {
         await fs.mkdir(path, { recursive: true })

@@ -75,6 +75,10 @@ function addEscapeCharsToAscii(text) {
 }
 
 // Functions
+/**
+ * 
+ * @returns 
+ */
 async function available() {
     db.setKey("available", [])
     try {
@@ -123,6 +127,17 @@ async function available() {
     ]
     */
 }
+
+/** Open serial port by path.
+ * @param {string} path 
+ * @param {string|number} [baudRate = 9600] baud rate of serial port
+ * @param {string} encoding see the data in "ascii" or "hex"
+ * @param {string} delimiter expected delimiter such as "\r\n". leave blank "" or "none" to receive all data.
+ * @returns {Promise<string>} Promise<"ok" or "error...">
+ * @example
+ *     open('COM1', 9600, "ascii", "\r\n")
+ *     open('COM2', 14400, "hex", "0D0A")
+ */ 
 async function open(path, baudRate = 9600, encoding = "ascii", delimiter = "none") {
     const port = db.getKey(path + "-status")
 
@@ -205,6 +220,13 @@ async function onData(path, data) {
     db.setKey(path + "-history", history)
     await db.write()
 }
+
+/** Send data out a serial port
+ * @param {*} path 
+ * @param {*} data 
+ * @param {*} encoding 
+ * @returns 
+ */
 async function send(path, data, encoding = "ascii") {
     const port = db.getKey(path + "-status")
     const history = db.getKey(path + "-history")
@@ -244,6 +266,12 @@ async function send(path, data, encoding = "ascii") {
 
     return "ok"
 }
+
+/**
+ * 
+ * @param {*} path 
+ * @returns 
+ */
 async function close(path) {
     const port = db.getKey(path + "-status")
 
@@ -258,6 +286,12 @@ async function close(path) {
 
     return "ok"
 }
+
+/**
+ * 
+ * @param {*} path 
+ * @returns 
+ */
 async function remove(path) {
     db.deleteKey(path + "-status")
     db.deleteKey(path + "-history")

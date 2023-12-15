@@ -1,5 +1,6 @@
 // Imports
 import * as db from '../modules/database.js'
+import * as db2 from '../modules/database-v1.js'
 
 // Functions
 export async function test() {
