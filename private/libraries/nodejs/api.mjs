@@ -22,6 +22,4 @@ export const api = {
 }
 
 // Functions
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
