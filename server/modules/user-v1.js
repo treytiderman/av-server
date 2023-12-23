@@ -2,7 +2,7 @@
 
 // Imports
 import { Logger } from './logger.js'
-import { DatabaseWithLogging } from './database-v1.js'
+import { Database } from './database-v1.js'
 import {
     hashPassword,
     isHashedPassword,
@@ -35,22 +35,22 @@ export {
 }
 
 // Constants
-const ADMIN_GROUP = "admin"
+const ADMIN_GROUP = 'admin'
 const DEFAULT_USERS = {
     admin: {
         username: 'admin',
-        password: hashPassword("admin"),
+        password: hashPassword('admin'),
         groups: [ADMIN_GROUP],
     }
 }
 const DEFAULT_GROUPS = {
-    groups: [ADMIN_GROUP, "user", "guest"]
+    groups: [ADMIN_GROUP, 'user', 'guest']
 }
 
 // State
-const log = new Logger("modules/users-v1.js")
-const dbUsers = new DatabaseWithLogging("user-v1")
-const dbGroups = new DatabaseWithLogging("groups-v1")
+const log = new Logger('modules/users-v1.js')
+const dbUsers = new Database('user-v1')
+const dbGroups = new Database('groups-v1')
 
 // Startup
 await dbUsers.create(DEFAULT_USERS)
@@ -62,17 +62,17 @@ const token = {
         const user = dbUsers.getKey(username)
     
         // Errors
-        if (!isUsername(username)) return `error username "${username}" does NOT exists`
-        else if (!isHashedPassword(password, user.password.hash, user.password.salt)) return "error password incorrect"
+        if (!isUsername(username)) return `error username '${username}' does NOT exists`
+        else if (!isHashedPassword(password, user.password.hash, user.password.salt)) return 'error password incorrect'
     
         return generateTokenAuth({ username: user.username })
-    }, "token.get"),
+    }, 'token.get'),
     verify: log.call((token, cb) => {
         verifyTokenAuth(token, (error, jwtJson) => {
-            if (error) cb(jwtJson, "error bad token")
+            if (error) cb(jwtJson, 'error bad token')
             else cb(jwtJson, error)
         })
-    }, "token.verify"),
+    }, 'token.verify'),
 }
 const user = {
     get: (username) => {
@@ -83,13 +83,13 @@ const user = {
     unsub: (username, callback) => dbUsers.unsubKey(username, callback),
     create: log.call(async (username, password, passwordConfirm, groups = []) => {
         // Errors
-        if (isUsername(username)) return `error username "${username}" exists already`
-        else if (!validUsermame(username)) return `error username "${username}" is NOT valid`
-        else if (!validPassword(password)) return `error password "${password}" is NOT valid`
-        else if (password !== passwordConfirm) return "error passwordConfirm does NOT match password"
+        if (isUsername(username)) return `error username '${username}' exists already`
+        else if (!validUsermame(username)) return `error username '${username}' is NOT valid`
+        else if (!validPassword(password)) return `error password '${password}' is NOT valid`
+        else if (password !== passwordConfirm) return 'error passwordConfirm does NOT match password'
         else if (!areGroups(groups)) {
             const badGroups = groups.filter(group => !isGroup(group))
-            return `error group(s) "${badGroups.join(",")}" does NOT exist`
+            return `error group(s) '${badGroups.join(',')}' does NOT exist`
         }
 
         // Create
@@ -99,56 +99,56 @@ const user = {
             groups: groups,
         })
         await dbUsers.write()
-        return "ok"
-    }, "user.create"),
+        return 'ok'
+    }, 'user.create'),
     delete: log.call(async (username) => {
         // Errors
-        if (!isUsername(username)) return `error username "${username}" does NOT exist`
+        if (!isUsername(username)) return `error username '${username}' does NOT exist`
 
         // Delete
         await dbUsers.removeKey(username)
         await dbUsers.write()
-        return "ok"
-    }, "user.delete"),
+        return 'ok'
+    }, 'user.delete'),
     addGroup: log.call(async (username, group) => {
         // Errors
-        if (!isUsername(username)) return `error username "${username}" does NOT exists`
-        else if (!isGroup(group)) return `error group "${group}" does NOT exist`
-        else if (isUserInGroup(username, group)) return `error user already in group "${group}"`
+        if (!isUsername(username)) return `error username '${username}' does NOT exists`
+        else if (!isGroup(group)) return `error group '${group}' does NOT exist`
+        else if (isUserInGroup(username, group)) return `error user '${username}' already in group '${group}'`
 
         // Update
         const user = dbUsers.getKey(username)
         user.groups.push(group)
         await dbUsers.setKey(username, user)
         await dbUsers.write()
-        return "ok"
-    }, "user.addGroup"),
+        return 'ok'
+    }, 'user.addGroup'),
     removeGroup: log.call(async (username, group) => {
         // Errors
-        if (!isUsername(username)) return `error username "${username}" does NOT exists`
-        else if (!isGroup(group)) return `error group "${group}" does NOT exist`
-        else if (!isUserInGroup(username, group)) return `error user is NOT in group "${group}"`
+        if (!isUsername(username)) return `error username '${username}' does NOT exists`
+        else if (!isGroup(group)) return `error group '${group}' does NOT exist`
+        else if (!isUserInGroup(username, group)) return `error user is NOT in group '${group}'`
 
         // Update
         const user = dbUsers.getKey(username)
         user.groups = user.groups.filter(groupName => groupName !== group)
         await dbUsers.setKey(username, user)
         await dbUsers.write()
-        return "ok"
-    }, "user.removeGroup"),
+        return 'ok'
+    }, 'user.removeGroup'),
     changePassword: log.call(async (username, password, passwordConfirm) => {
         // Errors
-        if (!isUsername(username)) return `error username "${username}" does NOT exists`
-        else if (!validPassword(password)) return `error password "${password}" is NOT valid`
-        else if (password !== passwordConfirm) return "error passwordConfirm does NOT match password"
+        if (!isUsername(username)) return `error username '${username}' does NOT exists`
+        else if (!validPassword(password)) return `error password '${password}' is NOT valid`
+        else if (password !== passwordConfirm) return 'error passwordConfirm does NOT match password'
 
         // Update
         const user = dbUsers.getKey(username)
         user.password = hashPassword(password)
         await dbUsers.setKey(username, user)
         await dbUsers.write()
-        return "ok"
-    }, "user.changePassword"),
+        return 'ok'
+    }, 'user.changePassword'),
 }
 const users = {
     get: () => dbUsers.get(),
@@ -158,13 +158,13 @@ const users = {
     reset: log.call(async () => {
         await dbUsers.reset()
         await dbGroups.reset()
-        return "ok"
-    }, "users.reset"),
+        return 'ok'
+    }, 'users.reset'),
 }
 const groups = {
-    get: () => dbGroups.getKey("groups"),
-    sub: (callback) => dbGroups.subKey("groups", callback),
-    unsub: (callback) => dbGroups.unsubKey("groups", callback),
+    get: () => dbGroups.getKey('groups'),
+    sub: (callback) => dbGroups.subKey('groups', callback),
+    unsub: (callback) => dbGroups.unsubKey('groups', callback),
     create: log.call(async (group) => {
         // Errors
         if (!validGroup(group)) {
@@ -174,12 +174,12 @@ const groups = {
         }
         
         // Create group
-        const groups = dbGroups.getKey("groups")
+        const groups = dbGroups.getKey('groups')
         groups.push(group)
-        await dbGroups.setKey("groups", groups)
+        await dbGroups.setKey('groups', groups)
         await dbGroups.write()
-        return "ok"
-    }, "groups.create"),
+        return 'ok'
+    }, 'groups.create'),
     delete: log.call(async (group) => {
         // Errors
         if (group === ADMIN_GROUP) {
@@ -195,16 +195,16 @@ const groups = {
         }))
     
         // Delete group
-        const groups = dbGroups.getKey("groups").filter(groupName => groupName !== group)
-        dbGroups.setKey("groups", groups)
+        const groups = dbGroups.getKey('groups').filter(groupName => groupName !== group)
+        dbGroups.setKey('groups', groups)
         await dbGroups.write()
-        return "ok"
-    }, "groups.delete"),
+        return 'ok'
+    }, 'groups.delete'),
 }
 
 // Helper Functions
 function validGroup(group) {
-    // check if empty, 0, "", NaN, null, false, undefined
+    // check if empty, 0, '', NaN, null, false, undefined
     if (!group) return false
     // contains only alphanumaric, whitespace, special charactors _ ! @ # $ % ^ & -
     const regex = /^[a-zA-Z0-9 _!@#$%^&-]+$/
@@ -234,7 +234,7 @@ function validPassword(password) {
 }
 
 function isGroup(group) {
-    return dbGroups.getKey("groups").some(groupName => group === groupName)
+    return dbGroups.getKey('groups').some(groupName => group === groupName)
 }
 function areGroups(groups) {
     if (!Array.isArray(groups)) return false

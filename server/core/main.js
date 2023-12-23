@@ -8,6 +8,7 @@ import { createServer as createHttpServer } from 'http'
 const server = createWsServer(createHttpServer(expressServer))
 
 // API
+import "../api/api.js"
 import "./api.js"
 
 // Start Server
