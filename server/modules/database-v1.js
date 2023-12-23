@@ -1,63 +1,58 @@
 // Imports
 import fs from 'fs/promises'
 import { Logger } from './logger.js'
+import { writeDatabase } from './database.js'
 
 // Exports
 export {
-    // databases,
+    getNames,
+    subNames,
+    unsubNames,
+
     create,
     write,
     remove,
-    // removeAll,
-    
+    removeAll,
+
     get,
+    sub,
+    unsub,
     set,
-    // keys,
-    // reset,
-    // sub,
-    // unsub,
+    reset,
 
-    // getKey,
-    // setKey,
-    // removeKey,
-    // subKey,
-    // unsubKey,
+    getKey,
+    subKey,
+    unsubKey,
+    setKey,
+    removeKey,
 
-    DB,
+    Database,
 
     isObject,
     STORAGE_PATH
 }
 
-// State
+// Constants
 const STORAGE_PATH = "../private/databases/"
+const POLL_RATE = 1000
+
+// State
 const log = new Logger("modules/database-v1.js")
-
-/** Database state object
- * @typedef {Object} Database
- * @property {string} filename - The name of the database file
- * @property {string} path - The path to file relative to this file
- * @property {number} data - The cached Data
- * @property {number} defaultData - The default data. The data to reset to
- * @property {{key: callback[]}} keyCallbacks - Array of callback functions per key
- * @property {callback[]} dataCallbacks - Array of callback functions
-*/
-
-/**
- * @type {{filename: Database}}
-*/
 const dbs = {}
 
 // Functions
+const getNames = async () => await getKey("database-v1", "names")
+const subNames = (callback) => subKey("database-v1", "names", callback)
+const unsubNames = (callback) => unsubKey("database-v1", "names", callback)
+
 /** Create an observable json data store.
  * @param {string} filename Filename without an extention. The extension ".json" will be added.
  * @param {Object} [defaultData={}] Data starting point. Is also used to reset to
  * @returns {Promise<string>} await "ok" or "error..."
- * @example
- *     await create("my-file", { key: "value" })
+ * @example await create("my-file", { key: "value" })
  */
-async function create(filename, defaultData = {}) {
-    if (dbs[filename]) return `error database "${filename}" exists`
+const create = log.call(async (filename, defaultData = {}) => {
+    if (dbs[filename]) return `error database '${filename}' exists`
 
     if (isObject(defaultData) === false) defaultData = {}
     dbs[filename] = {
@@ -80,195 +75,167 @@ async function create(filename, defaultData = {}) {
     }
 
     return "ok"
-}
+}, "create")
 
 /** Write the json data to a file
  * @param {string} filename Filename without an extention.
  * @returns {Promise<string>} await "ok" or "error..."
- * @example
- *     await write("my-file")
+ * @example await write("my-file")
  */
-async function write(filename) {
-    if (!dbs[filename]) return `error database "${filename}" doesn't exist`
+const write = log.call(async (filename) => {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
     await writeJson(dbs[filename].path, dbs[filename].data)
     return "ok"
-}
+}, "write",)
 
 /** Remove the json file from disk
  * @param {string} filename Filename without an extention.
  * @returns {Promise<string>} await "ok" or "error..."
- * @example
- *     await remove("my-file")
+ * @example await remove("my-file")
  */
-async function remove(filename) {
-    if (!dbs[filename]) return `error database "${filename}" doesn't exist`
+const remove = log.call(async (filename) => {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
     await deleteFile(dbs[filename].path)
     delete dbs[filename]
     return "ok"
-}
+}, "remove")
+
+const removeAll = log.call(async () => {
+    await deleteFolder(STORAGE_PATH)
+}, "removeAll")
 
 /** Get data (cached)
  * @param {string} filename Filename without an extention.
- * @returns {Promise<Object|undefined>} await data or "error..."
- * @example
- *     await remove("my-file")
+ * @returns {Promise<Object|undefined>} await data or undefined
+ * @example await get("my-file")
  */
-function get(filename) {
+const get = (filename) => {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
     return dbs[filename]?.data
 }
 
-await log.call(create)("test", {key: "val"})
-log.call(get)("test")
-
 /** Set data (cache only). Must write() to save to disk
  * @param {string} filename The filename without an extention.
- * @param {string} object The new data for database
+ * @param {Object} object The new data for database
  * @returns {Promise<string>} await "ok" or "error..."
- * @example
- *     await remove("my-file")
+ * @example await set("my-file", {key2: "val2"})
  */
-function set(filename, object = {}) {
-    if (!dbs[filename]) return `error database "${filename}" doesn't exist`
-
+const set = log.call((filename, object) => {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
+    if (isObject(object) === false) return `error must provide an object`
+    
     for (const key in dbs[filename].data) {
         if (!object[key]) removeKey(filename, key)
     }
+    
+    dbs[filename].data = clone(object)
+    dbs[filename].dataCallbacks.forEach((callback) => callback(dbs[filename].data))
+    for (const key in dbs[filename].data) {
+        if (!dbs[filename].keyCallbacks[key]) { dbs[filename].keyCallbacks[key] = [] }
+        dbs[filename].keyCallbacks[key].forEach((callback) => callback(dbs[filename].data[key]))
+    }
+    
+    return "ok"
+}, "set")
 
-    // this.#data = clone(object)
-    // log.debug(this.filename, "setData(", object, ")", this.#data)
-    // this.#dataCallbacks.forEach((callback) => callback(this.#data))
-    // for (const key in this.#data) {
-    //     if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
-    //     this.#keyCallbacks[key].forEach((callback) => callback(this.#data[key]))
-    // }
+function keys(filename) {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
+    return Object.keys(dbs[filename].data)
+}
 
+const reset = log.call((filename) => {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
+    set(filename, dbs[filename].defaultData)
+    return "ok"
+}, "reset")
+
+function sub(filename, callback) {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
+    dbs[filename].dataCallbacks.push(callback)
+    callback(dbs[filename].data)
     return "ok"
 }
 
-/** Set data (cache only). Must write() to save to disk
- * @param {string} filename Filename without an extention.
- * @returns {Promise<string>} await "ok" or "error..."
- * @example
- *     await remove("my-file")
- */
-function asfafw(filename, object = {}) {
-    if (!dbs[filename]) return `error database "${filename}" doesn't exist`
+function unsub(filename, callback) {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
+    dbs[filename].dataCallbacks = dbs[filename].dataCallbacks.filter((cb) => cb !== callback)
     return "ok"
 }
 
-async function getAllNames() {
-    return await readDirectory(STORAGE_PATH)
-}
-async function deleteAll() {
-    await deleteFolder(STORAGE_PATH)
+function getKey(filename, key) {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
+    return dbs[filename].data[key]
 }
 
+const setKey = log.call((filename, key, value) => {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
+    
+    dbs[filename].data[key] = clone(value)
+    if (!dbs[filename].keyCallbacks[key]) { dbs[filename].keyCallbacks[key] = [] }
+    dbs[filename].keyCallbacks[key].forEach((callback) => callback(value))
+    dbs[filename].dataCallbacks.forEach((callback) => callback(dbs[filename].data))
+    return "ok"
+}, "setKey")
 
-// Class
-class DB {
-    #data
-    #defaultData
-    #keyCallbacks
-    #dataCallbacks
+const removeKey = log.call((filename, key) => {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
+    
+    delete dbs[filename].data[key]
+    if (!dbs[filename].keyCallbacks[key]) { dbs[filename].keyCallbacks[key] = [] }
+    dbs[filename].keyCallbacks[key].forEach((callback) => callback(undefined))
+    dbs[filename].dataCallbacks.forEach((callback) => callback(dbs[filename].data))
+    // delete dbs[filename].keyCallbacks[key] // deletes the callback before running callback(undefined)
+    return "ok"
+}, "removeKey")
 
-    constructor(filename) {
+function subKey(filename, key, callback) {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
+    if (!dbs[filename].keyCallbacks[key]) { dbs[filename].keyCallbacks[key] = [] }
+    dbs[filename].keyCallbacks[key].push(callback)
+    callback(dbs[filename].data[key])
+    return "ok"
+}
+
+function unsubKey(filename, key, callback) {
+    if (!dbs[filename]) return `error database '${filename}' doesn't exist`
+    if (!dbs[filename].keyCallbacks[key]) return
+    dbs[filename].keyCallbacks[key] = dbs[filename].keyCallbacks[key].filter((cb) => cb !== callback)
+    return "ok"
+}
+
+// Startup
+create("database-v1", { names: [] })
+setInterval(async () => {
+    const names = getKey("database-v1", "names")
+    const newNames = await readDirectory(STORAGE_PATH)
+    if (JSON.stringify(names) !== JSON.stringify(newNames)) {
+        setKey("database-v1", "names", await readDirectory(STORAGE_PATH))
+        write("database-v1")
+    }
+}, POLL_RATE);
+
+// Classes
+class Database {
+    constructor(filename = "undefined") {
         this.filename = filename
-        this.path = STORAGE_PATH + filename + ".json"
-
-        // Private variables
-        this.#data = {}
-        this.#defaultData = {}
-        this.#keyCallbacks = {}
-        this.#dataCallbacks = []
     }
 
-    async create(defaultData) {
-        if (isObject(defaultData) === false) defaultData = {}
-        this.#defaultData = clone(defaultData)
-        const db = await readJson(this.path)
-        if (db) {
-            for (const key in db) { this.#keyCallbacks[key] = [] }
-            this.#data = db
-        } else {
-            for (const key in defaultData) { this.#keyCallbacks[key] = [] }
-            this.#data = defaultData
-            await this.write()
-        }
-        log.debug(this.filename, "create(", defaultData, ")", this.#data)
-        return db
-    }
-    async write() {
-        log.debug(this.filename, "write()", this.path, this.#data)
-        return await writeJson(this.path, this.#data)
-    }
-    async delete() {
-        this.#data = {}
-        this.#defaultData = {}
-        this.#keyCallbacks = {}
-        this.#dataCallbacks = []
-        log.debug(this.filename, "delete()", this.path)
-        return await deleteFile(this.path)
-    }
+    create(defaultData = {}) { return create(this.filename, defaultData) }
+    write() { return write(this.filename) }
+    remove() { return remove(this.filename) }
 
-    getData() {
-        return this.#data
-    }
-    setData(object = {}) {
-        for (const key in this.#data) {
-            if (!object[key]) this.deleteKey(key)
-        }
-        this.#data = clone(object)
-        log.debug(this.filename, "setData(", object, ")", this.#data)
-        this.#dataCallbacks.forEach((callback) => callback(this.#data))
-        for (const key in this.#data) {
-            if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
-            this.#keyCallbacks[key].forEach((callback) => callback(this.#data[key]))
-        }
-    }
-    resetData() {
-        log.debug(this.filename, "resetData()", this.#defaultData);
-        this.setData(this.#defaultData)
-    }
+    get() { return get(this.filename) }
+    set(object = {}) { return set(this.filename, object) }
+    keys() { return keys(this.filename) }
+    reset() { return reset(this.filename) }
+    sub(callback) { return sub(this.filename, callback) }
+    unsub(callback) { return unsub(this.filename, callback) }
 
-    subData(callback) {
-        this.#dataCallbacks.push(callback)
-        callback(this.#data)
-    }
-    unsubData(callback) {
-        this.#dataCallbacks = this.#dataCallbacks.filter((cb) => cb !== callback)
-    }
-
-    getKeys() {
-        return Object.keys(this.#data)
-    }
-
-    getKey(key) {
-        return this.#data[key]
-    }
-    setKey(key, value = "") {
-        log.debug(this.filename, "setKey(", key, value, ")", this.#data)
-        this.#data[key] = clone(value)
-        if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
-        this.#keyCallbacks[key].forEach((callback) => callback(value))
-        this.#dataCallbacks.forEach((callback) => callback(this.#data))
-    }
-    deleteKey(key) {
-        log.debug(this.filename, "deleteKey(", key, ")", this.#data)
-        if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
-        this.#keyCallbacks[key].forEach((callback) => callback(undefined))
-        delete this.#data[key]
-        // delete this.#keyCallbacks[key] // deletes the callback before running callback(undefined)
-    }
-
-    subKey(key, callback) {
-        if (!this.#keyCallbacks[key]) { this.#keyCallbacks[key] = [] }
-        this.#keyCallbacks[key].push(callback)
-        callback(this.#data[key])
-    }
-    unsubKey(key, callback) {
-        if (!this.#keyCallbacks[key]) return
-        this.#keyCallbacks[key] = this.#keyCallbacks[key].filter((cb) => cb !== callback)
-    }
+    getKey(key) { return getKey(this.filename, key) }
+    setKey(key, value = "") { return setKey(this.filename, key, value) }
+    removeKey(key) { return removeKey(this.filename, key) }
+    subKey(key, callback) { return subKey(this.filename, key, callback) }
+    unsubKey(key, callback) { return unsubKey(this.filename, key, callback) }
 }
 
 // Helper Functions
