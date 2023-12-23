@@ -1,7 +1,7 @@
 // Overview: standard way to create log files
 // Location: ~/av-server/private/logs/filename.log
 // Filename: log_YEAR-MONTH-DAY-STARTUPTIME-SEQ.log
-// Log Line: timestampISO >> level >> group >> message >> obj
+// Log Line: timestampISO LEVEL [group] message >> obj
 
 // Imports
 import { appendText, readText, makeDir, getStatsRecursive, deleteFile } from './files.js'
@@ -12,7 +12,9 @@ export {
     Logger,
     debug,
     info,
+    warn,
     error,
+    call,
     getHistory,
     deleteLogs,
     emitter,
@@ -25,12 +27,87 @@ const NUMBER_OF_LINES_MAX = 10_000
 const OBJ_JSON_LENGTH_MAX = 10_000
 const PATH_TO_LOG_FOLDER = "../private/logs/" // ~/av-server/private/logs
 const SPACER = " >> "
+const LOG_LEVELS = [
+    // "TRACE", 
+    "DEBUG",
+    "INFO ",
+    "WARN ",
+    "ERROR",
+    // "FATAL",
+]
 
-// Variables
+// State
 const emitter = new EventEmitter()
 const startup = Date.now()
 let count = 0
 let history = []
+
+// Startup
+await makeDir(PATH_TO_LOG_FOLDER)
+
+// Functions
+function getHistory(length = 1000) {
+    return history.slice(history.length - length, history.length)
+}
+async function debug(group, message, obj = {}) {
+    await log("DEBUG", group, message, obj)
+}
+async function info(group, message, obj = {}) {
+    await log("INFO ", group, message, obj)
+}
+async function warn(group, message, obj = {}) {
+    await log("WARN ", group, message, obj)
+}
+async function error(group, message, obj = {}) {
+    await log("ERROR", group, message, obj)
+}
+const call = (group, func, name = "") => async (...args) => {
+    const start_ms = Date.now()
+    const result = await func(...args)
+
+    const functionString = name !== "" ? name : func.name
+    // const argFunctionsAsStrings = args.map(arg => typeof arg === "function" ? arg + '' : arg)
+    const argStrings = args.map(arg => JSON.stringify(arg))
+    const resultString = JSON.stringify(result)
+    const logType = resultString && resultString.startsWith('"error') ? "WARN " : "FUNC "
+
+    const message = `${Date.now() - start_ms}ms ${functionString}(${argStrings.join(", ")}) -> ${resultString}`
+    await log(logType, group, message)
+
+    return result
+}
+async function deleteLogs() {
+    const logFilesStats = await getStatsRecursive(PATH_TO_LOG_FOLDER)
+    if (logFilesStats.contains_files.length > 0) {
+        const fileNames = logFilesStats.contains_files
+        fileNames.forEach(async file => {
+            await deleteFile(file.path)
+        })
+    }
+    // debug("logger.js", "deleteLogs()")
+}
+
+// Class
+class Logger {
+    constructor(group) {
+        this.group = group
+    }
+    async debug(message, obj = {}) {
+        await debug(this.group, message, obj)
+    }
+    async info(message, obj = {}) {
+        await info(this.group, message, obj)
+    }
+    async warn(message, obj = {}) {
+        await warn(this.group, message, obj)
+    }
+    async error(message, obj = {}) {
+        await error(this.group, message, obj)
+    }
+    call = (func, name = "") => async (...args) => {
+        return call(this.group, func, name)(...args)
+    }
+}
 
 // Helper Functions
 function getCurrentPath() {
@@ -44,7 +121,7 @@ function createLogLine(level, group, message, obj) {
         obj = `VALUE NOT SHOWN object length greater than ${OBJ_JSON_LENGTH_MAX} characters`
     }
     const timestampISO = new Date(Date.now()).toISOString()
-    const line = timestampISO + SPACER + level + SPACER + group + SPACER + message + SPACER + JSON.stringify(obj)
+    const line = `${timestampISO} ${SPACER} ${level} ${SPACER} [${group}] ${message} ${SPACER} ${JSON.stringify(obj)}`
     return line
 }
 async function deleteOldLogs() {
@@ -74,56 +151,12 @@ async function log(level, group, message, obj = {}) {
     await appendText(path, line + "\n")
     await deleteOldLogs()
 }
-
-// Functions
-function getHistory(length = 1000) {
-    return history.slice(history.length - length, history.length)
+function isObject(obj) {
+    return typeof obj === 'object' && !Array.isArray(obj) && obj !== null
 }
-async function debug(group, message, obj = {}) {
-    await log("debug", group, message, obj)
+function isArray(array) {
+    return Array.isArray(array) && array !== null
 }
-async function info(group, message, obj = {}) {
-    await log("info", group, message, obj)
-}
-async function error(group, message, obj = {}) {
-    await log("error", group, message, obj)
-}
-async function deleteLogs() {
-    const logFilesStats = await getStatsRecursive(PATH_TO_LOG_FOLDER)
-    if (logFilesStats.contains_files.length > 0) {
-        const fileNames = logFilesStats.contains_files
-        fileNames.forEach(async file => {
-            await deleteFile(file.path)
-        })
-    }
-    // debug("logger.js", "deleteLogs()")
-}
-
-// Class
-class Logger {
-    constructor(group) {
-        this.group = group
-    }
-    async debug(message, obj = {}) {
-        await log("debug", this.group, message, obj)
-    }
-    async info(message, obj = {}) {
-        await log("info", this.group, message, obj)
-    }
-    async error(message, obj = {}) {
-        await log("error", this.group, message, obj)
-    }
-    call = func => async (...args) => {
-        const result = await func(...args)
-        const argStrings = args.map(arg => JSON.stringify(arg))
-        const message = `${func.name}(${argStrings.join(", ")}) -> ${JSON.stringify(result)}`
-        await log("call", this.group, message)
-        return result
-    }
-}
-
-// Startup
-await makeDir(PATH_TO_LOG_FOLDER)
 
 // Testing
 // const logger = new Logger("logger.js")

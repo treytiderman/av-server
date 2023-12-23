@@ -3,8 +3,7 @@
 // Imports
 import { Logger } from './logger.js'
 import { EventEmitter } from 'events'
-import { createDatabase, resetDatabase } from './database.js'
-import * as dbz from './database.js'
+import { Database } from './database-v1.js'
 import { hashPassword, isHashedPassword, generateToken, verifyToken } from './auth.js'
 
 // Exports
@@ -18,7 +17,6 @@ export {
     // Login
     login,
     loginWithToken,
-    logout,
 
     // Groups
     isGroup,
@@ -63,10 +61,10 @@ const DEFAULT_STATE = {
 // Variables
 const log = new Logger("modules/users.js")
 const emitter = new EventEmitter()
-dbz.createDatabase("users", DEFAULT_STATE)
-// let db = await createDatabase("users", DEFAULT_STATE)
+const db = new Database("users")
 
 // Startup
+await db.create(DEFAULT_STATE)
 emitter.setMaxListeners(100)
 
 // Functions
@@ -103,12 +101,10 @@ function loginWithToken(token, cb) {
         }
     })
 }
-function logout(username) {}
 
 function isGroup(group) {
-    const groups = dbz.getKeyInDatabase("users", "groups")
+    const groups = db.getKey("groups")
     return groups.some(groupName => group === groupName)
-    // return db.data.groups.some(groupName => group === groupName)
 }
 function areGroups(groups) {
     if (!Array.isArray(groups)) return false
@@ -116,20 +112,9 @@ function areGroups(groups) {
     return groups.every(group => isGroup(group))
 }
 function getGroups() {
-    return dbz.getKeyInDatabase("users", "groups")
-    // return db.data.groups
+    return db.getKey("groups")
 }
-function validGroup(group) {
-    // check if empty, 0, "", NaN, null, false, undefined
-    if (!group) return false
-    // contains only alphanumaric, whitespace, special charactors _ ! @ # $ % ^ & -
-    const regex = /^[a-zA-Z0-9 _!@#$%^&-]+$/
-    group = group.toString()
-    if (group.length < 2) return false
-    else if (group.length > 20) return false
-    else if (regex.test(group) === false) return false
-    return true
-}
+
 async function createGroup(group) {
 
     // Errors
@@ -146,11 +131,10 @@ async function createGroup(group) {
     // Create group
     const groups = getGroups()
     groups.push(group)
-    dbz.setAndWriteKeyInDatabase("users", "groups", groups)
-    // db.data.groups.push(group)
+    db.setKey("groups", groups)
     emitter.emit('groups', getGroups())
     log.debug(`createGroup("${group}") -> "ok"`)
-    // await db.write()
+    await db.write()
     return "ok"
 }
 async function deleteGroup(group) {
@@ -173,26 +157,22 @@ async function deleteGroup(group) {
         emitter.emit('user', user)
         newUsers.push(user)
     })
-    // db.data.users = newUsers
-    dbz.setAndWriteKeyInDatabase("users", "users", newUsers)
+    db.setKey("users", newUsers)
     emitter.emit('users', getUsers())
 
     // Delete group
-    let groups = dbz.getKeyInDatabase("users", "groups")
-    groups = groups.filter(groupName => groupName !== group)
-    dbz.setAndWriteKeyInDatabase("users", "groups", groups)
-    // db.data.groups = db.data.groups.filter(groupName => groupName !== group)
+    const groups = db.getKey("groups").filter(groupName => groupName !== group)
+    db.setKey("groups", groups)
     emitter.emit('groups', getGroups())
 
     log.debug(`deleteGroup("${group}") -> "ok"`)
-    // await db.write()
+    await db.write()
     return "ok"
 }
 
 function isUsername(username) {
-    const users = dbz.getKeyInDatabase("users", "users")
+    const users = db.getKey("users")
     return users.some(user => user.username === username)
-    // return db.data.users.some(user => user.username === username)
 }
 function isUserInGroup(username, group) {
     if (!isUsername(username)) return false
@@ -201,9 +181,8 @@ function isUserInGroup(username, group) {
     return result
 }
 function getUserAndPassword(username) {
-    const users = dbz.getKeyInDatabase("users", "users")
+    const users = db.getKey("users")
     return users.find(user => user.username === username)
-    // return db.data.users.find(user => user.username === username)
 }
 function getUser(username) {
     if (!isUsername(username)) return undefined
@@ -211,37 +190,18 @@ function getUser(username) {
     return { username: user.username, groups: user.groups }
 }
 function getUsersAndPasswords() {
-    return dbz.getKeyInDatabase("users", "users")
-    // return db.data.users
+    return db.getKey("users")
 }
 function getUsers() {
     const array = []
-    const users = dbz.getKeyInDatabase("users", "users")
-    // db.data.users.forEach(user => {
+    const users = db.getKey("users")
     users.forEach(user => {
         const userWithoutPassword = getUser(user.username)
         array.push(userWithoutPassword)
     })
     return array
 }
-function validUsermame(username) {
-    if (!username) return false
-    const regex = /^[a-zA-Z0-9 _!@#$%^&-]+$/
-    username = username.toString()
-    if (username.length < 2) return false
-    else if (username.length > 20) return false
-    else if (regex.test(username) === false) return false
-    return true
-}
-function validPassword(password) {
-    if (!password) return false
-    const regex = /^[a-zA-Z0-9 _!@#$%^&-]+$/
-    password = password.toString()
-    if (password.length < 2) return false
-    else if (password.length > 20) return false
-    else if (regex.test(password) === false) return false
-    return true
-}
+
 async function createUser(username, password, passwordConfirm, groups = []) {
 
     // Errors
@@ -271,16 +231,15 @@ async function createUser(username, password, passwordConfirm, groups = []) {
         password: hashPassword(password),
         groups: groups,
     }
-    const users = dbz.getKeyInDatabase("users", "users")
+    const users = db.getKey("users")
     users.push(user)
-    dbz.setAndWriteKeyInDatabase("users", "users", users)
-    // db.data.users.push(user)
+    db.setKey("users", users)
     emitter.emit('users', getUsers())
     emitter.emit('user', user)
     const passwordToLog = process.env.DEV_MODE ? password : "********"
     const passwordConfirmToLog = process.env.DEV_MODE ? passwordConfirm : "********"
     log.debug(`createUser("${username}", "${passwordToLog}", "${passwordConfirmToLog}", "${groups}") -> "ok"`)
-    // await db.write()
+    await db.write()
     return "ok"
 }
 async function deleteUser(username) {
@@ -293,13 +252,12 @@ async function deleteUser(username) {
     }
 
     // Delete
-    let users = dbz.getKeyInDatabase("users", "users")
-    users = users.filter(user => user.username !== username)
-    dbz.setAndWriteKeyInDatabase("users", "users", users)
+    const users = db.getKey("users").filter(user => user.username !== username)
+    db.setKey("users", users)
     emitter.emit('user', {})
     emitter.emit('users', getUsers())
     log.debug(`deleteUser("${username}") -> "ok"`)
-    // await db.write()
+    await db.write()
     return "ok"
 }
 async function addGroupToUser(username, group) {
@@ -317,13 +275,13 @@ async function addGroupToUser(username, group) {
     // Update
     const user = getUserAndPassword(username)
     user.groups.push(group)
-    const users = dbz.getKeyInDatabase("users", "users")
+    const users = db.getKey("users")
     users.push(user)
-    dbz.setAndWriteKeyInDatabase("users", "users", users)
+    db.setKey("users", users)
     emitter.emit('user', getUser(username))
     emitter.emit('users', getUsers())
     log.debug(`addGroupToUser("${username}", "${group}") -> "ok"`)
-    // await db.write()
+    await db.write()
     return "ok"
 }
 async function removeGroupFromUser(username, group) {
@@ -341,13 +299,13 @@ async function removeGroupFromUser(username, group) {
     // Update
     const user = getUserAndPassword(username)
     user.groups = user.groups.filter(groupName => groupName !== group)
-    const users = dbz.getKeyInDatabase("users", "users")
+    const users = db.getKey("users")
     users.push(user)
-    dbz.setAndWriteKeyInDatabase("users", "users", users)
+    db.setKey("users", users)
     emitter.emit('user', getUser(username))
     emitter.emit('users', getUsers())
     log.debug(`removeGroupFromUser("${username}", "${group}") -> "ok"`)
-    // await db.write()
+    await db.write()
     return "ok"
 }
 async function changeUserPassword(username, newPassword, newPasswordConfirm) {
@@ -367,10 +325,10 @@ async function changeUserPassword(username, newPassword, newPasswordConfirm) {
     // Update
     const user = getUserAndPassword(username)
     user.password = hashPassword(newPassword)
-    const users = dbz.getKeyInDatabase("users", "users")
+    const users = db.getKey("users")
     users.push(user)
-    dbz.setAndWriteKeyInDatabase("users", "users", users)
-    // await db.write()
+    db.setKey("users", users)
+    await db.write()
     const passwordToLog = process.env.DEV_MODE ? newPassword : "********"
     const passwordConfirmToLog = process.env.DEV_MODE ? newPasswordConfirm : "********"
     log.debug(`changeUserPassword("${username}", "${passwordToLog}", "${passwordConfirmToLog}") -> "ok"`)
@@ -378,8 +336,39 @@ async function changeUserPassword(username, newPassword, newPasswordConfirm) {
 }
 
 async function resetToDefault() {
-    await dbz.resetDatabase("users")
-    // db = await resetDatabase("users")
+    await db.reset()
     emitter.emit('users', getUsers())
     emitter.emit('groups', getGroups())
 }
+
+// Helper Functions
+function validGroup(group) {
+    // check if empty, 0, "", NaN, null, false, undefined
+    if (!group) return false
+    // contains only alphanumaric, whitespace, special charactors _ ! @ # $ % ^ & -
+    const regex = /^[a-zA-Z0-9 _!@#$%^&-]+$/
+    group = group.toString()
+    if (group.length < 2) return false
+    else if (group.length > 20) return false
+    else if (regex.test(group) === false) return false
+    return true
+}
+function validUsermame(username) {
+    if (!username) return false
+    const regex = /^[a-zA-Z0-9 _!@#$%^&-]+$/
+    username = username.toString()
+    if (username.length < 2) return false
+    else if (username.length > 20) return false
+    else if (regex.test(username) === false) return false
+    return true
+}
+function validPassword(password) {
+    if (!password) return false
+    const regex = /^[a-zA-Z0-9 _!@#$%^&-]+$/
+    password = password.toString()
+    if (password.length < 2) return false
+    else if (password.length > 20) return false
+    else if (regex.test(password) === false) return false
+    return true
+}
+

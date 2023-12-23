@@ -53,7 +53,7 @@ const DEFAULT_STATE = { clients: {} }
 const db = await createDatabase('api', DEFAULT_STATE)
 
 // Startup
-emitter.setMaxListeners(100)
+emitter.setMaxListeners(1000)
 db.data.clients = {}
 await db.write()
 
@@ -121,6 +121,8 @@ emitter.on("connect", (id, protocal, sendFn) => {
         token: undefined,
         protocal: protocal,
         send: (path, body) => { return sendFn(path, body) },
+        sub: (template) => { return subscribe(id, template) },
+        unsub: (template) => { return unsubscribe(id, template) },
         subscribe: (template) => { return subscribe(id, template) },
         unsubscribe: (template) => { return unsubscribe(id, template) },
         subscriptions: () => { return subscriptions(id) },
