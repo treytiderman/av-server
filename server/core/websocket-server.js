@@ -1,7 +1,7 @@
 // Overview: websocket server
 
 // Imports
-import { Logger } from '../modules/logger.js'
+import { Logger } from '../lib/logger-v0.js'
 import { EventEmitter } from 'events'
 import { WebSocketServer } from 'ws'
 

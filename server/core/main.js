@@ -8,8 +8,7 @@ import { createServer as createHttpServer } from 'http'
 const server = createWsServer(createHttpServer(expressServer))
 
 // API
-import "../api/api.js"
-import "./api.js"
+import "../lib/api-v1.routes.js"
 
 // Start Server
 const port = process.env.PORT || 4620

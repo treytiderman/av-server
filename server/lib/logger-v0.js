@@ -4,7 +4,7 @@
 // Log Line: timestampISO LEVEL [group] message >> obj
 
 // Imports
-import { appendText, readText, makeDir, getStatsRecursive, deleteFile } from './files.js'
+import { appendText, makeDir, getStatsRecursive, deleteFile } from './file-v0.js'
 import { EventEmitter } from 'events'
 
 // Exports
@@ -69,7 +69,7 @@ const call = (group, func, name = "") => async (...args) => {
     // const argFunctionsAsStrings = args.map(arg => typeof arg === "function" ? arg + '' : arg)
     const argStrings = args.map(arg => JSON.stringify(arg))
     const resultString = JSON.stringify(result)
-    const logType = resultString && resultString.startsWith('"error') ? "WARN " : "FUNC "
+    const logType = resultString && resultString.startsWith('"error') ? "WARN " : "DEBUG"
 
     const message = `${Date.now() - start_ms}ms ${functionString}(${argStrings.join(", ")}) -> ${resultString}`
     await log(logType, group, message)
@@ -157,21 +157,3 @@ function isObject(obj) {
 function isArray(array) {
     return Array.isArray(array) && array !== null
 }
-
-// Testing
-// const logger = new Logger("logger.js")
-// let counter = 0
-// setInterval(() => {
-//     counter++
-//     logger.debug("counter", counter)
-//     logger.info("counter", counter)
-//     logger.error("counter", counter)
-// }, 100)
-// setTimeout(() => {
-//     console.log(getHistory());
-//     console.log(getHistory());
-//     console.log(getHistory());
-// }, 4000);
-// emitter.on("log", (logObj) => {
-//     console.log(logObj)
-// })

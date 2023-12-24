@@ -1,2 +1,3 @@
 import './core/main.js'
-import './tests/test.js'
+import './lib/run.test.js'
+// import './tests/test.js'
