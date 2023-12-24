@@ -1,7 +1,7 @@
 // Overview: websocket server
 
 // Imports
-import { Logger } from '../lib/logger-v0.js'
+import { Logger } from './logger-v0.js'
 import { EventEmitter } from 'events'
 import { WebSocketServer } from 'ws'
 
@@ -25,7 +25,7 @@ function create(httpServer, callback = () => {}) {
     // Create
     wss = new WebSocketServer({ server: httpServer })
 
-    // Events
+    // Server Events
     wss.on('listening', () => {
         log.info(`create(httpServer) -> "ok"`);
         callback(wss)

@@ -5,7 +5,7 @@ import express from 'express'
 import cors from 'cors'
 
 import { router } from './http-routes.js'
-import { getSystemInfo } from '../modules/system.js'
+import { info } from './system-v1.js'
 
 // Exports
 export {
@@ -32,12 +32,10 @@ function create() {
     return app
 }
 function startupConsoleLog(port) {
-    const systemInfo = getSystemInfo()
+    const systemInfo = info.get()
     console.log(`user interface available at:`)
     console.log(`- http://localhost:${port}`)
-    systemInfo.nics.forEach(nic => {
-        console.log(`- http://${nic.ip}:${port}`)
-    })
+    systemInfo.nics.forEach(nic => console.log(`- http://${nic.ip}:${port}`))
     console.log(`- http://${systemInfo.hostname}:${port}`)
     console.log("")
 }

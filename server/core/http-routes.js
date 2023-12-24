@@ -3,8 +3,8 @@
 // Imports
 import express from 'express'
 import fs from 'fs/promises'
-import { Logger } from '../modules/logger.js'
-import { renderMarkdown } from '../modules/markdown.js'
+import { Logger } from './logger-v0.js'
+import { renderMarkdown } from './markdown.js'
 
 // Exports
 export { router }

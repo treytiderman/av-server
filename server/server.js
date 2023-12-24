@@ -1,3 +1,21 @@
-import './core/main.js'
-import './lib/run.test.js'
-// import './tests/test.js'
+// HTTP Server
+import { create as createExpressServer, startupConsoleLog } from './core/http-server.js'
+const expressServer = createExpressServer()
+
+// WebSocket Server
+import { create as createWsServer } from './core/websocket-server.js'
+import { createServer as createHttpServer } from 'http'
+const server = createWsServer(createHttpServer(expressServer))
+
+// Run Tests
+import "./test.js"
+
+// API
+import "./routes.js"
+
+// Start Server
+const port = process.env.PORT || 4620
+server.listen(port, () => {
+    console.log(`av-server is up and running`)
+    startupConsoleLog(port)
+})
