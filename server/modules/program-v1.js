@@ -5,537 +5,339 @@
 // - PM2 doesn't let you attach to stdin / stdout ??
 
 // Imports
-import { Logger } from './logger.js'
-import { EventEmitter } from 'events'
-import { createDatabase, resetDatabase } from './database.js'
-import { getStatsRecursive, readText } from './files.js'
 import { spawn } from 'child_process'
+import { Logger } from '../core/logger-v0.js'
+import { Database } from '../core/database-v1.js'
+import { getStatsRecursive, readText } from '../core/file-v0.js'
 
 // Exports
 export {
-    // emitter, // available, data, history, status, status-all, create, kill, delete
-
-    // available,
-    // program,
-    // programs,
-    // history,
-
-
-
-    // available,
-
-    // status,
-    // history,
-
-    // create,
-    // start,
-    // send,
-    // kill,
-    // restart,
-    // remove,
-
-    // setDirectory,
-    // setCommand,
-    // setStartOnBoot,
-    // setEnviromentVariables,
-
-    // statusAll,
-    // startAll,
-    // sendAll,
-    // killAll,
-    // restartAll,
-    // removeAll,
-
-    // splitByWhitespace,
-    // PATH_TO_PROGRAMS as PATH,
-
-    // resetToDefault,
+    available, // get, sub, unsub, read
+    program, // get, sub, unsub, create, start, send, kill, restart, remove, 
+             // set, setDirectory, setCommand, setStartOnBoot, setEnviromentVariables,
+    data, // get, sub, unsub
+    history, // get, sub, unsub
+    programs, // get, sub, unsub, start, send, kill, restart, remove
 }
-
-// Constants
-const PATH_TO_PROGRAMS = "../private/programs" // ~/av-server/private/programs
-const MAX_HISTORY_LENGTH = 1_000
-const UPDATE_AVAILABLE_MS = 1_000
-const RESTART_TIMEOUT_MS = 100
-const DEFAULT_STATE = { programs: {}, available: {} }
 
 // Variables
-const log = new Logger("program-v1.js")
-const emitter = new EventEmitter()
-const spawnedList = {}
-let dbOLD = await createDatabase('programs', DEFAULT_STATE)
+const log = new Logger('program-v1.js')
+const dbSettings = new Database('program-settings-v1')
+const dbStatus = new Database('program-status-v1')
+const dbHistory = new Database('program-history-v1')
+const dbAvailable = new Database('program-avaiable-v1')
+const spawned = {}
 
 // Startup
-emitter.setMaxListeners(100)
-dbResetRunning()
-await checkAvailablePrograms()
-setInterval(async () => {
-    await checkAvailablePrograms()
-}, UPDATE_AVAILABLE_MS)
+await dbSettings.create({
+    PATH_TO_PROGRAMS: "../private/programs", // ~/av-server/private/programs
+    MAX_HISTORY_LENGTH: 1_000,
+    UPDATE_AVAILABLE_MS: 1_000,
+    RESTART_TIMEOUT_MS: 100,
+})
+await dbStatus.create()
+await dbStatus.set({})
+await dbStatus.write()
+await dbHistory.create()
+await dbAvailable.create({ available: {} })
 
 // Functions
-// const groups = {
-//     get: () => dbGroups.getKey('groups'),
-//     sub: (callback) => dbGroups.subKey('groups', callback),
-//     unsub: (callback) => dbGroups.unsubKey('groups', callback),
-//     create: log.call(async (group) => {
-//         // Errors
-//         if (!validGroup(group)) {
-//             return `error group '${group}' is not valid, only: alphanumaric, whitespace, special charactors _ ! @ # $ % ^ & -`
-//         } else if (isGroup(group)) {
-//             return `error group '${group}' arlready exists`
-//         }
+const available = {
+    get: (name) => dbAvailable.getKey(name),
+    sub: (name, callback) => dbAvailable.subKey(name, callback),
+    unsub: (name, callback) => dbAvailable.unsubKey(name, callback),
+    update: async () => {
+        const stats = await getStatsRecursive(dbSettings.getKey("PATH_TO_PROGRAMS"))
+        const availablePromise = stats.contains_folders.map(async folder => await parseFolder(folder))
+        const available = await Promise.all(availablePromise)
 
-//         // Create group
-//         const groups = dbGroups.getKey('groups')
-//         groups.push(group)
-//         await dbGroups.setKey('groups', groups)
-//         await dbGroups.write()
-//         return 'ok'
-//     }, 'groups.create'),
-// }
-
-// Functions ------------------------------------------
-function available() {
-    const array = []
-    Object.keys(dbOLD.data.available).forEach(name => {
-        array.push({ name: name, ...dbOLD.data.available[name] })
-    })
-    // log.debug(`available()`, db.data.available)
-    return array
-}
-
-function status(name) {
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`status("${name}") -> ${error}`)
-        return error
-    }
-    const statusWithoutHistory = {
-        name: name,
-        command: dbOLD.data.programs[name].command,
-        env: dbOLD.data.programs[name].env,
-        directory: dbOLD.data.programs[name].directory,
-        startOnBoot: dbOLD.data.programs[name].startOnBoot,
-        running: dbOLD.data.programs[name].running,
-        pid: dbOLD.data.programs[name].pid,
-    }
-    // log.debug(`status("${name}")`, statusWithoutHistory)
-    return statusWithoutHistory
-}
-function history(name) {
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`history("${name}") -> ${error}`)
-        return error
-    }
-    // log.debug(`history("${name}")`, db.data.programs[name].history)
-    return dbOLD.data.programs[name].history
-}
-function statusAll() {
-    const array = []
-    Object.keys(dbOLD.data.programs).forEach(name => {
-        array.push(status(name))
-    })
-    // log.debug(`statusAll()`, array)
-    return array
-}
-
-function create(name, directory, command, env = {}, startOnBoot = false) {
-
-    // Errors
-    if (dbOLD.data.programs[name]?.running === true) {
-        const error = `error program "${name}" is running`
-        log.error(`create("${name}", "${directory}", "${command}", "${startOnBoot}", "${JSON.stringify(env)}") -> ${error}`)
-        return error
-    }
-
-    // Create
-    dbOLD.data.programs[name] = {
-        running: false,
-        startOnBoot: startOnBoot,
-        pid: undefined,
-        directory: directory,
-        command: command,
-        env: env,
-        history: [],
-    }
-    emitter.emit('create', name)
-    emitter.emit('status', name, status(name))
-    emitter.emit('status-all', statusAll())
-    log.debug(`create("${name}", "${directory}", "${command}", "${startOnBoot}", "${JSON.stringify(env)}") -> "ok"`, dbOLD.data.programs[name])
-    dbOLD.write()
-    return "ok"
-}
-function start(name, callback = () => { }) {
-    log.debug(`trying start("${name}")`)
-
-    // Errors
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`start("${name}") -> ${error}`)
-        return error
-    } else if (dbOLD.data.programs[name].running === true) {
-        const error = `error program "${name}" is running`
-        log.error(`start("${name}") -> ${error}`)
-        return error
-    }
-
-    // Spawn
-    const program = dbOLD.data.programs[name]
-    const commandArray = splitByWhitespace(program.command)
-    const commandProgram = commandArray[0]
-    commandArray.shift()
-    try {
-        spawnedList[name] = spawn(commandProgram, commandArray, {
-            shell: false,
-            cwd: program.directory,
-            env: {
-                ...program.env,
-                PATH: process.env.PATH, // crashes without this
-            },
-        })
-    } catch (error) {
-        emitter.emit('start', name, error)
-        log.error(`start("${name}") event: "error" -> ${error.message}`, error)
-    }
-    // spawnedList[name] = spawned
-    program.running = false
-    program.pid = spawnedList[name].pid
-
-    // Events
-    spawnedList[name].on('spawn', (code, signal) => {
-        program.running = true
-        emitter.emit('status', name, status(name))
-        emitter.emit('status-all', statusAll())
-        log.debug(`start("${name}") event: "spawn"`)
-        dbOLD.write()
-        callback(name)
-    })
-    spawnedList[name].on('error', (error) => {
-        emitter.emit('start', name, error)
-        log.error(`start("${name}") event: "error" -> ${error.message}`, error)
-    })
-    spawnedList[name].on('exit', (code, signal) => {
-        program.running = false
-        emitter.emit('status', name, status(name))
-        emitter.emit('status-all', statusAll())
-        log.debug(`start("${name}") event: "exit"`)
-        dbOLD.write()
-    })
-    spawnedList[name].stdout.on('data', (data) => {
-        const dataObj = {
-            from: "stdout",
-            timestampISO: new Date(Date.now()).toISOString(),
-            data: data.toString('utf8'),
+        const availableAsJSON = JSON.stringify(available)
+        const availableAsJSON_prev = JSON.stringify(dbAvailable.getKey("available"))
+        if (availableAsJSON !== availableAsJSON_prev) {
+            dbAvailable.setKey("available", available)
+            await dbAvailable.write()
         }
-        program.history.push(dataObj)
-        if (program.history.length > MAX_HISTORY_LENGTH) { program.history.shift() }
-        emitter.emit('receive', name, dataObj.data)
-        emitter.emit('data', name, dataObj)
-        emitter.emit('history', name, history(name))
-        log.debug(`start("${name}") event: "stdout" -> ${JSON.stringify(dataObj.data)}`, dataObj)
-        dbOLD.write()
-    })
-    spawnedList[name].stderr.on('data', (data) => {
-        const dataObj = {
-            from: "stderr",
-            timestampISO: new Date(Date.now()).toISOString(),
-            data: data.toString('utf8'),
-        }
-        program.history.push(dataObj)
-        if (program.history.length > MAX_HISTORY_LENGTH) { program.history.shift() }
-        emitter.emit('receive', name, dataObj.data)
-        emitter.emit('data', name, dataObj)
-        emitter.emit('history', name, history(name))
-        // log.debug(`start("${name}") event: "stderr" -> ${JSON.stringify(dataObj.data)}`, dataObj)
-        dbOLD.write()
-    })
-
-    return "ok"
-}
-function send(name, text) {
-
-    // Errors
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`send("${name}", "${text}") -> error program "${name}" does NOT exist`)
-        return error
-    } else if (dbOLD.data.programs[name].running === false) {
-        const error = `error program "${name}" is NOT running`
-        log.error(`send("${name}") -> ${error}`)
-        return error
+    },
+    pollStart: async () => {
+        await available.update()
+        setInterval(async () => await available.update(), dbSettings.getKey("UPDATE_AVAILABLE_MS"))
     }
+}
+const program = {
+    get: (name) => dbStatus.getKey(name),
+    sub: (name, callback) => dbStatus.subKey(name, callback),
+    unsub: (name, callback) => dbStatus.unsubKey(name, callback),
+    create: async (name, directory, command, startOnBoot, env) => {
 
-    // Send
-    try {
-        const program = dbOLD.data.programs[name]
-        spawnedList[name].stdin.write(Buffer.from(text))
+        // Errors
+        if (dbStatus.getKey(name)?.running) return `error program "${name}" is running`
+
+        // Create program
+        const prog = {
+            name: name,
+            running: false,
+            startOnBoot: startOnBoot,
+            pid: undefined,
+            directory: directory,
+            command: command,
+            env: env,
+        }
+        dbHistory.setKey(name, [])
+        dbStatus.setKey(name, prog)
+        await dbStatus.write()
+        return 'ok'
+    },
+    start: async (name, callback = () => { }) => {
+        const prog = dbStatus.getKey(name)
+
+        // Errors
+        if (prog) return `error program "${name}" does NOT exist`
+        else if (prog.running) return `error program "${name}" is running`
+
+        // Spawn
+        const commandArray = splitByWhitespace(prog.command)
+        const commandProgram = commandArray[0]
+        commandArray.shift()
+        try {
+            spawned[name] = spawn(commandProgram, commandArray, {
+                shell: false,
+                cwd: prog.directory,
+                env: {
+                    ...prog.env,
+                    PATH: process.env.PATH, // crashes without this
+                },
+            })
+        } catch (error) {
+            return `error program "${name}" failed to start ${error.message}`
+        }
+        prog.running = false
+        prog.pid = spawned[name].pid
+        dbStatus.setKey(name, prog)
+        await dbStatus.write()
+
+        // Event Functions
+        async function onSpawn(code, signal) {
+            const prog = dbStatus.getKey(name)
+            prog.running = true
+            dbStatus.setKey(name, prog)
+            await dbStatus.write()
+            callback(name)
+        }
+        async function onError(error) {
+            return error.message
+        }
+        async function onExit(code, signal) {
+            const prog = dbStatus.getKey(name)
+            prog.running = false
+            dbStatus.setKey(name, prog)
+            await dbStatus.write()
+        }
+        function onData(from, data) {
+            const dataObj = {
+                from: from,
+                timestampISO: new Date(Date.now()).toISOString(),
+                data: data.toString('utf8'),
+            }
+
+            const history = dbHistory.getKey(name)
+            history.push(dataObj)
+            if (history.length > dbSettings.getKey("MAX_HISTORY_LENGTH")) { history.shift() }
+            dbHistory.setKey(name, history)
+        }
+        function onStdout(data) {
+            onData("stdout", data)
+        }
+        function onStderr(data) {
+            onData("stderr", data)
+        }
+
+        // Events
+        spawned[name].on('spawn', log.call(onSpawn, "program.onSpawn"))
+        spawned[name].on('error', log.call(onError, "program.onError"))
+        spawned[name].on('exit', log.call(onExit, "program.onExit"))
+        spawned[name].stdout.on('data', log.call(onStdout, "program.onStdout"))
+        spawned[name].stderr.on('data', log.call(onStderr, "program.onStderr"))
+
+        return 'ok'
+    },
+    send: (name, text) => {
+        const prog = dbStatus.getKey(name)
+
+        // Errors
+        if (prog) return `error program "${name}" does NOT exist`
+        else if (!prog.running) return `error program "${name}" is NOT running`
+
+        // Send
+        try { spawned[name].stdin.write(Buffer.from(text)) }
+        catch (err) { return `error program "${name}" could NOT send "${text}"` }
+
+        // History
         const dataObj = {
             from: "stdin",
             timestampISO: new Date(Date.now()).toISOString(),
             data: text,
         }
-        program.history.push(dataObj)
-        if (program.history.length > MAX_HISTORY_LENGTH) { program.history.shift() }
-        emitter.emit('data', name, dataObj)
-        emitter.emit('history', name, history(name))
-        log.debug(`send("${name}", "${text}") -> "ok"`)
-        dbOLD.write()
+        const history = dbHistory.getKey(name)
+        history.push(dataObj)
+        if (history.length > dbSettings.getKey("MAX_HISTORY_LENGTH")) { history.shift() }
+        dbHistory.setKey(name, history)
+
         return "ok"
-    } catch (err) {
-        const error = `error program "${name}" could NOT send "${text}"`
-        log.error(`send("${name}", "${text}") -> ${error}`, err)
-        return error
-    }
-}
-function kill(name) {
+    },
+    kill: async (name) => {
+        const prog = dbStatus.getKey(name)
 
-    // Errors
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`kill("${name}") -> ${error}`)
-        return error
-    }
+        // Errors
+        if (prog) return `error program "${name}" does NOT exist`
 
-    // Kill
-    try {
-        dbOLD.data.programs[name].running = false
-        dbOLD.write()
-        emitter.emit('kill', name)
-        emitter.emit('status', name, status(name))
-        emitter.emit('status-all', statusAll())
-        spawnedList[name].kill()
-        log.debug(`kill("${name}") -> "ok"`)
+        // Kill
+        try { spawned[name].kill() }
+        catch (err) { return `error program "${name}" could NOT be killed "${err.message}"` }
+
         return "ok"
-    } catch (err) {
-        const error = `error program ${name} could NOT be killed`
-        log.error(`kill("${name}") -> ${error}`, err)
-        return error
-    }
-}
-function restart(name) {
+    },
+    restart: async (name) => {
+        const prog = dbStatus.getKey(name)
 
-    // Errors
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`restart("${name}") -> ${error}`)
-        return error
-    }
+        // Errors
+        if (prog) return `error program "${name}" does NOT exist`
 
-    // Kill then Start
-    try {
-        dbOLD.data.programs[name].running = false
-        dbOLD.write()
-        emitter.emit('status', name, status(name))
-        emitter.emit('status-all', statusAll())
-        spawnedList[name].kill()
-        setTimeout(() => start(name), RESTART_TIMEOUT_MS)
-        log.debug(`restart("${name}") -> "ok"`)
+        // Restart
+        try {
+            spawned[name].kill()
+            setTimeout(() => start(name), dbSettings.getKey("RESTART_TIMEOUT_MS"))
+        } catch (err) {
+            return `error program "${name}" could NOT be killed "${err.message}"`
+        }
+
         return "ok"
-    } catch (err) {
-        const error = `error program "${name}" could NOT be killed`
-        log.error(`restart("${name}") -> ${error}`, err)
-        return error
-    }
-}
-function remove(name) {
+    },
+    remove: async (name) => {
+        const prog = dbStatus.getKey(name)
 
-    // Errors
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`remove("${name}") -> ${error}`)
-        return error
-    }
+        // Errors
+        if (prog) return `error program "${name}" does NOT exist`
 
-    // Kill then Remove
-    try {
-        dbOLD.data.programs[name].running = false
-        dbOLD.write()
-        emitter.emit('status', name, status(name))
-        emitter.emit('status-all', statusAll())
-        spawnedList[name].kill()
-        delete dbOLD.data.programs[name]
-        dbOLD.write()
-        emitter.emit('delete', name)
-        emitter.emit('status-all', statusAll())
-        log.debug(`remove("${name}") -> "ok"`)
+        // Remove
+        try {
+            spawned[name].kill()
+            setTimeout(() => start(name), dbSettings.getKey("RESTART_TIMEOUT_MS"))
+        } catch (err) {
+            return `error program "${name}" could NOT be killed "${err.message}"`
+        }
+
         return "ok"
-    } catch (err) {
-        const error = `error program "${name}" could NOT be killed`
-        log.error(`remove("${name}") -> ${error}`, err)
-        return error
-    }
+    },
+    set: async (name, key, value) => {
+        const prog = dbStatus.getKey(name)
+        const validKeys = ["directory", "command", "startOnBoot", "env"]
+
+        // Errors
+        if (prog) return `error program "${name}" does NOT exist`
+        else if (!prog.running) return `error program "${name}" is NOT running`
+        else if (!validKeys.some(validKey => key === validKey)) return `error key "${key}" is NOT valid`
+
+        // Set
+        prog[key] = value
+        dbStatus.setKey(name, prog)
+        await dbStatus.write()
+
+        return "ok"
+    },
+    setDirectory: async (name, directory) => program.set(name, "directory", directory),
+    setCommand: async (name, command) => program.set(name, "command", command),
+    setStartOnBoot: async (name, startOnBoot) => program.set(name, "startOnBoot", startOnBoot),
+    setEnviromentVariables: async (name, env) => program.set(name, "env", env),
+    log: {
+        create: (name, directory, command, startOnBoot, env) => log.call(program.create)(name, directory, command, startOnBoot, env),
+        start: (name, callback = () => { }) => log.call(program.start)(name, callback = () => { }),
+        send: (name, text) => log.call(program.send)(name, text),
+        kill: (name) => log.call(program.kill)(name),
+        restart: (name) => log.call(program.restart)(name),
+        remove: (name) => log.call(program.remove)(name),
+        set: (name, key, value) => log.call(program.set)(name, key, value),
+        setDirectory: (name, directory) => log.call(program.setDirectory)(name, directory),
+        setCommand: (name, command) => log.call(program.setCommand)(name, command),
+        setStartOnBoot: (name, startOnBoot) => log.call(program.setStartOnBoot)(name, startOnBoot),
+        setEnviromentVariables: (name, env) => log.call(program.setEnviromentVariables)(name, env),
+    },
 }
-
-function setDirectory(name, directory) {
-
-    // Errors
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`setDirectory("${name}", "${directory}") -> ${error}`)
-        return error
-    } else if (dbOLD.data.programs[name].running === true) {
-        const error = `error program "${name}" is running`
-        log.error(`setDirectory("${name}", "${directory}") -> ${error}`)
-        return error
-    }
-
-    // Set directory
-    dbOLD.data.programs[name].directory = directory
-    dbOLD.write()
-    emitter.emit('status', name, status(name))
-    emitter.emit('status-all', statusAll())
-    log.debug(`setDirectory("${name}", "${directory}") -> "ok"`)
-    return "ok"
+const programs = {
+    get: () => dbStatus.get(),
+    sub: (callback) => dbStatus.sub(callback),
+    unsub: (callback) => dbStatus.unsub(callback),
+    start: async () => {
+        dbStatus.keys().forEach(name => program.start(name))
+        return 'ok'
+    },
+    send: async (text) => {
+        dbStatus.keys().forEach(name => program.send(name, text))
+        return 'ok'
+    },
+    kill: async () => {
+        dbStatus.keys().forEach(name => program.kill(name))
+        return 'ok'
+    },
+    restart: async () => {
+        dbStatus.keys().forEach(name => program.restart(name))
+        return 'ok'
+    },
+    remove: async () => {
+        dbStatus.keys().forEach(name => program.remove(name))
+        return 'ok'
+    },
+    log: {
+        start: () => log.call(programs.start)(),
+        send: (text) => log.call(programs.send)(text),
+        kill: () => log.call(programs.kill)(),
+        restart: () => log.call(programs.restart)(),
+        remove: () => log.call(programs.remove)(),
+    },
 }
-function setCommand(name, command) {
-
-    // Errors
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`setCommand("${name}", "${command}") -> ${error}`)
-        return error
-    } else if (dbOLD.data.programs[name].running === true) {
-        const error = `error program "${name}" is running`
-        log.error(`setCommand("${name}", "${command}") -> ${error}`)
-        return error
-    }
-
-    // Set command
-    dbOLD.data.programs[name].command = command
-    dbOLD.write()
-    emitter.emit('status', name, status(name))
-    emitter.emit('status-all', statusAll())
-    log.debug(`setCommand("${name}", "${command}") -> "ok"`)
-    return "ok"
+const data = {
+    get: (name) => dbHistory.getKey(name).slice(-1),
+    sub: (name, callback) => dbHistory.subKey(name, callback).slice(-1),
+    unsub: (name, callback) => dbHistory.unsubKey(name, callback).slice(-1),
 }
-function setStartOnBoot(name, startOnBoot) {
-
-    // Errors
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`setStartOnBoot("${name}", "${startOnBoot}") -> ${error}`)
-        return error
-    } else if (dbOLD.data.programs[name].running === true) {
-        const error = `error program "${name}" is running`
-        log.error(`setStartOnBoot("${name}", "${startOnBoot}") -> ${error}`)
-        return error
-    }
-
-    // Set startOnBoot
-    if (startOnBoot) dbOLD.data.programs[name].startOnBoot = true
-    else dbOLD.data.programs[name].startOnBoot = false
-    dbOLD.write()
-    emitter.emit('status', name, status(name))
-    emitter.emit('status-all', statusAll())
-    log.debug(`setStartOnBoot("${name}", "${startOnBoot}") -> "ok"`)
-    return "ok"
+const history = {
+    get: (name) => dbHistory.getKey(name),
+    sub: (name, callback) => dbHistory.subKey(name, callback),
+    unsub: (name, callback) => dbHistory.unsubKey(name, callback),
 }
-function setEnviromentVariables(name, env) {
-
-    // Errors
-    if (!dbOLD.data.programs[name]) {
-        const error = `error program "${name}" does NOT exist`
-        log.error(`setEnviromentVariables("${name}", "${JSON.stringify(env)}") -> ${error}`)
-        return error
-    } else if (dbOLD.data.programs[name].running === true) {
-        const error = `error program "${name}" is running`
-        log.error(`setEnviromentVariables("${name}", "${JSON.stringify(env)}") -> ${error}`)
-        return error
-    } else if (typeof env !== 'object') {
-        const error = `error env is NOT an object`
-        log.error(`setEnviromentVariables("${name}", "${JSON.stringify(env)}") -> ${error}`)
-        return error
-    }
-
-    // Set enviroment variables
-    dbOLD.data.programs[name].env = env
-    dbOLD.write()
-    emitter.emit('status', name, status(name))
-    emitter.emit('status-all', statusAll())
-    log.debug(`setEnviromentVariables("${name}", "${JSON.stringify(env)}") -> "ok"`)
-    return "ok"
-}
-
-function startAll() {
-    log.debug(`startAll() -> "ok"`)
-    Object.keys(dbOLD.data.programs).forEach(name => start(name))
-    return "ok"
-}
-function sendAll(text) {
-    log.debug(`killAll() -> "ok"`)
-    Object.keys(dbOLD.data.programs).forEach(name => send(name, text))
-    return "ok"
-}
-function killAll() {
-    log.debug(`killAll() -> "ok"`)
-    Object.keys(dbOLD.data.programs).forEach(name => kill(name))
-    return "ok"
-}
-function restartAll() {
-    log.debug(`restartAll() -> "ok"`)
-    Object.keys(dbOLD.data.programs).forEach(name => restart(name))
-    return "ok"
-}
-function removeAll() {
-    log.debug(`removeAll() -> "ok"`)
-    Object.keys(dbOLD.data.programs).forEach(name => remove(name))
-    dbOLD.data.programs = {}
-    return "ok"
-}
-
-async function resetToDefault() {
-    dbOLD = await resetDatabase("programs")
-    emitter.emit('status-all', statusAll())
-}
-
 
 // Helper Functions
-function dbResetRunning() {
-    Object.keys(dbOLD.data.programs).forEach(name => {
-        dbOLD.data.programs[name].running = false
-    })
+async function parseFolder(folder) {
+    const directory = folder.folder_name.replace("/", "")
+    const avaiableProgramFolder = {
+        directory: `${dbSettings.getKey("PATH_TO_PROGRAMS")}/${directory}`,
+        command: "",
+        env: {},
+        files: [],
+    }
+
+    for (const file of folder.contains_files) {
+        avaiableProgramFolder.files.push(file.file_name)
+        if (file.file_name.endsWith(".js") || file.file_name.endsWith(".mjs")) {
+            avaiableProgramFolder.command = "node " + file.file_name
+        }
+        else if (file.file_name.endsWith(".py")) {
+            avaiableProgramFolder.command = "python3 " + file.file_name
+        }
+        else if (file.file_name.endsWith(".env")) {
+            const envFile = await readText(file.path)
+            const envFileLines = envFile.split("\n")
+            envFileLines.forEach(line => {
+                const key = line.split("=")[0].trim()
+                const value = line.split("=")[1].trim()
+                avaiableProgramFolder.env[key] = value
+            })
+        }
+    }
+    return avaiableProgramFolder
 }
 function splitByWhitespace(string) {
     return string.trim().split(/\s+/)
 }
-async function checkAvailablePrograms() {
-    const availableAsJSON_prev = JSON.stringify(dbOLD.data.available)
-    const stats = await getStatsRecursive(PATH_TO_PROGRAMS)
-    dbOLD.data.available = {}
-    for (const folder of stats.contains_folders) {
-        const directory = folder.folder_name.replace("/", "")
-        dbOLD.data.available[directory] = {
-            directory: `${PATH_TO_PROGRAMS}/${directory}`,
-            command: "echo hi",
-            env: {},
-            files: [],
-        }
-        for (const file of folder.contains_files) {
-            dbOLD.data.available[directory].files.push(file.file_name)
-            if (file.file_name.endsWith(".js") || file.file_name.endsWith(".mjs")) {
-                dbOLD.data.available[directory].command = "node " + file.file_name
-            }
-            else if (file.file_name.endsWith(".py")) {
-                dbOLD.data.available[directory].command = "python3 " + file.file_name
-            }
-            else if (file.file_name.endsWith(".env")) {
-                const envFile = await readText(file.path)
-                const envFileLines = envFile.split("\n")
-                envFileLines.forEach(line => {
-                    const key = line.split("=")[0].trim()
-                    const value = line.split("=")[1].trim()
-                    dbOLD.data.available[directory].env[key] = value
-                });
-            }
-        }
-    }
-    const availableAsJSON = JSON.stringify(dbOLD.data.available)
-    if (availableAsJSON !== availableAsJSON_prev) {
-        emitter.emit('available', dbOLD.data.available)
-        log.debug(`available() -> "updated"`, dbOLD.data.available)
-        await dbOLD.write()
-    }
-    return dbOLD.data.available
-}
+
+// Startup
+await available.pollStart()

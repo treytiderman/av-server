@@ -1,6 +1,5 @@
 // Imports
 import * as program from './program-v1.js'
-console.log("test");
 
 // Functions
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))

@@ -1,6 +1,8 @@
 # TODO
 
-- [ ] module/serial.js
-- [ ] api-serial-v0.js
-- [ ] api-files-v0.js
-- [ ] back to frontend
+- [ ] program-v1.js parsing a env file crashes with blank lines
+
+
+
+
+

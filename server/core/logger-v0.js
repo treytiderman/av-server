@@ -21,7 +21,7 @@ export {
 }
 
 // Constants
-const MAX_HISTORY_LENGTH = 10_000
+const MAX_HISTORY_LENGTH = 1_000
 const NUMBER_OF_FILES_MAX = 30
 const NUMBER_OF_LINES_MAX = 10_000
 const OBJ_JSON_LENGTH_MAX = 10_000
@@ -66,13 +66,14 @@ const call = (group, func, name = "") => async (...args) => {
     const result = await func(...args)
 
     const functionString = name !== "" ? name : func.name
-    // const argFunctionsAsStrings = args.map(arg => typeof arg === "function" ? arg + '' : arg)
     const argStrings = args.map(arg => JSON.stringify(arg))
     const resultString = JSON.stringify(result)
-    const logType = resultString && resultString.startsWith('"error') ? "WARN " : "DEBUG"
+    // const logType = resultString && resultString.startsWith('"error') ? "WARN " : "DEBUG"
+    const logType = resultString && resultString.startsWith('"error') ? "FUNC " : "FUNC "
+    const obj = isObject(result) || isArray(result) ? result : {}
 
     const message = `${Date.now() - start_ms}ms ${functionString}(${argStrings.join(", ")}) -> ${resultString}`
-    await log(logType, group, message)
+    await log(logType, group, message, obj)
 
     return result
 }

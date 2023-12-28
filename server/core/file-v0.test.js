@@ -1,5 +1,5 @@
 // Imports
-import * as files from './files-v0.js'
+import * as files from './file-v0.js'
 
 // Functions
 export async function test() {

@@ -70,7 +70,7 @@ const create = log.call(async (filename, defaultData = {}) => {
     } else {
         for (const key in defaultData) { dbs[filename].keyCallbacks[key] = [] }
         dbs[filename].data = defaultData
-        await write(filename)
+        // await write(filename)
     }
 
     return "ok"
@@ -168,6 +168,7 @@ function getKey(filename, key) {
 }
 
 const setKey = (filename, key, value) => {
+// const setKey = log.call((filename, key, value) => {
     if (!dbs[filename]) return `error database '${filename}' doesn't exist`
     
     dbs[filename].data[key] = clone(value)
@@ -176,6 +177,7 @@ const setKey = (filename, key, value) => {
     dbs[filename].dataCallbacks.forEach((callback) => callback(dbs[filename].data))
     return "ok"
 }
+// }, "setKey")
 
 const removeKey = log.call((filename, key) => {
     if (!dbs[filename]) return `error database '${filename}' doesn't exist`

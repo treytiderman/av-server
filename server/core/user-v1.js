@@ -1,14 +1,14 @@
 // Overview: user managment
 
 // Imports
-import { Logger } from './logger-v0.js'
-import { Database } from './database-v1.js'
+import { Logger } from '../core/logger-v0.js'
+import { Database } from '../core/database-v1.js'
 import {
     hashPassword,
     isHashedPassword,
     generateToken as generateTokenAuth,
     verifyToken as verifyTokenAuth
-} from './auth-v0.js'
+} from '../core/auth-v0.js'
 
 // Exports
 export {
