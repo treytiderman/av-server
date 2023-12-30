@@ -24,7 +24,7 @@ export {
 const MAX_HISTORY_LENGTH = 1_000
 const NUMBER_OF_FILES_MAX = 30
 const NUMBER_OF_LINES_MAX = 10_000
-const OBJ_JSON_LENGTH_MAX = 10_000
+const OBJ_JSON_LENGTH_MAX = 1_000
 const PATH_TO_LOG_FOLDER = "../private/logs/" // ~/av-server/private/logs
 const SPACER = ">>"
 const LOG_LEVELS = [
