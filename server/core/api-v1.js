@@ -9,7 +9,7 @@ import { Database } from './database-v1.js'
 import * as ws from './websocket-server.js'
 // import * as tcp from '../modules/tcp-server.js'
 // import * as udp from '../modules/udp-server.js'
-// import * as ipc from '../modules/programs.js'
+import * as ipc from '../modules/program-v1.js'
 // import * as http from '../modules/http-server.js'
 
 // Exports
@@ -52,14 +52,14 @@ await db.set({})
 
 // Api accessed via the WebSocket
 ws.emitter.on("connect", (wsClient, req) => {
-    sendFunctions[wsClient.id] = (path, body) => wsClient.send(JSON.stringify({path: path, body: body}))
-    emitter.emit("connect", wsClient.id, protocals.ws)
+    sendFunctions["ws-" + wsClient.id] = (path, body) => wsClient.send(JSON.stringify({path: path, body: body}))
+    emitter.emit("connect", "ws-" + wsClient.id, protocals.ws)
 })
 ws.emitter.on("disconnect", (wsClient) => {
-    emitter.emit("disconnect", wsClient.id)
+    emitter.emit("disconnect", "ws-" + wsClient.id)
 })
 ws.emitter.on("receive", (wsClient, data) => {
-    const apiClient = db.getKey(wsClient.id)
+    const apiClient = db.getKey("ws-" + wsClient.id)
     emitter.emit("receive-raw", apiClient, data)
 })
 
@@ -88,23 +88,52 @@ ws.emitter.on("receive", (wsClient, data) => {
 // })
 
 // Api accessed via the Interprocess Communication
-// ipc.emitter.on("create", (id) => {
-//     sendFunctions[id] = (path, body) => ipc.send(id, JSON.stringify({path: path, body: body}))
-//     emitter.emit("connect", id, protocals.ipc)
-// })
-// ipc.emitter.on("kill", (id) => {
-//     emitter.emit("pause", id)
-// })
-// ipc.emitter.on("delete", (id) => {
-//     emitter.emit("disconnect", id)
-// })
-// ipc.emitter.on("receive", (id, data) => {
-//     const split = data.split("\r\n")
-//     split.forEach(text => {
-//         const apiClient = db.getKey(id)
-//         emitter.emit("receive-raw", apiClient, text)
-//     })
-// })
+let ipcNames = []
+ipc.programs.sub(data => {
+    const names = Object.keys(data)
+
+    // Loop throup new names
+    names.forEach(name => {
+        const id = "ipc-" + name
+        const program = data[name]
+
+        // Receive
+        const dataCallback = obj => {
+            if (obj.from !== "stdout") return
+            const split = obj.data.split("\r\n")
+            split.forEach(text => {
+                const apiClient = db.getKey(id)
+                emitter.emit("receive-raw", apiClient, text)
+            })
+        }
+
+        // Start
+        if (program.running && !ipcNames.some(n => n === name)) {
+            ipcNames.push(name)
+            sendFunctions[id] = (path, body) => ipc.program.send(name, JSON.stringify({path: path, body: body}))
+            emitter.emit("connect", id, protocals.ipc)
+            ipc.data.sub(name, dataCallback)
+        }
+        
+        // Kill
+        else if (!program.running && ipcNames.some(n => n === name)) {
+            ipcNames = ipcNames.filter(n => n !== name)
+            emitter.emit("connect", id, protocals.ipc)
+            ipc.data.unsub(name, dataCallback)
+        }
+    })
+
+    // Loop though old names
+    const namesFromDb = db.keys(data)
+    namesFromDb.forEach(name => {
+
+        // Remove
+        if (name.startsWith("ipc-") && !names.some(n => "ipc-" + n == name)) {
+            emitter.emit("disconnect", name)
+        }
+    })
+
+})
 
 // Recieve from any protocal
 emitter.on("connect", async (id, protocal) => {

@@ -10,6 +10,9 @@ import * as system_v0 from "./api-system-v0.mjs";
 import * as tcpClient_v0 from "./api-tcp-client-v0.mjs";
 import * as user_v0 from "./api-user-v0.mjs";
 
+// Functions
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
 // Exports
 export const api = {
     stdio: stdio,
@@ -20,6 +23,3 @@ export const api = {
     tcpClient: { v0: tcpClient_v0 },
     user: { v0: user_v0 },
 }
-
-// Functions
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))

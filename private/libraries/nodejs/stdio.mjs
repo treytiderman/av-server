@@ -85,24 +85,24 @@ function sendPath(path, body = {}) {
 function receivePath(path, callback) {
     emitter.on("receive", buffer => {
         const data = buffer.toString()
-        if (isJSON(data)) {
-            const obj = JSON.parse(data)
-            if (obj.path === path) {
-                callback(obj.body)
-            }
-        }
+        if (!isJSON(data)) return
+
+        const obj = JSON.parse(data)
+        if (obj.path !== path) return
+
+        callback(obj.body)
     })
 }
 function receivePathOnce(path, callback) {
     function eventListenerFunction(buffer) {
         const data = buffer.toString()
-        if (isJSON(data)) {
-            const obj = JSON.parse(data)
-            if (obj.path === path) {
-                emitter.removeListener('receive', eventListenerFunction)
-                callback(obj.body)
-            }
-        }
+        if (!isJSON(data)) return
+
+        const obj = JSON.parse(data)
+        if (obj.path !== path) return
+
+        emitter.removeListener('receive', eventListenerFunction)
+        callback(obj.body)
     }
     emitter.on("receive", eventListenerFunction)
 }

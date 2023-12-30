@@ -18,6 +18,7 @@ export {
     data, // get, sub, unsub
     history, // get, sub, unsub
     programs, // get, sub, unsub, start, send, kill, restart, remove
+    logger as log, // program, programs
 }
 
 // Variables
@@ -43,9 +44,9 @@ await dbAvailable.create({ available: {} })
 
 // Functions
 const available = {
-    get: (name) => dbAvailable.getKey(name),
-    sub: (name, callback) => dbAvailable.subKey(name, callback),
-    unsub: (name, callback) => dbAvailable.unsubKey(name, callback),
+    get: () => dbAvailable.getKey("available", ),
+    sub: (callback) => dbAvailable.subKey("available", callback),
+    unsub: (callback) => dbAvailable.unsubKey("available", callback),
     update: async () => {
         const stats = await getStatsRecursive(dbSettings.getKey("PATH_TO_PROGRAMS"))
         const availablePromise = stats.contains_folders.map(async folder => await parseFolder(folder))
@@ -57,20 +58,22 @@ const available = {
             dbAvailable.setKey("available", available)
             await dbAvailable.write()
         }
+        return "ok"
     },
     pollStart: async () => {
         await available.update()
         setInterval(async () => await available.update(), dbSettings.getKey("UPDATE_AVAILABLE_MS"))
+        return "ok"
     }
 }
 const program = {
     get: (name) => dbStatus.getKey(name),
     sub: (name, callback) => dbStatus.subKey(name, callback),
     unsub: (name, callback) => dbStatus.unsubKey(name, callback),
-    create: async (name, directory, command, startOnBoot, env) => {
+    create: async (name, directory, command, startOnBoot = false, env = {}) => {
 
         // Errors
-        if (dbStatus.getKey(name)?.running) return `error program "${name}" is running`
+        if (dbStatus.getKey(name)?.running) return `error program '${name}' is running`
 
         // Create program
         const prog = {
@@ -87,12 +90,16 @@ const program = {
         await dbStatus.write()
         return 'ok'
     },
-    start: async (name, callback = () => { }) => {
+    setDirectory: async (name, directory) => program.set(name, "directory", directory),
+    setCommand: async (name, command) => program.set(name, "command", command),
+    setStartOnBoot: async (name, startOnBoot) => program.set(name, "startOnBoot", startOnBoot),
+    setEnviromentVariables: async (name, env) => program.set(name, "env", env),
+    start: (name, callback = () => { }) => {
         const prog = dbStatus.getKey(name)
 
         // Errors
-        if (prog) return `error program "${name}" does NOT exist`
-        else if (prog.running) return `error program "${name}" is running`
+        if (!prog) return `error program '${name}' does NOT exist`
+        else if (prog.running) return `error program '${name}' is running`
 
         // Spawn
         const commandArray = splitByWhitespace(prog.command)
@@ -108,35 +115,34 @@ const program = {
                 },
             })
         } catch (error) {
-            return `error program "${name}" failed to start ${error.message}`
+            return `error program '${name}' failed to start ${error.message}`
         }
-        prog.running = false
-        prog.pid = spawned[name].pid
-        dbStatus.setKey(name, prog)
-        await dbStatus.write()
 
         // Event Functions
-        async function onSpawn(code, signal) {
+        async function onSpawn(name) {
             const prog = dbStatus.getKey(name)
+            if (!prog) return
             prog.running = true
+            prog.pid = spawned[name].pid
             dbStatus.setKey(name, prog)
-            await dbStatus.write()
             callback(name)
+            await dbStatus.write()
         }
-        async function onError(error) {
-            return error.message
-        }
-        async function onExit(code, signal) {
+        async function onExit(name) {
             const prog = dbStatus.getKey(name)
+            if (!prog) return
             prog.running = false
             dbStatus.setKey(name, prog)
             await dbStatus.write()
         }
-        function onData(from, data) {
+        async function onError(name, error) {
+            return error.message
+        }
+        function onData(name, from, data) {
             const dataObj = {
                 from: from,
                 timestampISO: new Date(Date.now()).toISOString(),
-                data: data.toString('utf8'),
+                data: data,
             }
 
             const history = dbHistory.getKey(name)
@@ -144,19 +150,19 @@ const program = {
             if (history.length > dbSettings.getKey("MAX_HISTORY_LENGTH")) { history.shift() }
             dbHistory.setKey(name, history)
         }
-        function onStdout(data) {
-            onData("stdout", data)
+        function onStdout(name, data) {
+            onData(name, "stdout", data)
         }
-        function onStderr(data) {
-            onData("stderr", data)
+        function onStderr(name, data) {
+            onData(name, "stderr", data)
         }
 
         // Events
-        spawned[name].on('spawn', log.call(onSpawn, "program.onSpawn"))
-        spawned[name].on('error', log.call(onError, "program.onError"))
-        spawned[name].on('exit', log.call(onExit, "program.onExit"))
-        spawned[name].stdout.on('data', log.call(onStdout, "program.onStdout"))
-        spawned[name].stderr.on('data', log.call(onStderr, "program.onStderr"))
+        spawned[name].on('spawn', (code, signal) => log.call(onSpawn, "program.onSpawn")(name))
+        spawned[name].on('exit', (code, signal) => log.call(onExit, "program.onExit")(name))
+        spawned[name].on('error', (error) => log.call(onError, "program.onError")(name, error))
+        spawned[name].stdout.on('data', (data) => log.call(onStdout, "program.onStdout")(name, data.toString('utf8')))
+        spawned[name].stderr.on('data', (data) => log.call(onStderr, "program.onStderr")(name, data.toString('utf8')))
 
         return 'ok'
     },
@@ -164,12 +170,12 @@ const program = {
         const prog = dbStatus.getKey(name)
 
         // Errors
-        if (prog) return `error program "${name}" does NOT exist`
-        else if (!prog.running) return `error program "${name}" is NOT running`
+        if (!prog) return `error program '${name}' does NOT exist`
+        else if (!prog.running) return `error program '${name}' is NOT running`
 
         // Send
         try { spawned[name].stdin.write(Buffer.from(text)) }
-        catch (err) { return `error program "${name}" could NOT send "${text}"` }
+        catch (err) { return `error program '${name}' could NOT send "${text}"` }
 
         // History
         const dataObj = {
@@ -184,30 +190,30 @@ const program = {
 
         return "ok"
     },
-    kill: async (name) => {
+    kill: (name) => {
         const prog = dbStatus.getKey(name)
 
         // Errors
-        if (prog) return `error program "${name}" does NOT exist`
+        if (!prog) return `error program '${name}' does NOT exist`
 
         // Kill
         try { spawned[name].kill() }
-        catch (err) { return `error program "${name}" could NOT be killed "${err.message}"` }
+        catch (err) { return `error program '${name}' could NOT be killed "${err.message}"` }
 
         return "ok"
     },
-    restart: async (name) => {
+    restart: (name) => {
         const prog = dbStatus.getKey(name)
 
         // Errors
-        if (prog) return `error program "${name}" does NOT exist`
+        if (!prog) return `error program '${name}' does NOT exist`
 
         // Restart
         try {
             spawned[name].kill()
-            setTimeout(() => start(name), dbSettings.getKey("RESTART_TIMEOUT_MS"))
+            setTimeout(() => program.start(name), dbSettings.getKey("RESTART_TIMEOUT_MS"))
         } catch (err) {
-            return `error program "${name}" could NOT be killed "${err.message}"`
+            return `error program '${name}' could NOT be killed "${err.message}"`
         }
 
         return "ok"
@@ -216,14 +222,16 @@ const program = {
         const prog = dbStatus.getKey(name)
 
         // Errors
-        if (prog) return `error program "${name}" does NOT exist`
+        if (!prog) return `error program '${name}' does NOT exist`
 
         // Remove
         try {
+            // program.kill(name)
             spawned[name].kill()
-            setTimeout(() => start(name), dbSettings.getKey("RESTART_TIMEOUT_MS"))
+            await dbStatus.removeKey(name)
+            await dbHistory.removeKey(name)
         } catch (err) {
-            return `error program "${name}" could NOT be killed "${err.message}"`
+            return `error program '${name}' could NOT be killed "${err.message}"`
         }
 
         return "ok"
@@ -233,8 +241,8 @@ const program = {
         const validKeys = ["directory", "command", "startOnBoot", "env"]
 
         // Errors
-        if (prog) return `error program "${name}" does NOT exist`
-        else if (!prog.running) return `error program "${name}" is NOT running`
+        if (!prog) return `error program '${name}' does NOT exist`
+        else if (!prog.running) return `error program '${name}' is NOT running`
         else if (!validKeys.some(validKey => key === validKey)) return `error key "${key}" is NOT valid`
 
         // Set
@@ -244,22 +252,18 @@ const program = {
 
         return "ok"
     },
-    setDirectory: async (name, directory) => program.set(name, "directory", directory),
-    setCommand: async (name, command) => program.set(name, "command", command),
-    setStartOnBoot: async (name, startOnBoot) => program.set(name, "startOnBoot", startOnBoot),
-    setEnviromentVariables: async (name, env) => program.set(name, "env", env),
     log: {
-        create: (name, directory, command, startOnBoot, env) => log.call(program.create)(name, directory, command, startOnBoot, env),
-        start: (name, callback = () => { }) => log.call(program.start)(name, callback = () => { }),
-        send: (name, text) => log.call(program.send)(name, text),
-        kill: (name) => log.call(program.kill)(name),
-        restart: (name) => log.call(program.restart)(name),
-        remove: (name) => log.call(program.remove)(name),
-        set: (name, key, value) => log.call(program.set)(name, key, value),
-        setDirectory: (name, directory) => log.call(program.setDirectory)(name, directory),
-        setCommand: (name, command) => log.call(program.setCommand)(name, command),
-        setStartOnBoot: (name, startOnBoot) => log.call(program.setStartOnBoot)(name, startOnBoot),
-        setEnviromentVariables: (name, env) => log.call(program.setEnviromentVariables)(name, env),
+        create: (name, directory, command, startOnBoot, env) => log.call(program.create, "program.create")(name, directory, command, startOnBoot, env),
+        setDirectory: (name, directory) => log.call(program.setDirectory, "program.setDirectory")(name, directory),
+        setCommand: (name, command) => log.call(program.setCommand, "program.setCommand")(name, command),
+        setStartOnBoot: (name, startOnBoot) => log.call(program.setStartOnBoot, "program.setStartOnBoot")(name, startOnBoot),
+        setEnviromentVariables: (name, env) => log.call(program.setEnviromentVariables, "program.setEnviromentVariables")(name, env),
+        start: (name, callback = () => { }) => log.call(program.start, "program.start")(name, callback = () => { }),
+        send: (name, text) => log.call(program.send, "program.send")(name, text),
+        kill: (name) => log.call(program.kill, "program.kill")(name),
+        restart: (name) => log.call(program.restart, "program.restart")(name),
+        remove: (name) => log.call(program.remove, "program.remove")(name),
+        set: (name, key, value) => log.call(program.set, "program.set")(name, key, value),
     },
 }
 const programs = {
@@ -287,22 +291,50 @@ const programs = {
         return 'ok'
     },
     log: {
-        start: () => log.call(programs.start)(),
-        send: (text) => log.call(programs.send)(text),
-        kill: () => log.call(programs.kill)(),
-        restart: () => log.call(programs.restart)(),
-        remove: () => log.call(programs.remove)(),
+        start: () => log.call(programs.start, "programs.start")(),
+        send: (text) => log.call(programs.send, "programs.send")(text),
+        kill: () => log.call(programs.kill, "programs.kill")(),
+        restart: () => log.call(programs.restart, "programs.restart")(),
+        remove: () => log.call(programs.remove, "programs.remove")(),
     },
 }
 const data = {
-    get: (name) => dbHistory.getKey(name).slice(-1),
-    sub: (name, callback) => dbHistory.subKey(name, callback).slice(-1),
-    unsub: (name, callback) => dbHistory.unsubKey(name, callback).slice(-1),
+    get: (name) => dbHistory.getKey(name),
+    sub: (name, callback) => dbHistory.subKey(name, data => {
+        data = data.splice(-1)[0]
+        if (data) callback(data)
+    }),
+    unsub: (name, callback) => dbHistory.unsubKey(name, data => {
+        data = data.splice(-1)[0]
+        if (data) callback(data)
+    }),
 }
 const history = {
     get: (name) => dbHistory.getKey(name),
     sub: (name, callback) => dbHistory.subKey(name, callback),
     unsub: (name, callback) => dbHistory.unsubKey(name, callback),
+}
+const logger = {
+    program: {
+        create: (name, directory, command, startOnBoot, env) => log.call(program.create, "program.create")(name, directory, command, startOnBoot, env),
+        setDirectory: (name, directory) => log.call(program.setDirectory, "program.setDirectory")(name, directory),
+        setCommand: (name, command) => log.call(program.setCommand, "program.setCommand")(name, command),
+        setStartOnBoot: (name, startOnBoot) => log.call(program.setStartOnBoot, "program.setStartOnBoot")(name, startOnBoot),
+        setEnviromentVariables: (name, env) => log.call(program.setEnviromentVariables, "program.setEnviromentVariables")(name, env),
+        start: (name, callback = () => { }) => log.call(program.start, "program.start")(name, callback),
+        send: (name, text) => log.call(program.send, "program.send")(name, text),
+        kill: (name) => log.call(program.kill, "program.kill")(name),
+        restart: (name) => log.call(program.restart, "program.restart")(name),
+        remove: (name) => log.call(program.remove, "program.remove")(name),
+        set: (name, key, value) => log.call(program.set, "program.set")(name, key, value),
+    },
+    programs: {
+        start: () => log.call(programs.start, "programs.start")(),
+        send: (text) => log.call(programs.send, "programs.send")(text),
+        kill: () => log.call(programs.kill, "programs.kill")(),
+        restart: () => log.call(programs.restart, "programs.restart")(),
+        remove: () => log.call(programs.remove, "programs.remove")(),
+    },
 }
 
 // Helper Functions
@@ -340,4 +372,4 @@ function splitByWhitespace(string) {
 }
 
 // Startup
-await available.pollStart()
+await log.call(available.pollStart, "available.pollStart")()

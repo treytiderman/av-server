@@ -1,24 +1,23 @@
-import { api } from "../../libraries/nodejs/api.mjs"
+// Send
+const obj = { path: "v1/system/time/get/", body: {} }
+const json = JSON.stringify(obj)
+process.stdout.write(Buffer.from(json) + '\r\n')
 
-let time
-let uptime
-let timeAsIso
-let info
+// Receive
+process.stdin.on("data", eventHandler)
+function eventHandler(buffer) {
+    const data = buffer.toString()
 
-// api.system.v0.subTime(res => {
-//     time = res
-//     // console.log(`info rx time: ${time} uptime: ${uptime}`);
-// })
+    // Is JSON?
+    try { JSON.parse(data) }
+    catch (error) { return }
+    const obj = JSON.parse(data)
 
-// api.system.v0.subUptime(res => {
-//     uptime = res
-// })
-
-// api.system.v0.subTimeAsIso(res => {
-//     timeAsIso = res
-// })
-
-api.system.v0.subInfo(res => {
-    info = res
-    // console.log(res);
-})
+    // Is Path?
+    const path = obj.path
+    const body = obj.body
+    if (path === "v1/system/time/get/") {
+        process.stdin.removeListener("data", eventHandler)
+        console.log(body)
+    }
+}

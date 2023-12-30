@@ -35,7 +35,7 @@ async function test(name, func) {
 if (process.env.DEV_MODE) {
     // await db.removeAll()
     await log.deleteLogs()
-    await sleep(2000)
+    await sleep(1000)
     log.info("test.js", "DEV_MODE environment variable set to true")
 
     // Test Core
@@ -48,7 +48,7 @@ if (process.env.DEV_MODE) {
     await test("user_v1", user_v1.test)
 
     // Test Module
-    // await test("program_v1", program_v1.test)
+    test("program_v1", program_v1.test)
     // await test("serial_v1", serial_v1.test)
     // await test("tcpClient_v1", tcpClient_v1.test)
 
