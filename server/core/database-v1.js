@@ -183,10 +183,10 @@ const removeKey = log.call((filename, key) => {
     if (!dbs[filename]) return `error database '${filename}' doesn't exist`
     
     delete dbs[filename].data[key]
-    if (!dbs[filename].keyCallbacks[key]) { dbs[filename].keyCallbacks[key] = [] }
-    dbs[filename].keyCallbacks[key].forEach((callback) => callback(undefined))
+    delete dbs[filename].keyCallbacks[key]
     dbs[filename].dataCallbacks.forEach((callback) => callback(dbs[filename].data))
-    // delete dbs[filename].keyCallbacks[key] // deletes the callback before running callback(undefined)
+    // if (!dbs[filename].keyCallbacks[key]) { dbs[filename].keyCallbacks[key] = [] }
+    // dbs[filename].keyCallbacks[key].forEach((callback) => callback(undefined))
     return "ok"
 }, "removeKey")
 
