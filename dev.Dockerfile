@@ -1,8 +1,9 @@
 # Docker
+# cd /home/trey/av-server
 # sudo docker build -f dev.Dockerfile . -t av-server-dev
 # sudo docker stop av-server-dev
 # sudo docker rm av-server-dev
-# sudo docker run -d --name av-server-dev --hostname av-server-dev -p 4622:4620 -v $(pwd)/server:/app/server -v $(pwd)/public:/app/public -v $(pwd)/private:/app/private av-server-dev
+# sudo docker run -d --name av-server-dev --hostname av-server-dev -p 4622:4620 -v /home/trey/av-server/server:/app/server -v /home/trey/av-server/public:/app/public -v /home/trey/av-server/private:/app/private av-server-dev
 
 # Podman
 # podman build -f dev.Dockerfile . -t av-server-dev

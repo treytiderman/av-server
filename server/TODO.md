@@ -1,9 +1,54 @@
-# TODO
+# Core
+- [x] http-server-v1.js
+- [x] http-routes-v1.js
+- [x] markdown-v1.js
+    - integrate into svelte frontend
+- [x] websocket-server-v1.js
+    - use database-v1 instead of event emmiters
 
-- [ ] program-v1.js parsing a env file crashes with blank lines
-- [ ] program-v1.js available programs in nested folders
+# Modules
+- [x] api-v1.js
+    - use database-v1 instead of event emmiters
+    - add TCP
+    - Future
+        - add UDP
+        - add HTTP
+- [x] auth-v1.js
+    - change to async hashing
+- [x] database-v1.js
+    - removeAll() needs tested
+- [ ] file-v1.js
+    - refactor so all other files use this one for file io
+    - logging
+    - routes
+    - tests
+- [x] logger-v0.js
+- [x] system-v1.js
+- [x] user-v1.js
+    - logging seperate
+- [ ] scheduler-v1.js
+    - start
+    - routes
+    - tests
 
-
-
-
-
+# Extensions
+- dynamically import?
+- [x] program-v1.js
+    - parsing a env file crashes with blank lines
+    - available programs in nested folders
+- [ ] serial-v1.js
+    - use database-v1
+    - logging
+    - routes
+- [ ] tcp-client-v1.js
+    - use database-v1
+    - logging
+    - routes
+- Future
+    - [ ] http-client-v0.js
+    - [ ] http-server-v0.js
+    - [ ] tcp-server-v0.js
+    - [ ] udp-client-v0.js
+    - [ ] udp-server-v0.js
+    - [ ] websocket-client-v1.js
+    - [ ] websocket-server-v1.js

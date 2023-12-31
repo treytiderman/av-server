@@ -5,7 +5,7 @@ import express from 'express'
 import cors from 'cors'
 
 import { router } from './http-routes.js'
-import { info } from './system-v1.js'
+import { info } from '../modules/system-v1.js'
 
 // Exports
 export {

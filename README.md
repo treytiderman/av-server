@@ -64,6 +64,7 @@
         - rstp-to-ws
         - mdns-client
         - mqqt
+        - gpio (https://www.adafruit.com/product/2264#technical-details)
 - HTTP Server
     - Any files put in the `./public` directory will be served
 - HTTPS / WSS (encrypt all data between the server and clients)
@@ -83,6 +84,7 @@
 
 ```
 podman build . -t av-server
+docker build . -t av-server
 ```
 
 3. Remove the current running container if it exists

@@ -1,7 +1,7 @@
 // Overview: websocket server
 
 // Imports
-import { Logger } from './logger-v0.js'
+import { Logger } from '../modules/logger-v0.js'
 import { EventEmitter } from 'events'
 import { WebSocketServer } from 'ws'
 
@@ -14,7 +14,7 @@ export {
 }
 
 // Variables
-const log = new Logger("core/ws-server.js")
+const log = new Logger("core/websocket-server.js")
 const emitter = new EventEmitter()
 let wss
 

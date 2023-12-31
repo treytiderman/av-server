@@ -1,6 +1,6 @@
 // Imports
 import showdown from 'showdown'
-import { readText } from './file-v0.js'
+import { readText } from '../modules/file-v0.js'
 
 // Exports
 export {
