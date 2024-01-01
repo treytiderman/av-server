@@ -22,7 +22,7 @@ export {
 
 // Constants
 const MAX_HISTORY_LENGTH = 1_000
-const NUMBER_OF_FILES_MAX = 30
+const NUMBER_OF_FILES_MAX = process.env.DEV_MODE ? 3 : 30
 const NUMBER_OF_LINES_MAX = 10_000
 const OBJ_JSON_LENGTH_MAX = 1_000
 const PATH_TO_LOG_FOLDER = "../private/logs/" // ~/av-server/private/logs
@@ -118,11 +118,12 @@ function getCurrentPath() {
     return PATH_TO_LOG_FOLDER + "log_" + date + "_" + startup + `_${sequence}.log`
 }
 function createLogLine(level, group, message, obj) {
-    if (JSON.stringify(obj).length > OBJ_JSON_LENGTH_MAX) {
+    const json = JSON.stringify(obj)
+    if (json.length > OBJ_JSON_LENGTH_MAX) {
         obj = `VALUE NOT SHOWN object length greater than ${OBJ_JSON_LENGTH_MAX} characters`
     }
     const timestampISO = new Date(Date.now()).toISOString()
-    const line = `${timestampISO} ${SPACER} ${level} ${SPACER} [${group}] ${message} ${SPACER} ${JSON.stringify(obj)}`
+    const line = `${timestampISO} ${SPACER} ${level} ${SPACER} [${group}] ${message} ${SPACER} ${json}`
     return line
 }
 async function deleteOldLogs() {
@@ -146,6 +147,10 @@ async function log(level, group, message, obj = {}) {
     const path = getCurrentPath()
     history.push(line)
     if (history.length > MAX_HISTORY_LENGTH) history.shift()
+
+    if (line.split(" >> ")[1] === "ERROR") {
+        console.log("[" + line.split("[")[1])
+    }
 
     emitter.emit("log", line)
     await makeDir(PATH_TO_LOG_FOLDER)
