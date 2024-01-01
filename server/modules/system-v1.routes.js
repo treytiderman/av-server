@@ -27,6 +27,21 @@ const routes = [
 
 ]
 
+// Ping
+api.receive("ping", async (client, path, body, params) => {
+    client.send(path, "pong")
+})
+
+// Throw
+api.receiveAdmin("throw", (client, path, body, params) => {
+    throw new Error("api throw");
+})
+
+// Reject
+api.receiveAdmin("reject", (client, path, body, params) => {
+    return new Promise((resolve, reject) => reject("rejected"))
+})
+
 // Time
 api.receive("v1/system/time/get/", async (client, path, body, params) => {
     client.send(path, sys.time.get())
@@ -58,16 +73,16 @@ api.receive("v1/system/uptime/unsub/", async (client, path, body, params) => {
 })
 
 // Info
-api.receive("v1/system/info/get/", async (client, path, body, params) => {
+api.receiveAdmin("v1/system/info/get/", async (client, path, body, params) => {
     client.send(path, sys.info.get())
 })
-api.receive("v1/system/info/sub/", async (client, path, body, params) => {
+api.receiveAdmin("v1/system/info/sub/", async (client, path, body, params) => {
     client.send(path, sys.info.get())
     client.sub("v1/system/info/pub/")
     const callback = (user) => api.send("v1/system/info/pub/", user)
     sys.info.unsub(callback)
     sys.info.sub(callback)
 })
-api.receive("v1/system/info/unsub/", async (client, path, body, params) => {
+api.receiveAdmin("v1/system/info/unsub/", async (client, path, body, params) => {
     client.unsub("v1/system/info/pub/")
 })
