@@ -13,8 +13,8 @@ import * as user_v1 from "./modules/user-v1.test.js";
 
 // Import Extensions
 import * as program_v1 from "./extensions/program-v1.test.js";
-// import * as serial_v1 from "./extensions/serial-v1.test.js";
-// import * as tcpClient_v1 from "./extensions/tcp-client-v1.test.js";
+import * as serial_v1 from "./extensions/serial-v1.test.js";
+import * as tcpClient_v1 from "./extensions/tcp-client-v1.test.js";
 
 // Functions
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
@@ -33,7 +33,7 @@ async function test(name, func) {
 // Run Tests
 if (process.env.DEV_MODE) {
     // await db.removeAll()
-    await log.deleteLogs()
+    // await log.deleteLogs()
     await sleep(1000)
     log.info("test.js", "DEV_MODE environment variable set to true")
 
@@ -48,8 +48,8 @@ if (process.env.DEV_MODE) {
 
     // Test Extensions
     await test("program_v1", program_v1.test)
-    // await test("serial_v1", serial_v1.test)
-    // await test("tcpClient_v1", tcpClient_v1.test)
+    await test("serial_v1", serial_v1.test)
+    await test("tcpClient_v1", tcpClient_v1.test)
 
     log.info("test.js", "all tests are complete")
 }

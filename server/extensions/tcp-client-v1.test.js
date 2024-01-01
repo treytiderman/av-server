@@ -1,5 +1,5 @@
 // Imports
-// import * as api from '../modules/api.js'
+import * as tm from '../extensions/tcp-client-v1.js'
 
 // Functions
 export async function test() {
@@ -13,84 +13,33 @@ export async function test() {
     return pass
 }
 
-// setTimeout(() => {
-//     const address = "192.168.1.9:23"
+// Manual Testing
+// setTimeout(manualTest1, 1000);
+async function manualTest1() {
 
-//     close(address)
-//     console.log("removeAll()", removeAll());
+    // Connect
+    const address = "192.168.1.9:23"
+    await tm.log.client.open(address)
 
-//     console.log("try open", address);
-//     open(address, "ascii", () => {
-//         const history = getHistory(address)
-//         console.log("history", history);
-//         console.log("data", history[history.length - 1]);
-//         send(address, "hello")
-//     })
+    // Echo
+    tm.data.sub(address, obj => {
+        if (obj.wasReceived) {
+            tm.log.client.send(address, obj.data)
+        }
+    })
+    
+    // On Open
+    tm.client.sub(address, onOpen)
+    function onOpen(status) {
+        if (status.isOpen) {
+            tm.log.client.send(address, "hey")
+        }
+    }
 
-//     // Events: "open", "error", "close", "receive", "send"
-//     emitter.on("open", (address) => {
-//         console.log("open", address);
-//         console.log("client", getClient(address));
-//     })
-//     emitter.on("error", (address, error) => {
-//         console.log("error", address, "->", error);
-//     })
-//     emitter.on("close", (address) => {
-//         console.log("close");
-//         console.log("client", getClients(address));
-//         const history = getHistory(address)
-//         console.log("history", history);
-//         console.log("data", history[history.length - 1]);
-//     })
-//     emitter.on("receive", (address, data) => {
-//         console.log("receive", address, "->", data);
-//     })
-//     emitter.on("send", (address, data) => {
-//         console.log("send", address, "->", data);
-//     })
+    // Close
+    setTimeout(async () => {
+        tm.client.unsub(address, onOpen)
+        await tm.log.client.close(address)
+    }, 2000);
 
-//     // setTimeout(() => {
-//     //     console.log("closeAll()", closeAll());
-//     // }, 1000);
-
-//     // setTimeout(() => {
-//     //     console.log("openAll()", openAll());
-//     // }, 1200);
-
-//     // setTimeout(() => {
-//     //     console.log("removeAll()", removeAll());
-//     //     console.log("closeAll()", closeAll());
-//     //     console.log("close(address)", close(address));
-//     //     console.log("removeAll()", removeAll());
-//     //     console.log("openAll()", openAll());
-//     // }, 2000);
-
-// }, 1000);
-
-// setTimeout(() => {
-//     const address = "192.168.1.32:23"
-
-//     console.log("try open", address);
-//     open(address, "ascii", () => {
-//         send(address, "MVDOWN\r")
-//     })
-
-//     // Events: "open", "error", "close", "receive", "send"
-//     emitter.on("open", (address) => {
-//         console.log("open", address);
-//         console.log("client", getClient(address));
-//     })
-//     emitter.on("error", (address, error) => {
-//         console.log("error", address, "->", error);
-//     })
-//     emitter.on("close", (address) => {
-//         console.log("close");
-//     })
-//     emitter.on("receive", (address, data) => {
-//         console.log("receive", address, "->", data);
-//     })
-//     emitter.on("send", (address, data) => {
-//         console.log("send", address, "->", data);
-//     })
-
-// }, 1000);
+}
