@@ -77,7 +77,7 @@ api.receive("v1/program/get/:name/", async (client, path, body, params) => {
 api.receive("v1/program/sub/:name/", async (client, path, body, params) => {
     client.send(path, pm.program.get(params.name))
     client.sub(`v1/program/pub/${params.name}/`)
-    const callback = (user) => api.send(`v1/program/all/pub/${params.name}/`, user)
+    const callback = (user) => api.send(`v1/program/pub/${params.name}/`, user)
     pm.program.unsub(params.name, callback)
     pm.program.sub(params.name, callback)
 })

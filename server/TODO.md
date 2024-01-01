@@ -17,12 +17,15 @@
     - change to async hashing
 - [x] database-v1.js
     - removeAll() needs tested
+    - log database type
 - [ ] file-v1.js
     - refactor so all other files use this one for file io
     - logging
     - routes
     - tests
 - [x] logger-v0.js
+    - use database-v1
+    - read old log files
 - [x] system-v1.js
 - [x] user-v1.js
     - logging seperate
@@ -36,11 +39,13 @@
 - [x] program-v1.js
     - parsing a env file crashes with blank lines
     - available programs in nested folders
-- [ ] serial-v1.js
-    - use database-v1
+    - remove log var in program and programs
+- [x] serial-v1.js
     - logging
     - routes
-- [ ] tcp-client-v1.js
+- [x] tcp-client-v1.js
+    - connect error handling?
+    - test reconnect when first connect fails
     - use database-v1
     - logging
     - routes

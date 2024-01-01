@@ -11,7 +11,6 @@ export async function test() {
 
     // Tests
     await pm.programs.remove()
-
     
     // Program 0 - fakeProg
     response = await pm.log.program.start("fakeProg")
@@ -74,7 +73,7 @@ export async function test() {
         response = await pm.log.program.send(name, "420")
         if (response !== "ok") pass = false
         await sleep(100)
-        
+
         response = pm.history.get(name)[1].data
         if (!response.includes("echo: 420")) pass = false
     })
