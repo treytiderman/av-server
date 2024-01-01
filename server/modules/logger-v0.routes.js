@@ -26,14 +26,12 @@ const routes = [
     { path: "v0/log/history/unsub/" },
 
     // Group
-    // { path: "v0/log/group/get/:group/" },
-    // { path: "v0/log/group/sub/:group/" },
-    // { path: "v0/log/group/unsub/:group/" },
+    { path: "v0/log/group/sub/:group/" },
+    { path: "v0/log/group/unsub/:group/" },
 
-    // Group History
-    // { path: "v0/log/group/history/get/" },
-    // { path: "v0/log/group/history/sub/" },
-    // { path: "v0/log/group/history/unsub/" },
+    // Level
+    { path: "v0/log/level/sub/:level/" },
+    { path: "v0/log/level/unsub/:level/" },
 
 ]
 
@@ -41,6 +39,14 @@ const routes = [
 logger.emitter.on("log", (data) => {
     api.send("v0/log/pub/", data)
     api.send("v0/log/history/pub/", logger.getHistory())
+
+    // Groups
+    const group = data.split("[")[1].split("]")[0]
+    api.send(`v0/log/group/pub/${group}/`, data)
+    
+    // Level
+    const level = data.split(" >> ")[1].trim().toLowerCase()
+    api.send(`v0/log/level/pub/${level}/`, data)
 })
 
 // Log
@@ -85,4 +91,26 @@ api.receiveAdmin("v0/log/history/sub/", async (client, path, body, params) => {
 })
 api.receiveAdmin("v0/log/history/unsub/", async (client, path, body, params) => {
     client.send(path, logger.getHistory())
+})
+
+// Group
+api.receiveAdmin("v0/log/group/sub/:group/", async (client, path, body, params) => {
+    if (params.group) params.group = params.group.toLowerCase()
+    client.sub(`v0/log/group/pub/${params.group}/`)
+})
+api.receiveAdmin("v0/log/group/unsub/:group/", async (client, path, body, params) => {
+    if (params.group) params.group = params.group.toLowerCase()
+    client.unsub(`v0/log/group/pub/${params.group}/`)
+    client.send(path, "ok")
+})
+
+// Level
+api.receiveAdmin("v0/log/level/sub/:level/", async (client, path, body, params) => {
+    if (params.level) params.level = params.level.toLowerCase()
+    client.sub(`v0/log/level/pub/${params.level}/`)
+})
+api.receiveAdmin("v0/log/level/unsub/:level/", async (client, path, body, params) => {
+    if (params.level) params.level = params.level.toLowerCase()
+    client.unsub(`v0/log/level/pub/${params.level}/`)
+    client.send(path, "ok")
 })
