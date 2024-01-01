@@ -13,9 +13,12 @@ import "./routes.js"
 // Run Tests
 import "./test.js"
 
+// Error handling
+import "./error.js"
+
 // Start Server
 const port = process.env.PORT || 4620
 server.listen(port, () => {
     console.log(`av-server is up and running`)
-    // startupConsoleLog(port)
+    startupConsoleLog(port)
 })
