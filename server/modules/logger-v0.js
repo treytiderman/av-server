@@ -118,9 +118,9 @@ function getCurrentPath() {
     return PATH_TO_LOG_FOLDER + "log_" + date + "_" + startup + `_${sequence}.log`
 }
 function createLogLine(level, group, message, obj) {
-    const json = JSON.stringify(obj)
+    let json = JSON.stringify(obj)
     if (json.length > OBJ_JSON_LENGTH_MAX) {
-        obj = `VALUE NOT SHOWN object length greater than ${OBJ_JSON_LENGTH_MAX} characters`
+        json = `VALUE NOT SHOWN object length greater than ${OBJ_JSON_LENGTH_MAX} characters`
     }
     const timestampISO = new Date(Date.now()).toISOString()
     const line = `${timestampISO} ${SPACER} ${level} ${SPACER} [${group}] ${message} ${SPACER} ${json}`

@@ -6,13 +6,13 @@ const ERROR_SHUTDOWN_TIMEOUT = process.env.DEV_MODE ? 300_000 : 2_000
 
 // Startup
 process.on('uncaughtException', error)
-process.on('unhandledRejection', reject)
+// process.on('unhandledRejection', reject)
 
 // Functions
 async function error(error) {
     const errorMessage = `ERROR SHUTTING DOWN IN ${ERROR_SHUTDOWN_TIMEOUT / 1_000} SEC`
     console.log(errorMessage)
-    console.log("CAUGHT", error)
+    console.log("ERROR", error)
 
     await log.error(errorMessage)
     await log.error(
@@ -25,7 +25,7 @@ async function error(error) {
     setTimeout(() => process.exit(1), ERROR_SHUTDOWN_TIMEOUT).unref()
 }
 async function reject(error, promise) {
-    console.log("CAUGHT", error)
+    console.log("REJECT", error)
     log.warn(`process.on('unhandledRejection', reject(${error}))`, promise)
     // await log.warn(`process.on('unhandledRejection', reject(${error}))`, promise)
 }
