@@ -24,8 +24,8 @@ const routes = [
     { path: "v1/serialport/close/:path/" },
     { path: "v1/serialport/remove/:path/" },
     { path: "v1/serialport/set-baudrate/:path/", body: { baudrate: 9600 } },
-    { path: "v1/serialport/set-delimiter/:path/", body: { delimiter: "\r\n" } },
     { path: "v1/serialport/set-encoding/:path/", body: { encoding: "ascii" } },
+    { path: "v1/serialport/set-delimiter/:path/", body: { delimiter: "\r\n" } },
 
     // Data
     { path: "v1/serialport/data/get/:path/" },
@@ -41,7 +41,6 @@ const routes = [
     { path: "v1/serialport/all/get/" },
     { path: "v1/serialport/all/sub/" },
     { path: "v1/serialport/all/unsub/" },
-    { path: "v1/serialport/all/send/", body: { data: "any" } },
     { path: "v1/serialport/all/close/" },
     { path: "v1/serialport/all/remove/" },
 
