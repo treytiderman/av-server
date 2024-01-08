@@ -1,4 +1,4 @@
-import{conf as t,language as e}from"./typescript.9a50a5fa.js";import"./editor.main.c496896e.js";import"./editorWorker.81c91396.js";import"./index.aa68b8f0.js";/*!-----------------------------------------------------------------------------
+import{conf as t,language as e}from"./typescript.5550db75.js";import"./editor.main.5d1a03c3.js";import"./editorWorker.81c91396.js";import"./index.e7b7d346.js";/*!-----------------------------------------------------------------------------
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Version: 0.38.0(0e330ae453813de4e6cf272460fb79c7117073d0)
  * Released under the MIT license
