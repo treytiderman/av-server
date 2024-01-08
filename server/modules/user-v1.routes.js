@@ -25,7 +25,7 @@ const routes = [
     { path: "v1/user/sub/:username/" },
     { path: "v1/user/unsub/:username/" },
     { path: "v1/user/create/:username/", body: { password: "password", passwordConfirm: "password", groups: ["group"] } },
-    { path: "v1/user/delete/:username/", body: { password: "password", passwordConfirm: "password", groups: ["group"] } },
+    { path: "v1/user/delete/:username/"},
     { path: "v1/user/add-group/:username/", body: { group: "group" } },
     { path: "v1/user/delete-group/:username/", body: { group: "group" } },
     { path: "v1/user/change-password/:username/", body: { password: "password", passwordConfirm: "password" } },

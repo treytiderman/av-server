@@ -151,10 +151,14 @@ const user = {
     }, 'user.changePassword'),
 }
 const users = {
-    get: () => dbUsers.get(),
+    get: () => dbUsers.keys().map(name => user.get(name)),
     names: () => dbUsers.keys(),
-    sub: (callback) => dbUsers.sub(callback),
-    unsub: (callback) => dbUsers.unsub(callback),
+    sub: (callback) => dbUsers.sub(data => {
+        return callback(Object.keys(data).map(name => user.get(name)))
+    }),
+    unsub: (callback) => dbUsers.unsub(data => {
+        return callback(Object.keys(data).map(name => user.get(name)))
+    }),
     reset: log.call(async () => {
         await dbUsers.reset()
         await dbGroups.reset()
