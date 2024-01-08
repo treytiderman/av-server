@@ -10,7 +10,7 @@ export {
     client, // get, sub, unsub, open, send, close, reconnect, remove, set, setEncoding,
     data, // get, sub, unsub
     history, // get, sub, unsub
-    clients, // get, sub, unsub, start, send, kill, restart, remove
+    clients, // get, sub, unsub, close, remove
     logger as log, // client, clients
 }
 
@@ -45,10 +45,11 @@ const client = {
     sub: (address, callback) => db.status.subKey(address, callback),
     unsub: (address, callback) => db.status.unsubKey(address, callback),
     open: async (address, encoding = "ascii", reconnect = false) => {
+        const status = db.status.getKey(address)
 
         // Errors
         if (address.includes(":") === false) return `error address must contain a ':' followed by a port number, for example '192.168.1.9:23'`
-        else if (db.status.getKey(address)?.isOpen === true) return `error client '${address}' already open`
+        else if (status?.isOpen === true) return `error client '${address}' already open`
 
         // Force encoding
         if (encoding !== "ascii" && encoding !== "hex") encoding = "ascii"
@@ -78,10 +79,12 @@ const client = {
         }
         async function onClose(address) {
             const status = db.status.getKey(address)
-            status.isOpen = false
-            db.status.setKey(address, status)
             if (status?.reconnect) await logger.client.reconnect(address, encoding, reconnect)
-            await db.status.write()
+            if (status.isOpen !== false) {
+                status.isOpen = false
+                db.status.setKey(address, status)
+                await db.status.write()
+            }
             return "ok"
         }
         async function onError(address, error) {
@@ -138,8 +141,10 @@ const client = {
     },
     setEncoding: async (address, encoding) => client.set(address, "encoding", encoding),
     reconnect: (address, encoding = "ascii", reconnect = false) => {
-        if (db.data.clients[address]?.isOpen === true) client.close(address)
+        const port = db.status.getKey(address)
+        if (port && port.isOpen === true) client.close(address)
         setTimeout(() => client.open(address, encoding, reconnect), db.settings.getKey("RECONNECT_TIMER_MS"));
+        return "reconnecting in " + db.settings.getKey("RECONNECT_TIMER_MS") + " ms"
     },
     send: (address, data, encoding = "ascii") => {
         const port = db.status.getKey(address)

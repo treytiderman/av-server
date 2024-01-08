@@ -14,7 +14,7 @@ const routes = [
     { path: "v1/tcp/client/get/:address/" },
     { path: "v1/tcp/client/sub/:address/" },
     { path: "v1/tcp/client/unsub/:address/" },
-    { path: "v1/tcp/client/open/:address/", body: { encoding: "ascii" } },
+    { path: "v1/tcp/client/open/:address/", body: { encoding: "ascii", reconnect: false } },
     { path: "v1/tcp/client/send/:address/", body: { data: "data", encoding: "ascii" } },
     { path: "v1/tcp/client/reconnect/:address/" },
     { path: "v1/tcp/client/close/:address/" },
@@ -35,7 +35,6 @@ const routes = [
     { path: "v1/tcp/client/all/get/" },
     { path: "v1/tcp/client/all/sub/" },
     { path: "v1/tcp/client/all/unsub/" },
-    { path: "v1/tcp/client/all/send/" },
     { path: "v1/tcp/client/all/close/" },
     { path: "v1/tcp/client/all/remove/" },
 
@@ -56,13 +55,13 @@ api.receive("v1/tcp/client/unsub/:address/", async (client, path, body, params) 
     client.unsub(`v1/tcp/client/pub/${params.address}/`)
 })
 api.receiveAdmin("v1/tcp/client/open/:address/", async (client, path, body, params) => {
-    client.send(path, await tm.log.client.open(params.address, body.directory, body.command, body.startOnBoot, body.env))
+    client.send(path, await tm.log.client.open(params.address, body.encoding, body.reconnect))
 })
 api.receiveAdmin("v1/tcp/client/set-encoding/:address/", async (client, path, body, params) => {
     client.send(path, await tm.log.client.setEncoding(params.address, body.encoding))
 })
 api.receiveAdmin("v1/tcp/client/send/:address/", async (client, path, body, params) => {
-    client.send(path, await tm.log.client.send(params.address, body.data))
+    client.send(path, await tm.log.client.send(params.address, body.data, body.encoding))
 })
 api.receiveAdmin("v1/tcp/client/reconnect/:address/", async (client, path, body, params) => {
     client.send(path, await tm.log.client.reconnect(params.address))
@@ -117,9 +116,6 @@ api.receive("v1/tcp/client/all/sub/", async (client, path, body, params) => {
 })
 api.receive("v1/tcp/client/all/unsub/", async (client, path, body, params) => {
     client.unsub(`v1/tcp/client/all/pub/`)
-})
-api.receiveAdmin("v1/tcp/client/all/send/", async (client, path, body, params) => {
-    client.send(path, await tm.log.clients.send(body.data))
 })
 api.receiveAdmin("v1/tcp/client/all/close/", async (client, path, body, params) => {
     client.send(path, await tm.log.clients.close())
