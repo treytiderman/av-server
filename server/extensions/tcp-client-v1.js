@@ -51,8 +51,9 @@ const client = {
         if (address.includes(":") === false) return `error address must contain a ':' followed by a port number, for example '192.168.1.9:23'`
         else if (status?.isOpen === true) return `error client '${address}' already open`
 
-        // Force encoding
+        // Force
         if (encoding !== "ascii" && encoding !== "hex") encoding = "ascii"
+        if (reconnect !== "true" || reconnect !== true) reconnect = false
 
         // New socket
         sockets[address] = new Socket()
@@ -79,8 +80,8 @@ const client = {
         }
         async function onClose(address) {
             const status = db.status.getKey(address)
-            if (status?.reconnect) await logger.client.reconnect(address, encoding, reconnect)
-            if (status.isOpen !== false) {
+            // if (status?.reconnect) await logger.client.reconnect(address, encoding, reconnect)
+            if (status?.isOpen !== false) {
                 status.isOpen = false
                 db.status.setKey(address, status)
                 await db.status.write()
@@ -129,7 +130,7 @@ const client = {
 
         // Errors
         if (!status) return `error client '${address}' does NOT exist`
-        else if (status.isOpen) return `error client '${address}' is open`
+        // else if (status.isOpen) return `error client '${address}' is open`
         else if (!validKeys.some(validKey => key === validKey)) return `error key '${key}' is NOT valid`
 
         // Set
@@ -168,7 +169,7 @@ const client = {
         // History
         const dataObj = {
             wasReceived: false,
-            timestamp: new Date(Date.now()).toISOString(),
+            timestampISO: new Date(Date.now()).toISOString(),
             encoding: encoding,
             data: data,
         }
@@ -202,7 +203,7 @@ const client = {
 
         // Remove
         try {
-            port[address].close()
+            client.close(address)
             await db.status.removeKey(address)
             await db.history.removeKey(address)
         } catch (err) {
@@ -230,14 +231,15 @@ const clients = {
     },
 }
 const data = {
-    get: (address) => db.history.getKey(address),
-    sub: (address, callback) => db.history.subKey(address, data => {
-        data = data.splice(-1)[0]
-        if (data) callback(data)
+    get: (address) => {
+        const history = db.history.getKey(address)
+        return history[history.length-1]
+    },
+    sub: (address, callback) => db.history.subKey(address, history => {
+        callback(history[history.length-1])
     }),
-    unsub: (address, callback) => db.history.unsubKey(address, data => {
-        data = data.splice(-1)[0]
-        if (data) callback(data)
+    unsub: (address, callback) => db.history.unsubKey(address, history => {
+        callback(history[history.length-1])
     }),
 }
 const history = {

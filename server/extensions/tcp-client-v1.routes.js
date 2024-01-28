@@ -16,7 +16,7 @@ const routes = [
     { path: "v1/tcp/client/unsub/:address/" },
     { path: "v1/tcp/client/open/:address/", body: { encoding: "ascii", reconnect: false } },
     { path: "v1/tcp/client/send/:address/", body: { data: "data", encoding: "ascii" } },
-    { path: "v1/tcp/client/reconnect/:address/" },
+    { path: "v1/tcp/client/reconnect/:address/", body: { encoding: "ascii", reconnect: false } },
     { path: "v1/tcp/client/close/:address/" },
     { path: "v1/tcp/client/remove/:address/" },
     { path: "v1/tcp/client/set-encoding/:address/", body: { encoding: "ascii" } },
@@ -64,7 +64,7 @@ api.receiveAdmin("v1/tcp/client/send/:address/", async (client, path, body, para
     client.send(path, await tm.log.client.send(params.address, body.data, body.encoding))
 })
 api.receiveAdmin("v1/tcp/client/reconnect/:address/", async (client, path, body, params) => {
-    client.send(path, await tm.log.client.reconnect(params.address))
+    client.send(path, await tm.log.client.reconnect(params.address, body.encoding, body.reconnect))
 })
 api.receiveAdmin("v1/tcp/client/close/:address/", async (client, path, body, params) => {
     client.send(path, await tm.log.client.close(params.address))
@@ -78,9 +78,9 @@ api.receive("v1/tcp/client/data/get/:address/", async (client, path, body, param
     client.send(path, tm.data.get(params.address))
 })
 api.receive("v1/tcp/client/data/sub/:address/", async (client, path, body, params) => {
-    client.send(path, tm.data.get(params.address))
+    // client.send(path, tm.data.get(params.address))
     client.sub(`v1/tcp/client/data/pub/${params.address}/`)
-    const callback = (user) => api.send(`v1/tcp/client/data/pub/${params.address}/`, user)
+    const callback = (data) => api.send(`v1/tcp/client/data/pub/${params.address}/`, data)
     tm.data.unsub(params.address, callback)
     tm.data.sub(params.address, callback)
 })
@@ -95,7 +95,7 @@ api.receive("v1/tcp/client/history/get/:address/", async (client, path, body, pa
 api.receive("v1/tcp/client/history/sub/:address/", async (client, path, body, params) => {
     client.send(path, tm.history.get(params.address))
     client.sub(`v1/tcp/client/history/pub/${params.address}/`)
-    const callback = (user) => api.send(`v1/tcp/client/history/pub/${params.address}/`, user)
+    const callback = (history) => api.send(`v1/tcp/client/history/pub/${params.address}/`, history)
     tm.history.unsub(params.address, callback)
     tm.history.sub(params.address, callback)
 })
