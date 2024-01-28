@@ -1,4 +1,4 @@
-import{m as l}from"./editor.main.a1311f9c.js";import"./editorWorker.81c91396.js";import"./index.d2c788a5.js";/*!-----------------------------------------------------------------------------
+import{m as l}from"./editor.main.f3f1a062.js";import"./editorWorker.81c91396.js";import"./index.8f406b28.js";/*!-----------------------------------------------------------------------------
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Version: 0.38.0(0e330ae453813de4e6cf272460fb79c7117073d0)
  * Released under the MIT license
