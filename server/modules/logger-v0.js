@@ -46,7 +46,7 @@ let history = []
 await makeDir(PATH_TO_LOG_FOLDER)
 
 // Functions
-function getHistory(length = 1000) {
+function getHistory(length = 100) {
     return history.slice(history.length - length, history.length)
 }
 async function debug(group, message, obj = {}) {
