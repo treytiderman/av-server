@@ -5,7 +5,7 @@ import { EventEmitter } from 'events'
 import { Logger } from '../modules/logger-v0.js'
 import { Database } from '../modules/database-v1.js'
 
-// Protocals
+// Protocols
 import * as ws from '../core/websocket-server.js'
 // import * as tcp from '../modules/tcp-server.js'
 // import * as udp from '../modules/udp-server.js'
@@ -35,7 +35,7 @@ export {
 // State
 const log = new Logger("api-v1.js")
 const emitter = new EventEmitter()
-const protocals = {
+const protocols = {
     ws: "ws",
     tcp: "tcp",
     udp: "udp",
@@ -53,7 +53,7 @@ await db.set({})
 // Api accessed via the WebSocket
 ws.emitter.on("connect", (wsClient, req) => {
     sendFunctions["ws-" + wsClient.id] = (path, body) => wsClient.send(JSON.stringify({path: path, body: body}))
-    emitter.emit("connect", "ws-" + wsClient.id, protocals.ws)
+    emitter.emit("connect", "ws-" + wsClient.id, protocols.ws)
 })
 ws.emitter.on("disconnect", (wsClient) => {
     emitter.emit("disconnect", "ws-" + wsClient.id)
@@ -66,7 +66,7 @@ ws.emitter.on("receive", (wsClient, data) => {
 // Api accessed via the TCP
 // tcp.emitter.on("connect", (client) => {
 //     const sendFn = (text) => { return client.send(text) }
-//     emitter.emit("connect", id, protocals.tcp, sendFn)
+//     emitter.emit("connect", id, protocols.tcp, sendFn)
 // })
 // tcp.emitter.on("disconnect", (client) => {
 //     emitter.emit("disconnect", client.id)
@@ -78,7 +78,7 @@ ws.emitter.on("receive", (wsClient, data) => {
 // Api accessed via the UDP
 // udp.emitter.on("connect", (client) => {
 //     const sendFn = (text) => { return client.send(text) }
-//     emitter.emit("connect", id, protocals.udp, sendFn)
+//     emitter.emit("connect", id, protocols.udp, sendFn)
 // })
 // udp.emitter.on("disconnect", (client) => {
 //     emitter.emit("disconnect", client.id)
@@ -92,7 +92,7 @@ let ipcNames = []
 ipc.programs.sub(data => {
     const names = Object.keys(data)
 
-    // Loop throup new names
+    // Loop through new names
     names.forEach(name => {
         const id = "ipc-" + name
         const program = data[name]
@@ -111,14 +111,14 @@ ipc.programs.sub(data => {
         if (program.running && !ipcNames.some(n => n === name)) {
             ipcNames.push(name)
             sendFunctions[id] = (path, body) => ipc.program.send(name, JSON.stringify({path: path, body: body}))
-            emitter.emit("connect", id, protocals.ipc)
+            emitter.emit("connect", id, protocols.ipc)
             ipc.data.sub(name, dataCallback)
         }
         
         // Kill
         else if (!program.running && ipcNames.some(n => n === name)) {
             ipcNames = ipcNames.filter(n => n !== name)
-            emitter.emit("connect", id, protocals.ipc)
+            emitter.emit("connect", id, protocols.ipc)
             ipc.data.unsub(name, dataCallback)
         }
     })
@@ -135,17 +135,17 @@ ipc.programs.sub(data => {
 
 })
 
-// Recieve from any protocal
-emitter.on("connect", async (id, protocal) => {
+// Receive from any protocol
+emitter.on("connect", async (id, protocol) => {
     const client = {
         id: id,
         auth: false,
         user: {},
         subs: [],
         token: undefined,
-        protocal: protocal,
+        protocol: protocol,
     }
-    if (protocal === protocals.ipc) {
+    if (protocol === protocols.ipc) {
         client.auth = true
         client.user = { "username": "ipc", "groups": ["admin"] }
     }
@@ -166,7 +166,7 @@ emitter.on("disconnect", async (id) => {
 })
 emitter.on("receive-raw", (client, data) => {
     client.send = (path, body) => {
-        log.debug(`send (${client.protocal}) -> ${path}`, body)
+        log.debug(`send (${client.protocol}) -> ${path}`, body)
         sendFunctions[client.id](path, body)
     }
     client.sub = (template) => subscribe(client.id, template)
@@ -180,7 +180,7 @@ emitter.on("receive-raw", (client, data) => {
 
         // Is API
         if (json.path) {
-            log.debug(`receive (${client.protocal}) -> ${json.path}`, json.body)
+            log.debug(`receive (${client.protocol}) -> ${json.path}`, json.body)
             emitter.emit("receive-api", client, json.path, json.body)
         }
     }
