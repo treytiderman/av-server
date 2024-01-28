@@ -194,7 +194,7 @@ function subKey(filename, key, callback) {
     if (!dbs[filename]) return `error database '${filename}' doesn't exist`
     if (!dbs[filename].keyCallbacks[key]) { dbs[filename].keyCallbacks[key] = [] }
     dbs[filename].keyCallbacks[key].push(callback)
-    callback(dbs[filename].data[key])
+    // callback(dbs[filename].data[key])
     return "ok"
 }
 
