@@ -29,6 +29,7 @@
 - [x] system-v1.js
 - [x] user-v1.js
     - logging seperate
+    - crash on create {"groups": "[\"admin\", \"user\"]"} string not array
 - [ ] scheduler-v1.js
     - start
     - routes
