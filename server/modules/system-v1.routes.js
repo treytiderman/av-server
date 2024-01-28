@@ -11,14 +11,14 @@ export { routes }
 const routes = [
 
     // Time
-    { path: "v1/system/time/get/:name/" },
-    { path: "v1/system/time/sub/:name/" },
-    { path: "v1/system/time/unsub/:name/" },
+    { path: "v1/system/time/get/" },
+    { path: "v1/system/time/sub/" },
+    { path: "v1/system/time/unsub/" },
 
     // Uptime
-    { path: "v1/system/uptime/get/:name/" },
-    { path: "v1/system/uptime/sub/:name/" },
-    { path: "v1/system/uptime/unsub/:name/" },
+    { path: "v1/system/uptime/get/" },
+    { path: "v1/system/uptime/sub/" },
+    { path: "v1/system/uptime/unsub/" },
 
     // Info
     { path: "v1/system/info/get/" },
