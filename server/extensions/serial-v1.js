@@ -116,8 +116,8 @@ const port = {
         if (db.status.getKey(path)?.isOpen === true) return `error port '${path}' already open`
 
         // Unescape the delimiter if needed
-        delimiter = delimiter.replace(/\\r/g, CR.ascii)
-        delimiter = delimiter.replace(/\\n/g, LF.ascii)
+        delimiter = delimiter.replace(/\\r/g, CARRIAGE_RETURN.ascii)
+        delimiter = delimiter.replace(/\\n/g, LINE_FEED.ascii)
 
         // Force encoding
         if (encoding !== "ascii" && encoding !== "hex") encoding = "ascii"
@@ -126,14 +126,14 @@ const port = {
 
         // New serial port
         try {
-            coms[path] = new SerialPort({ path: path, baudrate: Number(baudrate) })
+            coms[path] = new SerialPort({ path: path, baudRate: Number(baudrate) })
         } catch (error) {
             return `error port '${path}' failed to start ${error.message}`
         }
         db.history.setKey(path, [])
         db.status.setKey(path, {
-            isOpen: false,
             path: path,
+            isOpen: false,
             baudrate: baudrate,
             encoding: encoding,
             delimiter: delimiter,
@@ -148,26 +148,33 @@ const port = {
         }
         async function onClose(path) {
             const status = db.status.getKey(path)
-            status.isOpen = false
-            db.status.setKey(path, status)
-            await db.status.write()
+            if (status?.isOpen !== false) {
+                status.isOpen = false
+                db.status.setKey(path, status)
+                await db.status.write()
+            }
+            return "ok"
         }
         async function onError(path, error) {
             console.log("serial-v1:", error.message);
         }
-        async function onData(path, buffer) {
-            const status = db.status.getKey(path)
+        async function onData(path, data, encoding) {
             const dataObj = {
                 wasReceived: true,
-                timestampISO: new Date(Date.now()).toISOString(),
-                encoding: status.encoding,
-                data: buffer.toString(status.encoding) + status.delimiter,
+                timestamp: new Date(Date.now()).toISOString(),
+                encoding: encoding,
+                data: data,
             }
 
             const history = db.history.getKey(path)
             history.push(dataObj)
-            if (history.length > MAX_HISTORY_LENGTH) history.shift()
+            if (history.length > db.settings.getKey("MAX_HISTORY_LENGTH")) history.shift()
             db.history.setKey(path, history)
+            return "ok"
+        }
+        async function onBuffer(path, buffer) {
+            const status = db.status.getKey(path)
+            log.call(onData, "port.onData")(path, buffer.toString(status.encoding), status.encoding)
         }
 
         // Events
@@ -175,10 +182,10 @@ const port = {
         coms[path].on('close', () => log.call(onClose, "port.onClose")(path))
         coms[path].on('error', (error) => log.call(onError, "port.onError")(path, error))
         if (delimiter === "none" || delimiter === "") { // Raw received data
-            coms[path].on('data', (buffer) => log.call(onData, "port.onData")(path, buffer))
+            coms[path].on('data', (buffer) => onBuffer(path, buffer))
         } else { // Gather by delimiter
             coms[path].parser = coms[path].pipe(new DelimiterParser({ delimiter: delimiter }))
-            coms[path].parser.on('data', (buffer) => log.call(onData, "port.onData")(path, buffer))
+            coms[path].parser.on('data', (buffer) => onBuffer(path, buffer))
         }
 
         await db.status.write()
@@ -210,7 +217,9 @@ const port = {
         if (!status || !status.isOpen) return `error p '${path}' is NOT open`
 
         // Prepare data
-        data += status.delimiter
+        if (status.delimiter !== "none" && status.delimiter !== "") {
+            data += status.delimiter
+        }
         if (encoding === "hex") {
             data = removeAllSeperatorsFromHex(data)
         } else {
@@ -258,7 +267,7 @@ const port = {
 
         // Remove
         try {
-            port.kill(path)
+            port.close(path)
             await db.status.removeKey(path)
             await db.history.removeKey(path)
         } catch (err) {
@@ -282,18 +291,20 @@ const ports = {
     },
     remove: async () => {
         db.status.keys().forEach(path => port.remove(path))
+        log.warn(db.status.keys(), db.status.keys());
         return 'ok'
     },
 }
 const data = {
-    get: (path) => db.history.getKey(path),
-    sub: (path, callback) => db.history.subKey(path, data => {
-        data = data.splice(-1)[0]
-        if (data) callback(data)
+    get: (path) => {
+        const history = db.history.getKey(path)
+        return history[history.length-1]
+    },
+    sub: (path, callback) => db.history.subKey(path, history => {
+        callback(history[history.length-1])
     }),
-    unsub: (path, callback) => db.history.unsubKey(path, data => {
-        data = data.splice(-1)[0]
-        if (data) callback(data)
+    unsub: (path, callback) => db.history.unsubKey(path, history => {
+        callback(history[history.length-1])
     }),
 }
 const history = {
@@ -303,7 +314,7 @@ const history = {
 }
 const logger = {
     port: {
-        open: (path, baudrate = 9600, encoding = "ascii", delimiter = "none") => log.call(port.create, "port.create")(path, baudrate, encoding, delimiter),
+        open: (path, baudrate = 9600, encoding = "ascii", delimiter = "none") => log.call(port.open, "port.open")(path, baudrate, encoding, delimiter),
         set: (path, key, value) => log.call(port.set, "port.set")(path, key, value),
         setBaudrate: (path, baudrate) => log.call(port.setBaudrate, "port.setBaudrate")(path, baudrate),
         setEncoding: (path, encoding) => log.call(port.setEncoding, "port.setEncoding")(path, encoding),
