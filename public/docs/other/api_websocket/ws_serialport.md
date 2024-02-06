@@ -126,7 +126,7 @@ Receive
   "event": "send",
   "body": {
     "wasReceived": false,
-    "timestampISO": "2022-12-26T20:36:00.898Z",
+    "timestamp": "2022-12-26T20:36:00.898Z",
     "hex": "6d632030312030320d",
     "ascii": "mc 01 02\r",
     "buffer": {
@@ -220,7 +220,7 @@ Receive
     "history": [
       {
         "wasReceived": false,
-        "timestampISO": "2022-12-26T20:40:37.654Z",
+        "timestamp": "2022-12-26T20:40:37.654Z",
         "hex": "6d632030312030320d",
         "ascii": "mc 01 02\r",
         "buffer": {
@@ -233,7 +233,7 @@ Receive
     "historyRaw": [
       {
         "wasReceived": false,
-        "timestampISO": "2022-12-26T20:40:37.654Z",
+        "timestamp": "2022-12-26T20:40:37.654Z",
         "hex": "6d632030312030320d",
         "ascii": "mc 01 02\r",
         "buffer": {
@@ -274,7 +274,7 @@ Receive
       "history": [
         {
           "wasReceived": false,
-          "timestampISO": "2022-12-26T20:45:25.586Z",
+          "timestamp": "2022-12-26T20:45:25.586Z",
           "hex": "6d632030312030320d",
           "ascii": "mc 01 02\r",
           "buffer": {
@@ -287,7 +287,7 @@ Receive
       "historyRaw": [
         {
           "wasReceived": false,
-          "timestampISO": "2022-12-26T20:45:25.586Z",
+          "timestamp": "2022-12-26T20:45:25.586Z",
           "hex": "6d632030312030320d",
           "ascii": "mc 01 02\r",
           "buffer": {
@@ -343,7 +343,7 @@ Receive
   "event": "send",
   "body": {
     "wasReceived": false,
-    "timestampISO": "2022-12-26T20:40:37.654Z",
+    "timestamp": "2022-12-26T20:40:37.654Z",
     "hex": "6d632030312030320d",
     "ascii": "mc 01 02\r",
     "buffer": {

@@ -57,7 +57,7 @@ ws.receive.json(`tcp_client_v1/${ip}:${port}`, "send", body => {
 			"hex": "4d563f0d",
 			"ascii": "MV?\r",
 			"wasReceived": false,
-			"timestampISO": "2022-12-26T17:14:11.935Z",
+			"timestamp": "2022-12-26T17:14:11.935Z",
 		}
 	}
 })
@@ -71,7 +71,7 @@ ws.receive.json(`tcp_client_v1/${ip}:${port}`, "receive", body => {
 		"hex": "4d5632340d",
 		"ascii": "MV24\r",
 		"wasReceived": true,
-		"timestampISO": "2022-12-26T17:14:11.964Z",
+		"timestamp": "2022-12-26T17:14:11.964Z",
 	}
 })
 ```
@@ -145,19 +145,19 @@ ws.receive.json(`tcp_client_v1/${ip}:${port}`, "history", body => {
 					"hex": "4d563f0d",
 					"ascii": "MV?\r",
 					"wasReceived": false,
-					"timestampISO": "2022-12-26T17:19:03.664Z",
+					"timestamp": "2022-12-26T17:19:03.664Z",
 				},
 				{
 					"hex": "4d5632340d",
 					"ascii": "MV24\r",
 					"wasReceived": true,
-					"timestampISO": "2022-12-26T17:19:03.699Z",
+					"timestamp": "2022-12-26T17:19:03.699Z",
 				},
 				{
 					"hex": "4d564d41582039380d",
 					"ascii": "MVMAX 98\r",
 					"wasReceived": true,
-					"timestampISO": "2022-12-26T17:19:03.743Z",
+					"timestamp": "2022-12-26T17:19:03.743Z",
 				}
 			]
 		}
@@ -233,19 +233,19 @@ ws.receive.json(`tcp_client_v1`, "history", body => {
 						"hex": "4d563f0d",
 						"ascii": "MV?\r",
 						"wasReceived": false,
-						"timestampISO": "2022-12-26T17:19:03.664Z",
+						"timestamp": "2022-12-26T17:19:03.664Z",
 					},
 					{
 						"hex": "4d5632340d",
 						"ascii": "MV24\r",
 						"wasReceived": true,
-						"timestampISO": "2022-12-26T17:19:03.699Z",
+						"timestamp": "2022-12-26T17:19:03.699Z",
 					},
 					{
 						"hex": "4d564d41582039380d",
 						"ascii": "MVMAX 98\r",
 						"wasReceived": true,
-						"timestampISO": "2022-12-26T17:19:03.743Z",
+						"timestamp": "2022-12-26T17:19:03.743Z",
 					},
 				]
 			},

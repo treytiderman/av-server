@@ -128,7 +128,7 @@
 	"event": "data",
 	"body": {
 		"from": "stdout",
-		"timestampISO": "2023-06-04T17:21:55.480Z",
+		"timestamp": "2023-06-04T17:21:55.480Z",
 		"ascii": "Hello from Nodejs\n"
     }
 }
@@ -166,7 +166,7 @@
 	"event": "data",
 	"body": {
 		"from": "stdout",
-		"timestampISO": "2023-06-04T17:21:55.480Z",
+		"timestamp": "2023-06-04T17:21:55.480Z",
 		"ascii": "Hello from Nodejs\n"
     }
 }
@@ -193,17 +193,17 @@
 	"body": [
 		{
 			"from": "stdout",
-			"timestampISO": "2023-06-04T17:21:55.480Z",
+			"timestamp": "2023-06-04T17:21:55.480Z",
 			"ascii": "Hello from Nodejs\n"
 	    },
 		{
 			"from": "stdout",
-			"timestampISO": "2023-06-04T17:23:12.400Z",
+			"timestamp": "2023-06-04T17:23:12.400Z",
 			"ascii": "Thing is complete\n"
 	    },
 		{
 			"from": "stderr",
-			"timestampISO": "2023-06-05T17:23:12.400Z",
+			"timestamp": "2023-06-05T17:23:12.400Z",
 			"ascii": "Oh no\n"
 	    }
     ]

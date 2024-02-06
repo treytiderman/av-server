@@ -91,7 +91,7 @@ Receive event updates
   "event": "send",
   "body": {
     "wasReceived": false,
-    "timestampISO": "2022-12-26T17:14:11.935Z",
+    "timestamp": "2022-12-26T17:14:11.935Z",
     "hex": "4d563f0d",
     "ascii": "MV?\r",
     "buffer": {
@@ -109,7 +109,7 @@ Receive event updates
   "event": "receive",
   "body": {
     "wasReceived": true,
-    "timestampISO": "2022-12-26T17:14:11.964Z",
+    "timestamp": "2022-12-26T17:14:11.964Z",
     "hex": "4d5632340d",
     "ascii": "MV24\r",
     "buffer": {
@@ -129,7 +129,7 @@ Errors
   "event": "send",
   "body": {
     "wasReceived": false,
-    "timestampISO": "2022-12-26T17:36:49.187Z",
+    "timestamp": "2022-12-26T17:36:49.187Z",
     "hex": "4d563f0d",
     "ascii": "MV?\r",
     "buffer": {
@@ -236,7 +236,7 @@ Receive the whole client obj
     "history": [
       {
         "wasReceived": false,
-        "timestampISO": "2022-12-26T17:19:03.664Z",
+        "timestamp": "2022-12-26T17:19:03.664Z",
         "hex": "4d563f0d",
         "ascii": "MV?\r",
         "buffer": {
@@ -248,7 +248,7 @@ Receive the whole client obj
       },
       {
         "wasReceived": true,
-        "timestampISO": "2022-12-26T17:19:03.699Z",
+        "timestamp": "2022-12-26T17:19:03.699Z",
         "hex": "4d5632340d",
         "ascii": "MV24\r",
         "buffer": {
@@ -260,7 +260,7 @@ Receive the whole client obj
       },
       {
         "wasReceived": true,
-        "timestampISO": "2022-12-26T17:19:03.743Z",
+        "timestamp": "2022-12-26T17:19:03.743Z",
         "hex": "4d564d41582039380d",
         "ascii": "MVMAX 98\r",
         "buffer": {
@@ -303,7 +303,7 @@ Receive event updates
       "history": [
         {
           "wasReceived": false,
-          "timestampISO": "2022-12-26T17:19:03.664Z",
+          "timestamp": "2022-12-26T17:19:03.664Z",
           "hex": "4d563f0d",
           "ascii": "MV?\r",
           "buffer": {
@@ -315,7 +315,7 @@ Receive event updates
         },
         {
           "wasReceived": true,
-          "timestampISO": "2022-12-26T17:19:03.699Z",
+          "timestamp": "2022-12-26T17:19:03.699Z",
           "hex": "4d5632340d",
           "ascii": "MV24\r",
           "buffer": {
@@ -327,7 +327,7 @@ Receive event updates
         },
         {
           "wasReceived": true,
-          "timestampISO": "2022-12-26T17:19:03.743Z",
+          "timestamp": "2022-12-26T17:19:03.743Z",
           "hex": "4d564d41582039380d",
           "ascii": "MVMAX 98\r",
           "buffer": {
@@ -378,7 +378,7 @@ Receive event updates for every tcp client
   "event": "send",
   "body": {
     "wasReceived": false,
-    "timestampISO": "2022-12-26T17:33:13.394Z",
+    "timestamp": "2022-12-26T17:33:13.394Z",
     "hex": "4d563f0d",
     "ascii": "MV?\r",
     "buffer": {
@@ -397,7 +397,7 @@ Receive event updates for every tcp client
   "event": "receive",
   "body": {
     "wasReceived": true,
-    "timestampISO": "2022-12-26T17:33:13.436Z",
+    "timestamp": "2022-12-26T17:33:13.436Z",
     "hex": "4d5632340d",
     "ascii": "MV24\r",
     "buffer": {
@@ -444,7 +444,7 @@ Errors
   "event": "send",
   "body": {
     "wasReceived": false,
-    "timestampISO": "2022-12-26T17:36:49.187Z",
+    "timestamp": "2022-12-26T17:36:49.187Z",
     "hex": "4d563f0d",
     "ascii": "MV?\r",
     "buffer": {
@@ -463,7 +463,7 @@ Errors
   "event": "send",
   "body": {
     "wasReceived": false,
-    "timestampISO": "2022-12-26T17:45:05.237Z",
+    "timestamp": "2022-12-26T17:45:05.237Z",
     "hex": "4d563f0d",
     "ascii": "MV?\r",
     "buffer": {

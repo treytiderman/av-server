@@ -1,7 +1,7 @@
 // Overview: standard way to create log files
 // Location: ~/av-server/private/logs/filename.log
 // Filename: log_YEAR-MONTH-DAY-STARTUPTIME-SEQ.log
-// Log Line: timestampISO LEVEL [group] message >> obj
+// Log Line: timestamp LEVEL [group] message >> obj
 
 // Imports
 import { appendText, makeDir, getStatsRecursive, deleteFile } from '../modules/file-v0.js'
@@ -112,8 +112,8 @@ class Logger {
 
 // Helper Functions
 function getCurrentPath() {
-    const timestampISO = new Date(Date.now()).toISOString()
-    const date = timestampISO.split('T')[0]
+    const timestamp = new Date(Date.now()).toISOString()
+    const date = timestamp.split('T')[0]
     const sequence = Math.floor(count / NUMBER_OF_LINES_MAX)
     return PATH_TO_LOG_FOLDER + "log_" + date + "_" + startup + `_${sequence}.log`
 }
@@ -122,8 +122,8 @@ function createLogLine(level, group, message, obj) {
     if (json.length > OBJ_JSON_LENGTH_MAX) {
         json = `VALUE NOT SHOWN object length greater than ${OBJ_JSON_LENGTH_MAX} characters`
     }
-    const timestampISO = new Date(Date.now()).toISOString()
-    const line = `${timestampISO} ${SPACER} ${level} ${SPACER} [${group}] ${message} ${SPACER} ${json}`
+    const timestamp = new Date(Date.now()).toISOString()
+    const line = `${timestamp} ${SPACER} ${level} ${SPACER} [${group}] ${message} ${SPACER} ${json}`
     return line
 }
 async function deleteOldLogs() {

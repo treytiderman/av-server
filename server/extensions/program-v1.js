@@ -160,7 +160,7 @@ const program = {
         function onData(name, from, data) {
             const dataObj = {
                 from: from,
-                timestampISO: new Date(Date.now()).toISOString(),
+                timestamp: new Date(Date.now()).toISOString(),
                 data: data,
             }
 
@@ -199,7 +199,7 @@ const program = {
         // History
         const dataObj = {
             from: "stdin",
-            timestampISO: new Date(Date.now()).toISOString(),
+            timestamp: new Date(Date.now()).toISOString(),
             data: data,
         }
         const history = db.history.getKey(name)

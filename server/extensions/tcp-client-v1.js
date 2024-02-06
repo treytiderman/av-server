@@ -95,7 +95,7 @@ const client = {
         async function onData(address, data, encoding) {
             const dataObj = {
                 wasReceived: true,
-                timestampISO: new Date(Date.now()).toISOString(),
+                timestamp: new Date(Date.now()).toISOString(),
                 encoding: encoding,
                 data: data,
             }
@@ -169,7 +169,7 @@ const client = {
         // History
         const dataObj = {
             wasReceived: false,
-            timestampISO: new Date(Date.now()).toISOString(),
+            timestamp: new Date(Date.now()).toISOString(),
             encoding: encoding,
             data: data,
         }
