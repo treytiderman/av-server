@@ -1,4 +1,4 @@
-import{m as p}from"./editor.main.f3f1a062.js";import"./editorWorker.81c91396.js";import"./index.8f406b28.js";/*!-----------------------------------------------------------------------------
+import{m as p}from"./editor.main.0e1bbb0b.js";import"./editorWorker.81c91396.js";import"./index.6b2d69a6.js";/*!-----------------------------------------------------------------------------
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Version: 0.38.0(0e330ae453813de4e6cf272460fb79c7117073d0)
  * Released under the MIT license
