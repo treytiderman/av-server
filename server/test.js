@@ -25,7 +25,7 @@ async function test(name, func) {
         log.info("test.js", `results of "${name}" tests: "pass"`)
     } else {
         log.error("test.js", `results of "${name}" tests: "fail"`)
-        if (results !== true) console.log(name, '\x1b[31mTESTS FAILED\x1b[0m')
+        // if (results !== true) console.log(name, '\x1b[31mTESTS FAILED\x1b[0m')
     }
     return results
 }
