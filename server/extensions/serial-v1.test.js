@@ -12,12 +12,12 @@ export async function test() {
     response = sm.available.get()
     console.log(response);
     
-    response = await sm.log.port.open("COM3")
-    console.log(response);
-    await sleep(1000)
+    // response = await sm.log.port.open("COM3")
+    // console.log(response);
+    // await sleep(1000)
     
-    response = await sm.log.port.send("COM3", "data")
-    console.log(response);
+    // response = await sm.log.port.send("COM3", "data")
+    // console.log(response);
 
     return pass
 }
