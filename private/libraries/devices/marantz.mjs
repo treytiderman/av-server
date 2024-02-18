@@ -1,3 +1,5 @@
+// Device: Marantz NR1506
+
 // Imports
 import { api } from "../../libraries/nodejs/api.mjs"
 
@@ -12,6 +14,7 @@ export {
 }
 
 // Constants
+const POLL_INTERVAL = 5_000
 const ENCODING = "ascii"
 const EOL = "\r"
 const CMD = {
@@ -51,6 +54,26 @@ function connect(address, callback) {
         })
     }, 10);
 }
+
+function powerOn(address) {
+    api.tcpClient.v0.send(address, CMD.powerOn + EOL, ENCODING)
+}
+function powerOff(address) {
+    api.tcpClient.v0.send(address, CMD.powerOff + EOL, ENCODING)
+}
+function powerStatus(address, callback) {
+    api.tcpClient.v0.subData(address, res => {
+        if (res.wasReceived && res.data.startsWith("PW")) {
+            let power = Number(res.data.trim().replace("PW", ""))
+            if (!power) return
+            callback(power)
+        }
+    })
+    setInterval(() => {
+        api.tcpClient.v0.send(address, CMD.powerStatus + EOL, ENCODING)
+    }, POLL_INTERVAL);
+}
+
 function volumeUp(address) {
     api.tcpClient.v0.send(address, CMD.volumeUp + EOL, ENCODING)
 }
@@ -69,7 +92,26 @@ function volumePoll(address, callback) {
             callback(volume)
         }
     })
+    setInterval(() => {
+        api.tcpClient.v0.send(address, CMD.volumeStatus + EOL, ENCODING)
+    }, POLL_INTERVAL);
+}
+
+function muteOn(address) {
+    api.tcpClient.v0.send(address, CMD.muteOn + EOL, ENCODING)
+}
+function muteOff(address) {
+    api.tcpClient.v0.send(address, CMD.muteOff + EOL, ENCODING)
+}
+function mutePoll(address, callback) {
+    api.tcpClient.v0.subData(address, res => {
+        if (res.wasReceived && res.data.startsWith("MU")) {
+            let mute = Number(res.data.trim().replace("MU", ""))
+            if (!mute) return
+            callback(mute)
+        }
+    })
     // setInterval(() => {
-    //     api.tcpClient.v0.send(address, CMD.volumeStatus + EOL, ENCODING)
-    // }, 4000);
+    //     api.tcpClient.v0.send(address, CMD.muteStatus + EOL, ENCODING)
+    // }, POLL_INTERVAL);
 }
